@@ -1,6 +1,6 @@
 import { PartialType, PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/users/schema/user.schema';
 
 enum Permission {
   SUPER_ADMIN = 'Super admin',
@@ -39,7 +39,10 @@ export class ResetPasswordDto {
 
 export class AuthResponse {
   token: string;
-  permissions: string[];
+  user: User;
+}
+export class GetUsersResponse {
+  users: User[];
 }
 export class CoreResponse extends CoreMutationOutput {}
 export class VerifyOtpDto {

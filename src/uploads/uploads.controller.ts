@@ -3,26 +3,64 @@ import {
   Post,
   UseInterceptors,
   UploadedFiles,
+  UploadedFile,
+  Get,
+  Param,
+  Res,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import multer, { diskStorage } from 'multer';
 import { UploadsService } from './uploads.service';
+import { editFileName, imageFileFilter } from './uploads.utils';
 
 @Controller('attachments')
 export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
-  @Post()
-  @UseInterceptors(FilesInterceptor('attachment[]'))
-  uploadFile(@UploadedFiles() attachment: Array<Express.Multer.File>) {
-    console.log(attachment);
-    return [
-      {
-        id: '883',
-        original:
-          'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/881/aatik-tasneem-7omHUGhhmZ0-unsplash%402x.png',
-        thumbnail:
-          'https://pickbazarlaravel.s3.ap-southeast-1.amazonaws.com/881/conversions/aatik-tasneem-7omHUGhhmZ0-unsplash%402x-thumbnail.jpg',
-      },
-    ];
+  @Post('image')
+  @UseInterceptors(
+    FileInterceptor('attachment', {
+      storage: diskStorage({
+        destination: './uploads/images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadedFile(@UploadedFile() file) {
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+    };
+    return response;
+  }
+
+  @Post('images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadMultipleFiles(
+    @UploadedFiles() attachment: Express.Multer.File[],
+  ) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = {
+        originalname: file.originalname,
+        filename: file.filename,
+      };
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Get('images/:imgpath')
+  seeUploadedFile(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images' });
   }
 }

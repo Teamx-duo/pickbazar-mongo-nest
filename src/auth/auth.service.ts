@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   AuthResponse,
   ChangePasswordDto,
@@ -13,38 +14,37 @@ import {
   OtpResponse,
   VerifyOtpDto,
   OtpDto,
+  GetUsersResponse,
 } from './dto/create-auth.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { plainToClass } from 'class-transformer';
-import { User } from 'src/users/entities/user.entity';
+import { User, UserSchema } from 'src/users/schema/user.schema';
+import { Model } from 'mongoose';
 import usersJson from 'src/users/users.json';
+import { InjectModel } from '@nestjs/mongoose';
 const users = plainToClass(User, usersJson);
 
 @Injectable()
 export class AuthService {
-  private users: User[] = users;
+  constructor(@InjectModel(User.name) private userModel: Model<UserSchema>) {}
+
   async register(createUserInput: RegisterDto): Promise<AuthResponse> {
-    const user: User = {
-      id: uuidv4(),
-      ...users[0],
+    const user = {
       ...createUserInput,
-      created_at: new Date(),
-      updated_at: new Date(),
     };
 
-    this.users.push(user);
-    return {
-      token: 'jwt token',
-      permissions: ['super_admin', 'customer'],
-    };
+    const userData = new this.userModel(user);
+    const savedUser = await userData.save();
+
+    return { token: 'auth token', user: savedUser };
   }
+
   async login(loginInput: LoginDto): Promise<AuthResponse> {
     console.log(loginInput);
     return {
       token: 'jwt token',
-      permissions: ['super_admin', 'customer'],
+      user: users[0],
     };
   }
+
   async changePassword(
     changePasswordInput: ChangePasswordDto,
   ): Promise<CoreResponse> {
@@ -55,6 +55,7 @@ export class AuthService {
       message: 'Password change successful',
     };
   }
+
   async forgetPassword(
     forgetPasswordInput: ForgetPasswordDto,
   ): Promise<CoreResponse> {
@@ -65,6 +66,7 @@ export class AuthService {
       message: 'Password change successful',
     };
   }
+
   async verifyForgetPasswordToken(
     verifyForgetPasswordTokenInput: VerifyForgetPasswordDto,
   ): Promise<CoreResponse> {
@@ -75,6 +77,7 @@ export class AuthService {
       message: 'Password change successful',
     };
   }
+
   async resetPassword(
     resetPasswordInput: ResetPasswordDto,
   ): Promise<CoreResponse> {
@@ -85,20 +88,22 @@ export class AuthService {
       message: 'Password change successful',
     };
   }
-  async socialLogin(socialLoginDto: SocialLoginDto): Promise<AuthResponse> {
+
+  async socialLogin(socialLoginDto: SocialLoginDto): Promise<GetUsersResponse> {
     console.log(socialLoginDto);
     return {
-      token: 'jwt token',
-      permissions: ['super_admin', 'customer'],
+      users: users,
     };
   }
+
   async otpLogin(otpLoginDto: OtpLoginDto): Promise<AuthResponse> {
     console.log(otpLoginDto);
     return {
       token: 'jwt token',
-      permissions: ['super_admin', 'customer'],
+      user: users[0],
     };
   }
+
   async verifyOtpCode(verifyOtpInput: VerifyOtpDto): Promise<CoreResponse> {
     console.log(verifyOtpInput);
     return {
@@ -106,6 +111,7 @@ export class AuthService {
       success: true,
     };
   }
+
   async sendOtpCode(otpInput: OtpDto): Promise<OtpResponse> {
     console.log(otpInput);
     return {
@@ -135,7 +141,7 @@ export class AuthService {
   //   return this.users.find((user) => user.id === getUserArgs.id);
   // }
   me(): User {
-    return this.users[0];
+    return users[0];
   }
 
   // updateUser(id: number, updateUserInput: UpdateUserInput) {
