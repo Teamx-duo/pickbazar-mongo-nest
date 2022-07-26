@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUsersDto, UserPaginator } from './dto/get-users.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import Fuse from 'fuse.js';
 
-import { User } from './entities/user.entity';
+import { User, UserSchema } from './schema/user.schema';
+import { Profile, ProfileSchema } from './schema/profile.schema';
 import usersJson from './users.json';
 import { paginate } from 'src/common/pagination/paginate';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 const users = plainToClass(User, usersJson);
 
 const options = {
@@ -17,10 +21,36 @@ const options = {
 const fuse = new Fuse(users, options);
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserSchema>,
+    @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
+  ) {}
   private users: User[] = users;
 
-  create(createUserDto: CreateUserDto) {
-    return this.users[0];
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = {
+      ...createUserDto,
+    };
+    const userRegistered = await this.userModel.findOne({
+      email: user.email,
+    });
+    if (!userRegistered) {
+      const userData = new this.userModel(user);
+      const password = await bcrypt.hash(user.password, 10);
+      userData.password = password;
+      const savedUser = await userData.save();
+      const profile = await this.profileModel.create({
+        customer: savedUser._id,
+      });
+      savedUser.profile = profile._id;
+      await savedUser.save();
+      return user;
+    } else {
+      throw new HttpException(
+        'REGISTRATION.USER_ALREADY_REGISTERED',
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 
   async getUsers({ text, limit, page }: GetUsersDto): Promise<UserPaginator> {
@@ -40,15 +70,15 @@ export class UsersService {
       ...paginate(data.length, page, limit, results.length, url),
     };
   }
-  findOne(id: number) {
-    return this.users.find((user) => user.id === id);
+  async findOne(id: string) {
+    return await this.userModel.findOne({ _id: id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.users[0];
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    return await this.userModel.findByIdAndUpdate(id, { $set: updateUserDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    return await this.userModel.findByIdAndRemove(id, { new: true });
   }
 }

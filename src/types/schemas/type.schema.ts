@@ -2,21 +2,22 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { TypeSetting } from './typeSetting.schema';
 import { Banner } from './banner.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type TypeSchema = Type & Document;
 
 @Schema()
 export class Type {
-  @Prop()
+  @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop()
+  @Prop({ required: true })
   image: string;
 
-  @Prop()
+  @Prop({ required: true })
   icon: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Banner' }] })
@@ -30,3 +31,5 @@ export class Type {
 }
 
 export const TypeSchema = SchemaFactory.createForClass(Type);
+
+TypeSchema.plugin(mongoosePaginate);

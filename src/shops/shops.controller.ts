@@ -61,10 +61,10 @@ export class StaffsController {
     return this.shopsService.create(createShopDto);
   }
 
-  @Get()
-  async getStaffs(@Query() query: GetStaffsDto): Promise<UserPaginator> {
-    return this.shopsService.getStaffs(query);
-  }
+  // @Get()
+  // async getStaffs(@Query() query: GetStaffsDto): Promise<UserPaginator> {
+  //   return this.shopsService.getStaffs(query);
+  // }
 
   @Get(':slug')
   async getShop(@Param('slug') slug: string) {

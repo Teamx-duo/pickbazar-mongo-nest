@@ -1,52 +1,63 @@
+import { TypeSchema, Type } from './schemas/type.schema';
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateTypeDto } from './dto/create-type.dto';
 import { UpdateTypeDto } from './dto/update-type.dto';
-import { Type } from './entities/type.entity';
 
 import typesJson from './types.json';
-import Fuse from 'fuse.js';
 import { GetTypesDto } from './dto/get-types.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
+import { convertToSlug } from 'src/common/constants/common.function';
 
 const types = plainToClass(Type, typesJson);
 const options = {
   keys: ['name'],
   threshold: 0.3,
 };
-const fuse = new Fuse(types, options);
 @Injectable()
 export class TypesService {
+  constructor(
+    @InjectModel(Type.name)
+    private typeModel: PaginateModel<TypeSchema>,
+  ) {}
   private types: Type[] = types;
 
-  getTypes({ text }: GetTypesDto) {
-    let data: Type[] = this.types;
-    if (text?.replace(/%/g, '')) {
-      data = fuse.search(text)?.map(({ item }) => item);
-    }
-    return data;
+  async getTypes({ text, page, limit }: GetTypesDto) {
+    const data = await this.typeModel.paginate(
+      {
+        ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+      },
+      { page, limit },
+    );
+    return PaginationResponse(data);
   }
 
-  getTypeBySlug(slug: string): Type {
-    return this.types.find((p) => p.slug === slug);
+  async getTypeBySlug(slug: string): Promise<Type> {
+    return await this.typeModel.findOne({ slug });
   }
 
-  create(createTypeDto: CreateTypeDto) {
-    return this.types[0];
+  async create(createTypeDto: CreateTypeDto) {
+    return await this.typeModel.create({
+      ...createTypeDto,
+      slug: convertToSlug(createTypeDto.name),
+    });
   }
 
-  findAll() {
-    return `This action returns all types`;
+  async findAll() {
+    return await this.typeModel.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} type`;
+  async findOne(id: string) {
+    return await this.typeModel.findById(id);
   }
 
-  update(id: number, updateTypeDto: UpdateTypeDto) {
-    return this.types[0];
+  async update(id: string, updateTypeDto: UpdateTypeDto) {
+    return await this.typeModel.findByIdAndUpdate(id, { $set: updateTypeDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} type`;
+  async remove(id: string) {
+    return await this.typeModel.findByIdAndRemove(id, { new: true });
   }
 }

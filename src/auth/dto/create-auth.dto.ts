@@ -1,6 +1,7 @@
-import { PartialType, PickType } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
+import { IsString, IsEnum } from 'class-validator';
 
 enum Permission {
   SUPER_ADMIN = 'Super admin',
@@ -9,12 +10,25 @@ enum Permission {
   CUSTOMER = 'Customer',
 }
 export class RegisterDto extends PickType(User, ['name', 'email', 'password']) {
+  @IsString()
+  name: string;
+  @IsString()
+  email: string;
+
+  @IsString()
+  password: string;
+
+  @IsEnum(Permission)
   permission: Permission = Permission.CUSTOMER;
 }
 
-export class LoginDto extends PartialType(
-  PickType(User, ['email', 'password']),
-) {}
+export class LoginDto extends PickType(User, ['email', 'password']) {
+  @IsString()
+  email: string;
+
+  @IsString()
+  password: string;
+}
 
 export class SocialLoginDto {
   provider: string;

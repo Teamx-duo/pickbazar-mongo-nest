@@ -8,7 +8,7 @@ export class Attachment {
   @Prop()
   thumbnail: string;
 
-  @Prop()
+  @Prop({ required: true })
   original: string;
 }
 

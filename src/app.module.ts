@@ -19,10 +19,32 @@ import { AddressesModule } from './addresses/addresses.module';
 import { ImportsModule } from './imports/imports.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
+import config from './config';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/guards/roles.guards';
+
+const userString =
+  config.db.user && config.db.pass
+    ? config.db.user + ':' + config.db.pass + '@'
+    : '';
+const authSource = config.db.authSource
+  ? '?authSource=' + config.db.authSource + '&w=1'
+  : '';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/nest'),
+    MongooseModule.forRoot(
+      'mongodb://' +
+        userString +
+        config.db.host +
+        ':' +
+        (config.db.port || '27017') +
+        '/' +
+        config.db.database +
+        authSource,
+    ),
+    ConfigModule.forRoot(),
     UsersModule,
     CommonModule,
     ProductsModule,
@@ -44,6 +66,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{ provide: APP_GUARD, useClass: RolesGuard }],
 })
 export class AppModule {}

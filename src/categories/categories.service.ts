@@ -3,70 +3,75 @@ import { plainToClass } from 'class-transformer';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './entities/category.entity';
+import { Category } from './schemas/category.schema';
 import Fuse from 'fuse.js';
 import categoriesJson from './categories.json';
-import { paginate } from 'src/common/pagination/paginate';
+// import { paginate } from 'src/common/pagination/paginate';
 import { GetCategoriesAlongChildrenDto } from './dto/get-categories-along-children.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, PaginateModel } from 'mongoose';
+import { CategorySchema } from './schemas/category.schema';
+import {
+  Attachment,
+  AttachmentSchema,
+} from 'src/common/schemas/attachment.schema';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
+import { convertToSlug } from 'src/common/constants/common.function';
 const categories = plainToClass(Category, categoriesJson);
 const options = {
   keys: ['name', 'type.slug'],
   threshold: 0.3,
 };
-const fuse = new Fuse(categories, options);
 @Injectable()
 export class CategoriesService {
+  constructor(
+    @InjectModel(Category.name)
+    private categoryModel: PaginateModel<CategorySchema>,
+    @InjectModel(Attachment.name)
+    private attachmentModel: Model<AttachmentSchema>,
+  ) {}
   private categories: Category[] = categories;
 
-  create(createCategoryDto: CreateCategoryDto) {
-    return this.categories[0];
+  async create(createCategoryDto: CreateCategoryDto) {
+    const { name, details, type, parent, icon, image } = createCategoryDto;
+    return this.categoryModel.create({
+      slug: convertToSlug(name),
+      name,
+      details,
+      type,
+      parent,
+      icon,
+      image,
+    });
   }
 
-  getCategories({ limit, page, search }: GetCategoriesDto) {
-    if (!page) page = 1;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    let data: Category[] = this.categories;
-    if (search) {
-      const parseSearchParams = search.split(';');
-      for (const searchParam of parseSearchParams) {
-        const [key, value] = searchParam.split(':');
-        // data = data.filter((item) => item[key] === value);
-        data = fuse.search(value)?.map(({ item }) => item);
-      }
-    }
-    // if (text?.replace(/%/g, '')) {
-    //   data = fuse.search(text)?.map(({ item }) => item);
-    // }
-    // if (hasType) {
-    //   data = fuse.search(hasType)?.map(({ item }) => item);
-    // }
+  async getCategories({ limit, page, search }: GetCategoriesDto) {
+    const categories = await this.categoryModel.paginate(
+      { ...(search ? { name: { $regex: search, $options: 'i' } } : {}) },
+      { page, limit, populate: ['parent', 'type'] },
+    );
 
-    const results = data.slice(startIndex, endIndex);
-    const url = `/categories?search=${search}&limit=${limit}`;
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+    return PaginationResponse(categories);
   }
 
-  // getCategoriesAlongChildren(
-  //   values: GetCategoriesAlongChildrenDto,
-  // ): Category[] {
-  //   console.log(values, 'values');
-  //   return this.categories;
-  // }
-
-  getCategory(id: number): Category {
-    return this.categories.find((p) => p.id === id);
+  async getCategory(id: string) {
+    return await this.categoryModel
+      .findById(id)
+      .populate(['image', 'parent', 'children', 'products']);
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return this.categories[0];
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    return await this.categoryModel.findByIdAndUpdate(
+      id,
+      {
+        $set: { updateCategoryDto },
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: string) {
+    return await this.categoryModel.findByIdAndRemove(id, { new: true });
   }
 }
 

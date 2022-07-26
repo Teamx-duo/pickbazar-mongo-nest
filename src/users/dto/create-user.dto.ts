@@ -1,4 +1,5 @@
 import { PickType } from '@nestjs/swagger';
+import { IsEnum, IsString } from 'class-validator';
 import { CreateAddressDto } from 'src/addresses/dto/create-address.dto';
 import { User } from '../entities/user.entity';
 import { CreateProfileDto } from './create-profile.dto';
@@ -14,7 +15,12 @@ export class CreateUserDto extends PickType(User, [
   'email',
   'password',
 ]) {
-  address: CreateAddressDto[];
-  profile: CreateProfileDto;
-  permission: Permission = Permission.CUSTOMER;
+  @IsString()
+  name: string;
+  @IsString()
+  email: string;
+  @IsString()
+  password: string;
+  // @IsEnum(Permission)
+  // permission: Permission = Permission.CUSTOMER;
 }

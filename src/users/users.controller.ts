@@ -30,17 +30,17 @@ export class UsersController {
 
   @Get(':id')
   getUser(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Put(':id')
   updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
   removeUser(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 
   @Post(':id/active')
@@ -68,7 +68,7 @@ export class ProfilesController {
     console.log(updateProfileDto);
   }
   @Delete(':id')
-  deleteProfile(@Param('id') id: number) {
+  deleteProfile(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 }

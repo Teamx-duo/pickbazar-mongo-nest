@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpException,
+  HttpStatus,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
@@ -18,12 +26,31 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  createAccount(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async createAccount(@Body() registerDto: RegisterDto, @Res() res) {
+    try {
+      const response = await this.authService.register(registerDto);
+      res.status(200).json(response);
+    } catch (err) {
+      return res
+        .status(err.status ? err.status : HttpStatus.BAD_REQUEST)
+        .json(
+          new HttpException(
+            err.message ? err.message : 'Something went wrong',
+            err.status ? err.status : HttpStatus.BAD_REQUEST,
+          ),
+        );
+    }
   }
   @Post('token')
-  login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res() res) {
+    try {
+      const response = await this.authService.login(loginDto);
+      res.status(200).json(response);
+    } catch (err) {
+      return res
+        .status(err.status)
+        .json(new HttpException(err.message, err.status));
+    }
   }
   @Post('social-login-token')
   socialLogin(@Body() socialLoginDto: SocialLoginDto) {

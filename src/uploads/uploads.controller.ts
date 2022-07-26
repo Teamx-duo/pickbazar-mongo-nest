@@ -7,8 +7,13 @@ import {
   Get,
   Param,
   Res,
+  Body,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
 import { UploadsService } from './uploads.service';
 import { editFileName, imageFileFilter } from './uploads.utils';
@@ -62,5 +67,25 @@ export class UploadsController {
   @Get('images/:imgpath')
   seeUploadedFile(@Param('imgpath') image: string, @Res() res) {
     return res.sendFile(image, { root: './uploads/images' });
+  }
+
+  @Get('images/category/:imgpath')
+  seeCategoryImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/category' });
+  }
+
+  @Get('images/product/:imgpath')
+  seeProductImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/product' });
+  }
+
+  @Get('images/user/:imgpath')
+  seeUserImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/user' });
+  }
+
+  @Get('images/types/:imgpath')
+  seeTypeImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/types' });
   }
 }

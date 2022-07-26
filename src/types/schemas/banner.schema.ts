@@ -1,20 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+import { Type } from './type.schema';
 
 export type BannerSchema = Banner & Document;
 
 @Schema()
 export class Banner {
-  @Prop()
-  id: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type' })
+  type: Type;
 
-  @Prop()
+  @Prop({ required: true })
   title: string;
 
-  @Prop()
+  @Prop({ required: true })
   description: string;
 
-  @Prop()
+  @Prop({ required: true })
   image: string;
 }
 

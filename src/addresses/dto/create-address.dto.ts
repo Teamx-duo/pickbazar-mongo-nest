@@ -7,5 +7,5 @@ export class CreateAddressDto extends PickType(Address, [
   'default',
   'address',
 ]) {
-  'customer_id': number;
+  'customer_id': string;
 }
