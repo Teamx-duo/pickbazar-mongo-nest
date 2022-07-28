@@ -1,39 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { paginate } from 'src/common/pagination/paginate';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { convertToSlug } from 'src/common/constants/common.function';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { GetTagsDto } from './dto/get-tags.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { Tag } from './entities/tag.entity';
+import { Tag, TagSchema } from './schemas/tag.schema';
 
 @Injectable()
 export class TagsService {
+  constructor(
+    @InjectModel(Tag.name)
+    private tagModel: PaginateModel<TagSchema>,
+  ) {}
   private tags: Tag[] = [];
 
-  create(createTagDto: CreateTagDto) {
-    return {
-      id: this.tags.length + 1,
+  async create(createTagDto: CreateTagDto) {
+    return await this.tagModel.create({
       ...createTagDto,
-    };
+      slug: convertToSlug(createTagDto.name),
+    });
   }
 
-  findAll({ page, limit }: GetTagsDto) {
-    if (!page) page = 1;
-    const url = `/tags?limit=${limit}`;
-    return {
-      data: this.tags,
-      ...paginate(this.tags.length, page, limit, this.tags.length, url),
-    };
+  async findAll({ page, limit }: GetTagsDto) {
+    const response = await this.tagModel.paginate({}, { page, limit });
+    return PaginationResponse(response);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tag`;
+  async findOne(id: string) {
+    return await this.tagModel.findById(id);
   }
 
-  update(id: number, updateTagDto: UpdateTagDto) {
-    return this.tags[0];
+  async update(id: string, updateTagDto: UpdateTagDto) {
+    return await this.tagModel.findByIdAndUpdate(
+      id,
+      { $set: updateTagDto },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tag`;
+  async remove(id: string) {
+    return await this.tagModel.findByIdAndUpdate(id, { new: true });
   }
 }

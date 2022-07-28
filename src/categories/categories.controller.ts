@@ -32,20 +32,22 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './schemas/category.schema';
 import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
 import config from 'src/config';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
 
 @Controller('categories')
-@UseGuards(AuthGuard('jwt'))
+@UseInterceptors(LoggingInterceptor, TransformInterceptor)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.SUPER_ADMIN)
+  @Roles(Role.SUPER_ADMIN)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @UseInterceptors(
     FileFieldsInterceptor(
       [
         { name: 'icon', maxCount: 1 },
-        { name: 'image', maxCount: 10 },
+        { name: 'image', maxCount: 1 },
       ],
       {
         storage: diskStorage({
@@ -105,6 +107,7 @@ export class CategoriesController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'))
   @UseGuards(RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   update(
@@ -115,6 +118,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
   @UseGuards(RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   remove(@Param('id') id: string) {

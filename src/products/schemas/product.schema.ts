@@ -8,37 +8,43 @@ import { Shop } from 'src/shops/schemas/shop.shema';
 import { Tag } from 'src/tags/schemas/tag.schema';
 import { Type } from 'src/types/schemas/type.schema';
 import { Variation } from './variation.schema';
+import { VariationOption } from './variationOption.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type ProductSchema = Product & Document;
 
 @Schema()
 export class Product {
-  @Prop()
+  @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true })
   type: Type;
-
-  @Prop()
-  type_id: number;
 
   @Prop({ enum: ['simple', 'variable'] })
   product_type: string;
 
-  @Prop()
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+    required: true,
+  })
   categories: Category[];
 
-  @Prop()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }] })
   tags: Tag[];
 
-  @Prop()
-  variations: AttributeValue[];
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Variation' }],
+  })
+  variations: Variation[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Variation' }] })
-  variation_options: Variation[];
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VariationOption' }],
+  })
+  variation_options: VariationOption[];
 
   @Prop(
     raw({
@@ -53,43 +59,37 @@ export class Product {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
   orders: Order[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
   shop: Shop;
 
-  @Prop()
-  shop_id: number;
-
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' }] })
-  related_products: Product[];
-
-  @Prop()
+  @Prop({ required: true })
   description: string;
 
-  @Prop()
+  @Prop({ required: true })
   in_stock: boolean;
 
-  @Prop()
+  @Prop({ required: true })
   is_taxable: boolean;
 
-  @Prop()
+  @Prop({ required: true })
   sale_price: number;
 
-  @Prop()
+  @Prop({ required: true })
   max_price: number;
 
-  @Prop()
+  @Prop({ required: true })
   min_price: number;
 
-  @Prop()
+  @Prop({ required: true })
   sku: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' }] })
-  gallery: Attachment[];
+  @Prop({ required: true })
+  gallery: string[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' })
-  image: Attachment;
+  @Prop({ required: true })
+  image: string;
 
-  @Prop({ enum: ['publish', 'draft'] })
+  @Prop({ enum: ['published', 'draft'], default: 'published' })
   status: string;
 
   @Prop()
@@ -101,13 +101,13 @@ export class Product {
   @Prop()
   width: string;
 
-  @Prop()
+  @Prop({ required: true })
   price: number;
 
-  @Prop()
+  @Prop({ required: true })
   quantity: number;
 
-  @Prop()
+  @Prop({ required: true })
   unit: string;
 }
 
@@ -143,3 +143,5 @@ export class Product {
 // unit: string;
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+ProductSchema.plugin(mongoosePaginate);

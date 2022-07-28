@@ -88,4 +88,9 @@ export class UploadsController {
   seeTypeImage(@Param('imgpath') image: string, @Res() res) {
     return res.sendFile(image, { root: './uploads/images/types' });
   }
+
+  @Get('images/tag/:imgpath')
+  seeTagImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/tag' });
+  }
 }

@@ -5,7 +5,7 @@ import { User } from 'src/users/schema/user.schema';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly reflector?: Reflector) {}
 
   canActivate(
     context: ExecutionContext,
@@ -17,9 +17,6 @@ export class RolesGuard implements CanActivate {
 
     const req = context.switchToHttp().getRequest();
     const user: User = req.user;
-    if (!user) {
-      return false;
-    }
     const hasRole = () => user.roles.some((role) => roles.indexOf(role) > -1);
     let hasPermission = false;
 

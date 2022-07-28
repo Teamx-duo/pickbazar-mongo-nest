@@ -3,27 +3,25 @@ import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Product } from 'src/products/schemas/product.schema';
 import { Type } from 'src/types/schemas/type.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type TagSchema = Tag & Document;
 
 @Schema()
 export class Tag {
-  @Prop()
+  @Prop({ required: true, unique: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true, unique: true })
   slug: string;
 
-  @Prop()
-  parent: number;
-
-  @Prop()
+  @Prop({ required: true })
   details: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' })
-  image: Attachment;
+  @Prop({ required: true })
+  image: string;
 
-  @Prop()
+  @Prop({ required: true })
   icon: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type' })
@@ -36,3 +34,5 @@ export class Tag {
 }
 
 export const TagSchema = SchemaFactory.createForClass(Tag);
+
+TagSchema.plugin(mongoosePaginate);

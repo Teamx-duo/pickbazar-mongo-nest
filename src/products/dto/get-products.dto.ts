@@ -15,7 +15,7 @@ export class GetProductsDto extends PaginationArgs {
 }
 
 export enum QueryProductsOrderByColumn {
-  CREATED_AT = 'CREATED_AT',
-  NAME = 'NAME',
-  UPDATED_AT = 'UPDATED_AT',
+  CREATED_AT = 'createdAt',
+  NAME = 'name',
+  UPDATED_AT = 'updatedAt',
 }

@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
@@ -26,6 +27,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.OK)
   async createAccount(@Body() registerDto: RegisterDto, @Res() res) {
     try {
       const response = await this.authService.register(registerDto);
@@ -42,6 +44,7 @@ export class AuthController {
     }
   }
   @Post('token')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto, @Res() res) {
     try {
       const response = await this.authService.login(loginDto);

@@ -66,6 +66,6 @@ const authSource = config.db.authSource
     AuthModule,
   ],
   controllers: [],
-  providers: [{ provide: APP_GUARD, useClass: RolesGuard }],
+  providers: [],
 })
 export class AppModule {}

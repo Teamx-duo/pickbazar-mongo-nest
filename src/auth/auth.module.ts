@@ -11,6 +11,10 @@ import { JWTService } from './jwt.service';
 import { UsersService } from 'src/users/users.service';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import config from 'src/config';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -21,6 +25,12 @@ import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
       { name: User.name, schema: UserSchema },
       { name: Profile.name, schema: ProfileSchema },
     ]),
+    HttpModule,
+    PassportModule,
+    JwtModule.register({
+      secret: config.jwt.secretOrKey,
+      signOptions: { expiresIn: config.jwt.expiresIn },
+    }),
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService, JWTService, JwtStrategy],
