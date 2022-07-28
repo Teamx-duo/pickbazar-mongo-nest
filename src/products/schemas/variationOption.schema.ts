@@ -13,7 +13,7 @@ export class VariationOption {
   value: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Variation' })
-  variantion: Variation;
+  variation: Variation;
 }
 
 export const VariationOptionSchema =

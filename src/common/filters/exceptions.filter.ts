@@ -27,8 +27,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       response.status(status).json({
         status: status,
         path: request.url,
-        errorType: type,
+        error: type,
         message: message,
+        errorBody:
+          exception instanceof HttpException ? exception.getResponse() : {},
       });
     };
 

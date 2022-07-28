@@ -12,6 +12,7 @@ import usersJson from './users.json';
 import { paginate } from 'src/common/pagination/paginate';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UpdateUserPermissionsDto } from './dto/update-permission.dto';
 const users = plainToClass(User, usersJson);
 
 const options = {
@@ -76,6 +77,18 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.userModel.findByIdAndUpdate(id, { $set: updateUserDto });
+  }
+
+  async addUserPermission(id: string, updateUserDto: UpdateUserPermissionsDto) {
+    return await this.userModel.findByIdAndUpdate(id, {
+      $push: { roles: updateUserDto.permissions },
+    });
+  }
+
+  async addUserShop(id: string, shop_id: any) {
+    return await this.userModel.findByIdAndUpdate(id, {
+      $push: { shops: shop_id },
+    });
   }
 
   async remove(id: string) {

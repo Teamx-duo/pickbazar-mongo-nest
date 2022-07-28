@@ -10,9 +10,6 @@ export type VariationSchema = Variation & Document;
 @Schema()
 export class Variation {
   @Prop()
-  id: number;
-
-  @Prop()
   title: string;
 
   @Prop()

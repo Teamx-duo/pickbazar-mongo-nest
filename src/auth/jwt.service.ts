@@ -25,7 +25,6 @@ export class JWTService {
     const userFromDb = await this.userModel.findOne({
       email: signedUser.email,
     });
-    console.log('USER', userFromDb, signedUser);
     if (userFromDb) {
       return userFromDb;
     }

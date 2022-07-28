@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { ShopSocials } from 'src/settings/schemas/shopSocials.schema';
+import { Shop } from './shop.shema';
 
 export type ShopSettingsSchema = ShopSettings & Document;
 
@@ -19,6 +20,9 @@ export class ShopSettings {
 
   @Prop()
   website: string;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
+  shop: Shop;
 }
 
 export const ShopSettingsSchema = SchemaFactory.createForClass(ShopSettings);

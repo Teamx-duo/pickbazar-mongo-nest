@@ -3,54 +3,71 @@ import mongoose, { Document } from 'mongoose';
 import { ShopSettings } from './shopSettings.schema';
 import { Balance } from './balance.schema';
 import { UserAddress } from 'src/addresses/schemas/userAddress.schema';
-import { Attachment } from 'src/common/schemas/attachment.schema';
 import { User } from 'src/users/schema/user.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type ShopSchema = Shop & Document;
 
 @Schema()
 export class Shop {
-  @Prop()
-  owner_id: number;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   owner: User;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
+  @Prop({
+    type: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    ],
+  })
   staffs: User[];
 
-  @Prop()
+  @Prop({ required: true, default: false })
   is_active: boolean;
 
-  @Prop()
+  @Prop({ required: true, default: 0, min: 0 })
   orders_count: number;
 
-  @Prop()
+  @Prop({ required: true, default: 0, min: 0 })
   products_count: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Balance' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Balance',
+    // required: true,
+  })
   balance: Balance;
 
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
   slug: string;
 
-  @Prop()
+  @Prop({ required: true })
   description: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' })
-  cover_image: Attachment;
+  @Prop({
+    required: true,
+  })
+  cover_image: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Attachment' })
-  logo: Attachment;
+  @Prop({
+    required: true,
+  })
+  logo: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'UserAddress' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'UserAddress',
+  })
   address: UserAddress;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'ShopSettings' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ShopSettings',
+  })
   settings: ShopSettings;
 }
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);
+
+ShopSchema.plugin(mongoosePaginate);

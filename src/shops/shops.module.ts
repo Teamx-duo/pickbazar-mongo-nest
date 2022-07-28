@@ -9,19 +9,24 @@ import {
   ShopSettings,
   ShopSettingsSchema,
 } from './schemas/shopSettings.schema';
+import { UsersModule } from 'src/users/users.module';
+import { UsersService } from 'src/users/users.service';
+import { User, UserSchema } from 'src/users/schema/user.schema';
+import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Shop.name, schema: ShopSchema }]),
     MongooseModule.forFeature([
+      { name: Shop.name, schema: ShopSchema },
       { name: PaymentInfo.name, schema: PaymentInfoSchema },
-    ]),
-    MongooseModule.forFeature([{ name: Balance.name, schema: BalanceSchema }]),
-    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Profile.name, schema: ProfileSchema },
+      { name: Balance.name, schema: BalanceSchema },
       { name: ShopSettings.name, schema: ShopSettingsSchema },
     ]),
+    UsersModule,
   ],
   controllers: [ShopsController, StaffsController],
-  providers: [ShopsService],
+  providers: [ShopsService, UsersService],
 })
 export class ShopsModule {}

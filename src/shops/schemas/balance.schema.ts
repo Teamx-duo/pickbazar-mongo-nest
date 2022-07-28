@@ -7,23 +7,20 @@ export type BalanceSchema = Balance & Document;
 
 @Schema()
 export class Balance {
-  @Prop()
-  id: string;
+  @Prop({ required: true, min: 0 })
+  admin_commission_rate: number;
 
-  @Prop()
-  admin_commission_rate: boolean;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
   shop: Shop;
 
-  @Prop()
-  total_earnings: string;
+  @Prop({ default: 0 })
+  total_earnings: number;
 
-  @Prop()
-  withdrawn_amount: string;
+  @Prop({ default: 0 })
+  withdrawn_amount: number;
 
-  @Prop()
-  current_balance: string;
+  @Prop({ default: 0 })
+  current_balance: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PaymentInfo' })
   payment_info: PaymentInfo;

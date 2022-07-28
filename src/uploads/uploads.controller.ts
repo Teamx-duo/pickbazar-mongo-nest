@@ -93,4 +93,9 @@ export class UploadsController {
   seeTagImage(@Param('imgpath') image: string, @Res() res) {
     return res.sendFile(image, { root: './uploads/images/tag' });
   }
+
+  @Get('images/shop/:imgpath')
+  seeShopImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/shop' });
+  }
 }
