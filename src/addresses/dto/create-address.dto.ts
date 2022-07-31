@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { Address } from '../entities/address.entity';
+import { Address } from '../schemas/address.schema';
 
 export class CreateAddressDto extends PickType(Address, [
   'title',
@@ -7,5 +7,5 @@ export class CreateAddressDto extends PickType(Address, [
   'default',
   'address',
 ]) {
-  'customer_id': string;
+  'customer': string;
 }
