@@ -1,27 +1,48 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsArray, IsNotIn, IsOptional, IsString } from 'class-validator';
-import { Category } from '../schemas/category.schema';
+// import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateVariationDto {
   @IsString()
-  public name: string;
-  @IsString()
-  public type: string;
-  @IsString()
-  public details: string;
-  @IsString()
-  @IsOptional()
-  public parent: string;
+  public title: string;
+  @IsNumber()
+  public price: number;
+  @IsNumber()
+  public sale_price: number;
   @IsString()
   @IsOptional()
-  public image: string;
+  public sku: string;
   @IsString()
   @IsOptional()
-  public icon: string;
+  public is_disable: string;
+  @IsString()
+  @IsOptional()
+  public quantity: string;
 }
 
-export class CreateCategoryRequestDto extends PickType(Category, [
-  'name',
-  'details',
-  'parent',
-]) {}
+export class CreateVariationOptionDto {
+  @IsString()
+  public name: string;
+  @IsString()
+  public value: string;
+  @IsString()
+  public variation: string;
+}
+
+export class MultipleVariationOptionsDto {
+  @IsString()
+  public name: string;
+  @IsString()
+  public value: string;
+}
+
+export class CreateVariationOptionsDto {
+  @ApiProperty({
+    isArray: true,
+    type: MultipleVariationOptionsDto,
+  })
+  @IsArray()
+  options: CreateVariationOptionDto[];
+  @IsString()
+  public variation: string;
+}

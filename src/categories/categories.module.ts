@@ -13,11 +13,9 @@ import {
     MongooseModule.forFeature([
       { name: Category.name, schema: CategorySchema },
     ]),
-    MongooseModule.forFeature([
-      { name: Attachment.name, schema: AttachmentSchema },
-    ]),
   ],
   controllers: [CategoriesController],
   providers: [CategoriesService],
+  exports: [CategoriesService, MongooseModule],
 })
 export class CategoriesModule {}

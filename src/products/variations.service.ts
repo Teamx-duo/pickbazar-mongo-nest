@@ -1,36 +1,127 @@
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
-import { CreateProductDto } from './dto/create-product.dto';
-import { GetProductsDto } from './dto/get-products.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { Product, ProductSchema } from './schemas/product.schema';
-import { PaginateModel } from 'mongoose';
-import { GetPopularProductsDto } from './dto/get-popular-products.dto';
+import { GetVariationsDto } from './dto/get-products.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
-import { Tag, TagSchema } from 'src/tags/schemas/tag.schema';
-import { convertToSlug } from 'src/common/constants/common.function';
 import { Variation, VariationSchema } from './schemas/variation.schema';
+import {
+  CreateVariationDto,
+  CreateVariationOptionDto,
+  CreateVariationOptionsDto,
+} from './dto/create-variation.dto';
+import {
+  UpdateVariationDto,
+  UpdateVariationOptionDto,
+} from './dto/update-variation.dto';
+import {
+  VariationOption,
+  VariationOptionSchema,
+} from './schemas/variationOption.schema';
+import { PaginateModel } from 'mongoose';
 @Injectable()
-export class ProductsService {
+export class VariationsService {
   constructor(
     @InjectModel(Variation.name)
     private variationModel: PaginateModel<VariationSchema>,
+    @InjectModel(VariationOption.name)
+    private variationOptionModel: PaginateModel<VariationOptionSchema>,
   ) {}
-  async create(createVariationDto: CreateProductDto) {
-    await this.variationModel.create(createVariationDto);
+  async create(createVariationDto: CreateVariationDto) {
+    const variant = await this.variationModel.create(createVariationDto);
+    return variant;
+  }
+  async createVariationOption(
+    createVariationOptionDto: CreateVariationOptionDto,
+  ) {
+    const option = await this.variationOptionModel.create(
+      createVariationOptionDto,
+    );
+    const variation = await this.variationModel
+      .findOneAndUpdate(
+        { _id: createVariationOptionDto.variation },
+        {
+          $push: { options: option._id },
+        },
+        { new: true },
+      )
+      .populate(['options', 'product']);
+    return variation;
+  }
+  async createVariationOptions(
+    createVariationOptionDto: CreateVariationOptionsDto,
+  ) {
+    const options: any = await this.variationOptionModel.insertMany(
+      createVariationOptionDto.options.map((option) => ({
+        ...option,
+        variation: createVariationOptionDto.variation,
+      })),
+    );
+    console.log(options);
+    const variation = await this.variationModel
+      .findOneAndUpdate(
+        { _id: createVariationOptionDto.variation },
+        {
+          $push: { options: options.map((option) => option._id) },
+        },
+        { new: true },
+      )
+      .populate(['options', 'product']);
+    return variation;
   }
 
-  async getProducts({
+  async getVariations({
     limit,
     page,
     search,
     orderBy,
     sortedBy,
-  }: GetProductsDto) {}
+    productId,
+  }: GetVariationsDto) {
+    const response = await this.variationModel.paginate(
+      {
+        ...(search ? { title: { $regex: search, $options: 'i' } } : {}),
+        ...(productId ? { product: productId } : {}),
+      },
+      {
+        limit,
+        page,
+        sort: { [sortedBy]: orderBy },
+        populate: ['product', 'options'],
+      },
+    );
+    return PaginationResponse(response);
+  }
 
-  async getProductBySlug(slug: string) {}
-  async update(id: string, updateProductDto: UpdateProductDto) {}
+  async getVariationById(id: string) {
+    return await this.variationModel
+      .findById(id)
+      .populate(['product', 'options']);
+  }
 
-  async remove(id: string) {}
+  async getVariationOptionById(id: string) {
+    return await this.variationOptionModel.findById(id).populate(['variation']);
+  }
+
+  async update(id: string, updateVariationDto: UpdateVariationDto) {
+    return await this.variationModel
+      .findByIdAndUpdate(id, { $set: updateVariationDto }, { new: true })
+      .populate(['product', 'options']);
+  }
+
+  async updateVariationOption(
+    id: string,
+    updateVariationOptionDto: UpdateVariationOptionDto,
+  ) {
+    return await this.variationOptionModel
+      .findByIdAndUpdate(id, { $set: updateVariationOptionDto }, { new: true })
+      .populate(['product']);
+  }
+
+  async remove(id: string) {
+    await this.variationOptionModel.deleteMany({ variation: id });
+    return await this.variationModel.findByIdAndRemove(id, { new: true });
+  }
+
+  async removeVariationOption(id: string) {
+    return await this.variationOptionModel.findByIdAndRemove(id, { new: true });
+  }
 }

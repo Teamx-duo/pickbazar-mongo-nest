@@ -8,13 +8,14 @@ import { TypeSetting, TypeSettingSchema } from './schemas/typeSetting.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Banner.name, schema: BannerSchema }]),
-    MongooseModule.forFeature([{ name: Type.name, schema: TypeSchema }]),
     MongooseModule.forFeature([
+      { name: Banner.name, schema: BannerSchema },
+      { name: Type.name, schema: TypeSchema },
       { name: TypeSetting.name, schema: TypeSettingSchema },
     ]),
   ],
   controllers: [TypesController],
   providers: [TypesService],
+  exports: [TypesService, MongooseModule],
 })
 export class TypesModule {}

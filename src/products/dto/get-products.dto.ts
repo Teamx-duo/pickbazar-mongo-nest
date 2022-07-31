@@ -14,6 +14,13 @@ export class GetProductsDto extends PaginationArgs {
   search?: string;
 }
 
+export class GetVariationsDto extends PaginationArgs {
+  orderBy?: QueryProductsOrderByColumn;
+  sortedBy?: SortOrder;
+  productId?: string;
+  search?: string;
+}
+
 export enum QueryProductsOrderByColumn {
   CREATED_AT = 'createdAt',
   NAME = 'name',

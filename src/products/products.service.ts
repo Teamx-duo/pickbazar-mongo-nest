@@ -36,7 +36,18 @@ export class ProductsService {
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      { limit, page, sort: { [sortedBy]: orderBy } },
+      {
+        limit,
+        page,
+        sort: { [sortedBy]: orderBy },
+        populate: [
+          { path: 'variations' },
+          { path: 'variation_options' },
+          { path: 'categories', select: '_id name image icon' },
+          { path: 'tags', select: '_id name slug image icon' },
+          { path: 'shop', select: '_id name' },
+        ],
+      },
     );
     return PaginationResponse(response);
   }
@@ -66,11 +77,32 @@ export class ProductsService {
     );
     return PaginationResponse(response);
   }
+
   async update(id: string, updateProductDto: UpdateProductDto) {
     return await this.productModel.findByIdAndUpdate(
       id,
       {
         $set: updateProductDto,
+      },
+      { new: true },
+    );
+  }
+
+  async addVariant(id: string, variant: any) {
+    return await this.productModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { variations: variant },
+      },
+      { new: true },
+    );
+  }
+
+  async addVariantOption(id: string, option: any) {
+    return await this.productModel.findByIdAndUpdate(
+      id,
+      {
+        $push: { variation_options: option },
       },
       { new: true },
     );

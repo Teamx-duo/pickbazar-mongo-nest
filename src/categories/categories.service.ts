@@ -27,8 +27,6 @@ export class CategoriesService {
   constructor(
     @InjectModel(Category.name)
     private categoryModel: PaginateModel<CategorySchema>,
-    @InjectModel(Attachment.name)
-    private attachmentModel: Model<AttachmentSchema>,
   ) {}
   private categories: Category[] = categories;
 

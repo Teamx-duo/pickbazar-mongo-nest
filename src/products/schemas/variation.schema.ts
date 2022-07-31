@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Product } from 'src/products/schemas/product.schema';
-import { Attachment } from 'src/common/schemas/attachment.schema';
-import { Order } from 'src/orders/schemas/order.schema';
 import { VariationOption } from './variationOption.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type VariationSchema = Variation & Document;
 
@@ -27,6 +26,9 @@ export class Variation {
   @Prop()
   quantity: number;
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] })
+  product: Product[];
+
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VariationOption' }],
   })
@@ -34,3 +36,28 @@ export class Variation {
 }
 
 export const VariationSchema = SchemaFactory.createForClass(Variation);
+
+VariationSchema.plugin(mongoosePaginate);
+
+// export const VariationSchema = () => {
+//   const schema = new mongoose.Schema({
+//     product: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: 'Product',
+//     },
+//     options: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: 'VariationOption',
+//     },
+//     title: {
+//       type: String,
+//       required: true,
+//     },
+//     price: { type: Number },
+//     sku: { type: Number },
+//     is_disable: { type: Number },
+//     sale_price: { type: Number },
+//     quantity: { type: Number },
+//   });
+//   return schema;
+// };

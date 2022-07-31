@@ -13,7 +13,7 @@ import {
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { GetProductsDto } from './dto/get-products.dto';
+import { GetProductsDto, GetVariationsDto } from './dto/get-products.dto';
 import { Product } from './schemas/product.schema';
 import { GetPopularProductsDto } from './dto/get-popular-products.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -21,6 +21,16 @@ import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
 import config from 'src/config';
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { VariationsService } from './variations.service';
+import {
+  CreateVariationDto,
+  CreateVariationOptionDto,
+  CreateVariationOptionsDto,
+} from './dto/create-variation.dto';
+import {
+  UpdateVariationDto,
+  UpdateVariationOptionDto,
+} from './dto/update-variation.dto';
 
 @Controller('products')
 @UseInterceptors(LoggingInterceptor)
@@ -124,5 +134,65 @@ export class PopularProductsController {
   @Get()
   async getProducts(@Query() query: GetPopularProductsDto): Promise<Product[]> {
     return this.productsService.getPopularProducts(query);
+  }
+}
+
+@Controller('variations')
+export class VariationsController {
+  constructor(private readonly variationsService: VariationsService) {}
+
+  @Get()
+  async getVariations(@Query() query: GetVariationsDto): Promise<Product[]> {
+    return this.variationsService.getVariations(query);
+  }
+
+  @Post('options')
+  async createVariationOption(
+    @Body() createVariationOptionDto: CreateVariationOptionDto,
+  ) {
+    return await this.variationsService.createVariationOption({
+      ...createVariationOptionDto,
+    });
+  }
+
+  @Post('options/multiple')
+  async createVariationOptions(
+    @Body() createVariationOptionDto: CreateVariationOptionsDto,
+  ) {
+    return await this.variationsService.createVariationOptions({
+      ...createVariationOptionDto,
+    });
+  }
+
+  @Post()
+  async createVariation(@Body() createVariationDto: CreateVariationDto) {
+    return await this.variationsService.create({
+      ...createVariationDto,
+    });
+  }
+
+  @Put(':id')
+  async updateVariation(
+    @Param('id') id: string,
+    @Body() updateVariationDto: UpdateVariationDto,
+  ) {
+    return await this.variationsService.update(id, {
+      ...updateVariationDto,
+    });
+  }
+
+  @Put('options/:id')
+  async updateVariationOption(
+    @Param('id') id: string,
+    @Body() updateVariationOptionDto: UpdateVariationOptionDto,
+  ) {
+    return await this.variationsService.updateVariationOption(id, {
+      ...updateVariationOptionDto,
+    });
+  }
+
+  @Delete(':id')
+  async removeVariation(@Param('id') id: string) {
+    return await this.variationsService.remove(id);
   }
 }

@@ -15,6 +15,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import config from 'src/config';
 import { HttpModule } from '@nestjs/axios';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -22,9 +23,8 @@ import { HttpModule } from '@nestjs/axios';
       { name: 'EmailVerification', schema: EmailVerificationSchema },
       { name: 'ForgottenPassword', schema: ForgottenPasswordSchema },
       { name: 'ConsentRegistry', schema: ConsentRegistrySchema },
-      { name: User.name, schema: UserSchema },
-      { name: Profile.name, schema: ProfileSchema },
     ]),
+    UsersModule,
     HttpModule,
     PassportModule,
     JwtModule.register({

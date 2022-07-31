@@ -19,8 +19,6 @@ import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
     MongooseModule.forFeature([
       { name: Shop.name, schema: ShopSchema },
       { name: PaymentInfo.name, schema: PaymentInfoSchema },
-      { name: User.name, schema: UserSchema },
-      { name: Profile.name, schema: ProfileSchema },
       { name: Balance.name, schema: BalanceSchema },
       { name: ShopSettings.name, schema: ShopSettingsSchema },
     ]),
@@ -28,5 +26,6 @@ import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
   ],
   controllers: [ShopsController, StaffsController],
   providers: [ShopsService, UsersService],
+  exports: [ShopsService, MongooseModule],
 })
 export class ShopsModule {}
