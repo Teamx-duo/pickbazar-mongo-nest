@@ -60,12 +60,12 @@ export class ProductsController {
   ) {
     return await this.productsService.create({
       ...createProductDto,
-      image: `${config.app.imageUrl}/category/${images.image[0].filename}`,
+      image: `${config.app.imageUrl}/product/${images.image[0].filename}`,
       gallery: [
         ...images.gallery.map(
-          (image) => `${config.app.imageUrl}/category/${image.filename}`,
+          (image) => `${config.app.imageUrl}/product/${image.filename}`,
         ),
-        `${config.app.imageUrl}/category/${images.image[0].filename}`,
+        `${config.app.imageUrl}/product/${images.image[0].filename}`,
       ],
     });
   }
@@ -106,16 +106,16 @@ export class ProductsController {
       ...updateProductDto,
       ...(images.image
         ? {
-            image: `${config.app.imageUrl}/tag/${images.image[0].filename}`,
+            image: `${config.app.imageUrl}/product/${images.image[0].filename}`,
           }
         : {}),
       ...(images.gallery
         ? {
             gallery: [
               ...images.gallery.map(
-                (image) => `${config.app.imageUrl}/category/${image.filename}`,
+                (image) => `${config.app.imageUrl}/product/${image.filename}`,
               ),
-              `${config.app.imageUrl}/category/${images.image[0].filename}`,
+              `${config.app.imageUrl}/product/${images.image[0].filename}`,
             ],
           }
         : {}),
