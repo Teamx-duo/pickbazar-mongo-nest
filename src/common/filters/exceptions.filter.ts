@@ -1,3 +1,4 @@
+import { MongoError } from 'mongodb';
 import {
   ExceptionFilter,
   Catch,
@@ -28,7 +29,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         status: status,
         path: request.url,
         error: type,
-        message: message,
+        message:
+          exception instanceof HttpException
+            ? exception.getResponse()['message']
+            : message,
         errorBody:
           exception instanceof HttpException ? exception.getResponse() : {},
       });
@@ -47,7 +51,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Throw an exceptions for either
     // MongoError, ValidationError, TypeError, CastError and Error
     if (exception.message) {
-      responseMessage('Error', exception.message);
+      responseMessage(
+        exception instanceof HttpException
+          ? exception.getResponse()['error']
+          : 'Error',
+        exception.message,
+      );
     } else {
       responseMessage(exception.name, exception.message);
     }

@@ -1,5 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import { Coupon } from '../entities/coupon.entity';
+import { Coupon } from '../schemas/coupon.shema';
 
 export class CreateCouponDto extends PickType(Coupon, [
   'code',
@@ -9,4 +9,5 @@ export class CreateCouponDto extends PickType(Coupon, [
   'image',
   'expire_at',
   'active_from',
+  'is_valid',
 ]) {}

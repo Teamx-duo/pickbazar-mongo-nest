@@ -1,52 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
-import { Coupon } from './entities/coupon.entity';
-import couponsJson from './coupons.json';
-import Fuse from 'fuse.js';
+import { Coupon, CouponSchema } from './schemas/coupon.shema';
 import { GetCouponsDto } from './dto/get-coupons.dto';
-import { paginate } from 'src/common/pagination/paginate';
-const coupons = plainToClass(Coupon, couponsJson);
-const options = {
-  keys: ['name'],
-  threshold: 0.3,
-};
-const fuse = new Fuse(coupons, options);
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 @Injectable()
 export class CouponsService {
-  private coupons: Coupon[] = coupons;
-  create(createCouponDto: CreateCouponDto) {
-    return this.coupons[0];
+  constructor(
+    @InjectModel(Coupon.name)
+    private couponModel: PaginateModel<CouponSchema>,
+  ) {}
+  async create(createCouponDto: CreateCouponDto) {
+    return await this.couponModel.create(createCouponDto);
   }
 
-  getCoupons({ search, limit, page }: GetCouponsDto) {
-    if (!page) page = 1;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const data: Coupon[] = this.coupons;
-    // if (text?.replace(/%/g, '')) {
-    //   data = fuse.search(text)?.map(({ item }) => item);
-    // }
-
-    const results = data.slice(startIndex, endIndex);
-    const url = `/coupons?search=${search}&limit=${limit}`;
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+  async getCoupons({ search, limit, page }: GetCouponsDto) {
+    const response = await this.couponModel.paginate(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+      },
+      { limit, page },
+    );
+    return PaginationResponse(response);
   }
 
-  getCoupon(id: number): Coupon {
-    return this.coupons.find((p) => p.id === id);
+  async getCoupon(id: string) {
+    return this.couponModel.findById(id);
   }
 
-  update(id: number, updateCouponDto: UpdateCouponDto) {
-    return this.coupons[0];
+  async update(id: string, updateCouponDto: UpdateCouponDto) {
+    return await this.couponModel.findByIdAndUpdate(
+      id,
+      { $set: updateCouponDto },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} coupon`;
+  async remove(id: string) {
+    return await this.couponModel.findByIdAndRemove(id, { new: true });
   }
 }

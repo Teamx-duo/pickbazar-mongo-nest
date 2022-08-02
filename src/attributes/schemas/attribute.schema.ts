@@ -1,22 +1,34 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
-import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Shop } from 'src/shops/schemas/shop.shema';
 import { AttributeValue } from './attributeValue.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type AttributeSchema = Attribute & Document;
 
 @Schema()
 export class Attribute {
-  @Prop()
+  @IsString()
+  @ApiProperty()
+  @Prop({ required: true })
   name: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  @IsMongoId()
+  @ApiProperty()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
   shop: Shop;
 
-  @Prop()
+  @IsString()
+  @ApiProperty()
+  @IsOptional()
+  @Prop({ required: true })
   slug: string;
 
+  @IsArray()
+  @IsOptional()
+  @ApiProperty()
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AttributeValue' }],
   })
@@ -24,3 +36,5 @@ export class Attribute {
 }
 
 export const AttributeSchema = SchemaFactory.createForClass(Attribute);
+
+AttributeSchema.plugin(mongoosePaginate);

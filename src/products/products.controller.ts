@@ -1,3 +1,4 @@
+import { TransformInterceptor } from './../common/interceptors/transform.interceptor';
 import {
   Controller,
   Get,
@@ -9,6 +10,7 @@ import {
   Put,
   UseInterceptors,
   UploadedFiles,
+  HttpException,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -33,7 +35,7 @@ import {
 } from './dto/update-variation.dto';
 
 @Controller('products')
-@UseInterceptors(LoggingInterceptor)
+@UseInterceptors(LoggingInterceptor, TransformInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -58,6 +60,8 @@ export class ProductsController {
     images: { image: Express.Multer.File[]; gallery: Express.Multer.File[] },
     @Body() createProductDto: CreateProductDto,
   ) {
+    if (!images.image || !images.gallery)
+      throw new HttpException('Product images are required.', 400);
     return await this.productsService.create({
       ...createProductDto,
       image: `${config.app.imageUrl}/product/${images.image[0].filename}`,

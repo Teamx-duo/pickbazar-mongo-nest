@@ -94,6 +94,11 @@ export class UploadsController {
     return res.sendFile(image, { root: './uploads/images/tag' });
   }
 
+  @Get('images/coupon/:imgpath')
+  seeCouponImage(@Param('imgpath') image: string, @Res() res) {
+    return res.sendFile(image, { root: './uploads/images/coupon' });
+  }
+
   @Get('images/shop/:imgpath')
   seeShopImage(@Param('imgpath') image: string, @Res() res) {
     return res.sendFile(image, { root: './uploads/images/shop' });

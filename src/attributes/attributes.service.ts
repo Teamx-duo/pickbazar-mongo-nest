@@ -2,30 +2,55 @@ import { Injectable } from '@nestjs/common';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import attributesJson from './attributes.json';
-import { Attribute } from './entities/attribute.entity';
+import { Attribute, AttributeSchema } from './schemas/attribute.schema';
+import {
+  AttributeValue,
+  AttributeValueSchema,
+} from './schemas/attributeValue.schema';
 import { plainToClass } from 'class-transformer';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { GetAttributesArgs } from './dto/get-attributes.dto';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 
 const attributes = plainToClass(Attribute, attributesJson);
 @Injectable()
 export class AttributesService {
+  constructor(
+    @InjectModel(Attribute.name)
+    private attributeModel: PaginateModel<AttributeSchema>,
+    @InjectModel(AttributeValue.name)
+    private attributeValueModel: PaginateModel<AttributeValueSchema>,
+  ) {}
   private attributes: Attribute[] = attributes;
-  create(createAttributeDto: CreateAttributeDto) {
-    return this.attributes[0];
+
+  async create(createAttributeDto: CreateAttributeDto) {
+    return this.attributeModel.create(createAttributeDto);
   }
 
-  findAll() {
-    return this.attributes;
+  async findAll({ limit, page, shop }: GetAttributesArgs) {
+    const response = await this.attributeModel.paginate(
+      { ...(shop ? { shop } : {}) },
+      { limit, page },
+    );
+    return PaginationResponse(response);
   }
 
-  findOne(id: number) {
-    return this.attributes.find((p) => p.id === Number(id));
+  async findOne(id: string) {
+    return this.attributeModel.findById(id);
   }
 
-  update(id: number, updateAttributeDto: UpdateAttributeDto) {
-    return this.attributes[0];
+  async update(id: string, updateAttributeDto: UpdateAttributeDto) {
+    return await this.attributeModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateAttributeDto,
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} attribute`;
+  async remove(id: string) {
+    return await this.attributeModel.findByIdAndRemove(id, { new: true });
   }
 }

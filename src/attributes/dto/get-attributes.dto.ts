@@ -1,8 +1,13 @@
+import { IsMongoId, IsOptional } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
+import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 
-export class GetAttributesArgs {
+export class GetAttributesArgs extends PaginationArgs {
   orderBy?: QueryAttributesOrderByOrderByClause[];
-  shop_id?: number;
+
+  @IsMongoId()
+  @IsOptional()
+  shop?: string;
 }
 
 export class QueryAttributesOrderByOrderByClause {
