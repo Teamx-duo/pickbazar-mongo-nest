@@ -1,5 +1,5 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
-import { PaginateModel } from 'mongoose';
+import mongoose, { ObjectId, PaginateModel } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { ApproveShopDto, CreateShopDto } from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
@@ -97,6 +97,14 @@ export class ShopsService {
     );
   }
 
+  async updateMultiple(ids: string, updateShopDto: UpdateShopDto) {
+    return await this.shopModel.updateMany(
+      { _id: { $in: ids } },
+      { $set: updateShopDto },
+      { new: true },
+    );
+  }
+
   async approve({ id, admin_commission_rate }: ApproveShopDto) {
     await this.balanceModel.findOneAndUpdate(
       { shop: id },
@@ -129,6 +137,16 @@ export class ShopsService {
     return await this.balanceModel.findByIdAndUpdate(updateBalanceDto, {
       $set: updateBalanceDto,
     });
+  }
+
+  async addOrder(id: ObjectId, ordersCount: number) {
+    return await this.shopModel.findByIdAndUpdate(
+      id,
+      {
+        $inc: { orders_count: ordersCount },
+      },
+      { new: true },
+    );
   }
 
   async createPaymentInfo(createPaymentDto: CreatePaymentDto) {

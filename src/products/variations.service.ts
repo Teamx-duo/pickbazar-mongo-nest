@@ -107,6 +107,18 @@ export class VariationsService {
       .populate(['product', 'options']);
   }
 
+  async updateMultiple(ids: string[], updateVariationDto: UpdateVariationDto) {
+    return await this.variationModel
+      .updateMany(
+        {
+          _id: { $in: ids },
+        },
+        { $set: updateVariationDto },
+        { new: true },
+      )
+      .populate(['product', 'options']);
+  }
+
   async updateVariationOption(
     id: string,
     updateVariationOptionDto: UpdateVariationOptionDto,

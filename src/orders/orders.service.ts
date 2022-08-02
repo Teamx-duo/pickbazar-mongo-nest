@@ -5,8 +5,8 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import ordersJson from './orders.json';
 import orderStatusJson from './order-statuses.json';
 import { plainToClass } from 'class-transformer';
-import { Order } from './entities/order.entity';
-import { OrderStatus } from './entities/order-status.entity';
+import { Order, OrderSchema } from './schemas/order.schema';
+import { OrderStatus, OrderStatusSchema } from './schemas/orderStatus.schema';
 import { paginate } from 'src/common/pagination/paginate';
 import {
   GetOrderStatusesDto,
@@ -20,96 +20,147 @@ import {
   CreateOrderStatusDto,
   UpdateOrderStatusDto,
 } from './dto/create-order-status.dto';
-const orders = plainToClass(Order, ordersJson);
-const orderStatus = plainToClass(OrderStatus, orderStatusJson);
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
+import { ProductsService } from 'src/products/products.service';
+import { ShopsService } from 'src/shops/shops.service';
+import { Product } from 'src/products/schemas/product.schema';
+import { CouponsService } from 'src/coupons/coupons.service';
+import { CouponType } from 'src/coupons/schemas/coupon.shema';
+import { TaxesService } from 'src/taxes/taxes.service';
+import { Tax } from 'src/taxes/schemas/taxes.schema';
+
 @Injectable()
 export class OrdersService {
-  private orders: Order[] = orders;
-  private orderStatus: OrderStatus[] = orderStatus;
-  create(createOrderInput: CreateOrderDto) {
-    return this.orders[0];
-  }
-
-  getOrders({
-    limit,
-    page,
-    customer_id,
-    tracking_number,
-    search,
-    shop_id,
-  }: GetOrdersDto): OrderPaginator {
-    if (!page) page = 1;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    let data: Order[] = this.orders;
-
-    if (shop_id && shop_id !== 'undefined') {
-      data = this.orders?.filter((p) => p?.shop?.id === Number(shop_id));
+  constructor(
+    @InjectModel(Order.name)
+    private orderModel: PaginateModel<OrderSchema>,
+    @InjectModel(OrderStatus.name)
+    private orderStatusModel: PaginateModel<OrderStatusSchema>,
+    private readonly productServices: ProductsService,
+    private readonly shopServices: ShopsService,
+    private readonly couponServices: CouponsService,
+    private readonly taxServices: TaxesService,
+  ) {}
+  async create(createOrderInput: CreateOrderDto, location?: any) {
+    const { products, shop, coupon } = createOrderInput;
+    const dbProducts: Product[] = await Promise.all([
+      ...products.map((prod) => this.productServices.getProductById(prod)),
+    ]);
+    let total = dbProducts.reduce((acc, curr) => acc + curr.price, 0);
+    const amount = total;
+    let tax = 0;
+    let taxes: Tax[];
+    if (location && location['country']) {
+      taxes = await this.taxServices.getAllTaxes({
+        country: location['country'],
+      });
+    } else {
+      taxes = await this.taxServices.getAllTaxes({ priority: 1, global: true });
     }
-    const results = data.slice(startIndex, endIndex);
-    const url = `/orders?search=${search}&limit=${limit}`;
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+    if (taxes.length > 0) {
+      tax = taxes[0].rate;
+      total += (taxes[0].rate / 100) * total;
+    }
+    if (coupon) {
+      const dbCoupon = await this.couponServices.getCoupon(coupon);
+      if (dbCoupon.type === CouponType.FIXED_COUPON) {
+        total -= dbCoupon.amount;
+      }
+      if (dbCoupon.type === CouponType.PERCENTAGE_COUPON) {
+        total -= (dbCoupon.amount / 100) * total;
+      }
+    }
+    const order = await this.orderModel.create({
+      ...createOrderInput,
+      total: total < 0 ? 0 : total,
+      amount,
+      sales_tax: tax,
+    });
+    await Promise.all([
+      this.productServices.addOrder(products, order._id),
+      this.shopServices.addOrder(shop, 1),
+    ]);
+    return order;
   }
 
-  getOrderById(id: number): Order {
-    return this.orders.find((p) => p.id === Number(id));
-  }
-  getOrderByTrackingNumber(tracking_number: string): Order {
-    const parentOrder = this.orders.find(
-      (p) => p.tracking_number === tracking_number,
+  async getOrders({ limit, page, customer, id, search, shop }: GetOrdersDto) {
+    const response = await this.orderModel.paginate(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(customer ? { customer } : {}),
+        ...(shop ? { shop } : {}),
+        ...(id ? { _id: id } : {}),
+      },
+      { limit, page },
     );
-    if (!parentOrder) {
-      return this.orders[0];
-    }
-    return parentOrder;
+    return PaginationResponse(response);
   }
-  getOrderStatuses({
+
+  async getOrderById(id: string) {
+    return await this.orderModel
+      .findById(id)
+      .populate(['shop', 'coupon', 'products', 'status', 'customer', 'billing_address', 'shipping_address']);
+  }
+  // getOrderByTrackingNumber(tracking_number: string): Order {
+  //   const parentOrder = this.orders.find(
+  //     (p) => p.tracking_number === tracking_number,
+  //   );
+  //   if (!parentOrder) {
+  //     return this.orders[0];
+  //   }
+  //   return parentOrder;
+  // }
+  async getOrderStatuses({
     limit,
     page,
     search,
     orderBy,
-  }: GetOrderStatusesDto): OrderStatusPaginator {
-    if (!page || page.toString() === 'undefined') page = 1;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const data: OrderStatus[] = this.orderStatus;
-
-    // if (shop_id) {
-    //   data = this.orders?.filter((p) => p?.shop?.id === shop_id);
-    // }
-    const results = data.slice(startIndex, endIndex);
-    const url = `/order-status?search=${search}&limit=${limit}`;
-
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+  }: GetOrderStatusesDto) {
+    const response = await this.orderStatusModel.paginate(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+      },
+      { limit, page, sort: { [orderBy]: 1 } },
+    );
+    return PaginationResponse(response);
   }
-  getOrderStatus(slug: string) {
-    return this.orderStatus.find((p) => p.name === slug);
+  async getOrderStatusById(id: string) {
+    return await this.orderStatusModel.findById(id);
   }
-  update(id: number, updateOrderInput: UpdateOrderDto) {
-    return this.orders[0];
+  async update(id: string, updateOrderInput: UpdateOrderDto) {
+    return await this.orderModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateOrderInput,
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: string) {
+    return await this.orderModel.findByIdAndRemove(id, { new: true });
   }
-  verifyCheckout(input: CheckoutVerificationDto): VerifiedCheckoutData {
-    return {
-      total_tax: 0,
-      shipping_charge: 0,
-      unavailable_products: [],
-    };
+  async verifyCheckout(input: CheckoutVerificationDto) {
+    return input;
   }
-  createOrderStatus(createOrderStatusInput: CreateOrderStatusDto) {
-    return this.orderStatus[0];
+  async createOrderStatus(createOrderStatusInput: CreateOrderStatusDto) {
+    return await this.orderStatusModel.create(createOrderStatusInput);
   }
-  updateOrderStatus(updateOrderStatusInput: UpdateOrderStatusDto) {
-    return this.orderStatus[0];
+  async updateOrderStatus(
+    id: string,
+    updateOrderStatusInput: UpdateOrderStatusDto,
+  ) {
+    return await this.orderStatusModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateOrderStatusInput,
+      },
+      { new: true },
+    );
+  }
+  async removeOrderStatus(id: string) {
+    return await this.orderStatusModel.findByIdAndRemove(id, { new: true });
   }
 }

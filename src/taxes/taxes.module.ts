@@ -10,5 +10,6 @@ import { Tax, TaxesSchema } from './schemas/taxes.schema';
   ],
   controllers: [TaxesController],
   providers: [TaxesService],
+  exports: [TaxesService, MongooseModule],
 })
 export class TaxesModule {}

@@ -4,7 +4,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { Coupon, CouponSchema } from './schemas/coupon.shema';
 import { GetCouponsDto } from './dto/get-coupons.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
+import { ObjectId, PaginateModel } from 'mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 @Injectable()
 export class CouponsService {
@@ -26,7 +26,7 @@ export class CouponsService {
     return PaginationResponse(response);
   }
 
-  async getCoupon(id: string) {
+  async getCoupon(id: ObjectId | string) {
     return this.couponModel.findById(id);
   }
 

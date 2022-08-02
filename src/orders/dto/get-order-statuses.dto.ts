@@ -2,7 +2,7 @@ import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
 
-import { OrderStatus } from '../entities/order-status.entity';
+import { OrderStatus } from '../schemas/orderStatus.schema';
 
 export class OrderStatusPaginator extends Paginator<OrderStatus> {
   data: OrderStatus[];

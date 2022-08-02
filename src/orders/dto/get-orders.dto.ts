@@ -1,17 +1,35 @@
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
 
-import { Order } from '../entities/order.entity';
+import { Order } from '../schemas/order.schema';
 
-export class OrderPaginator extends Paginator<Order> {
+export class OrderPaginator {
   data: Order[];
 }
 
 export class GetOrdersDto extends PaginationArgs {
-  tracking_number?: string;
+  @IsMongoId()
+  @IsOptional()
+  id?: string;
+
+  @IsString()
+  @IsOptional()
   orderBy?: string;
+
+  @IsString()
+  @IsOptional()
   sortedBy?: string;
-  customer_id?: number;
-  shop_id?: string;
+
+  @IsMongoId()
+  @IsOptional()
+  customer?: string;
+
+  @IsMongoId()
+  @IsOptional()
+  shop?: string;
+
+  @IsString()
+  @IsOptional()
   search?: string;
 }

@@ -24,21 +24,21 @@ export class TaxesController {
 
   @Get()
   findAll(@Query() getTaxesDto: GetTaxesDto) {
-    return this.taxesService.findAll();
+    return this.taxesService.findAll(getTaxesDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.taxesService.findOne(+id);
+    return this.taxesService.findOne(id);
   }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateTaxDto: UpdateTaxDto) {
-    return this.taxesService.update(+id, updateTaxDto);
+    return this.taxesService.update(id, updateTaxDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.taxesService.remove(+id);
+    return this.taxesService.remove(id);
   }
 }

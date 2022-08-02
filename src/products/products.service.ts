@@ -64,6 +64,18 @@ export class ProductsService {
       ]);
   }
 
+  async getProductById(id: string): Promise<Product> {
+    return await this.productModel
+      .findById(id)
+      .populate([
+        'tags',
+        'categories',
+        'variations',
+        'variation_options',
+        'shop',
+      ]);
+  }
+
   async getPopularProducts({
     shop_id,
     limit,
@@ -83,6 +95,30 @@ export class ProductsService {
       id,
       {
         $set: updateProductDto,
+      },
+      { new: true },
+    );
+  }
+
+  async updateMultiple(ids: string[], updateProductDto: UpdateProductDto) {
+    return await this.productModel.updateMany(
+      {
+        _id: { $in: ids },
+      },
+      {
+        $set: updateProductDto,
+      },
+      { new: true },
+    );
+  }
+
+  async addOrder(ids: string[], amount: any) {
+    return await this.productModel.updateMany(
+      {
+        _id: { $in: ids },
+      },
+      {
+        $push: { orders: amount },
       },
       { new: true },
     );

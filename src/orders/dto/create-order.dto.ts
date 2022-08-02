@@ -1,23 +1,33 @@
-import { PaymentGatewayType } from '../entities/order.entity';
+import { PickType } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsEmail,
+  IsMongoId,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { PaymentGatewayType, Order } from '../schemas/order.schema';
 
-export class CreateOrderDto {
-  shop_id?: number;
-  coupon_id?: number;
-  status: string;
-  customer_contact: string;
-  products: ConnectProductOrderPivot[];
-  amount: number;
-  sales_tax: number;
-  total?: number;
-  paid_total?: number;
-  payment_id?: string;
-  payment_gateway?: PaymentGatewayType;
-  discount?: number;
-  delivery_fee?: number;
-  delivery_time: string;
-  card?: CardInput;
-  billing_address?: UserAddressInput;
-  shipping_address?: UserAddressInput;
+export class CreateOrderDto extends PickType(Order, [
+  'billing_address',
+  'children',
+  'coupon',
+  'customer',
+  'customer_contact',
+  'delivery_fee',
+  'delivery_time',
+  'discount',
+  'paid_total',
+  'parent_order',
+  'payment_gateway',
+  'payment_gateway',
+  'payment_id',
+  'shipping_address',
+  'shop',
+  'status',
+]) {
+  @IsArray()
+  products: string[];
 }
 
 export class UserAddressInput {
@@ -29,17 +39,27 @@ export class UserAddressInput {
 }
 
 export class ConnectProductOrderPivot {
-  product_id: number;
-  variation_option_id?: number;
+  @IsMongoId()
+  product_id: string;
+  @IsMongoId()
+  variation_option_id?: string;
+  @IsNumber()
   order_quantity: number;
+  @IsNumber()
   unit_price: number;
+  @IsNumber()
   subtotal: number;
 }
 
 export class CardInput {
+  @IsString()
   number: string;
+  @IsString()
   expiryMonth: string;
+  @IsString()
   expiryYear: string;
+  @IsString()
   cvv: string;
+  @IsEmail()
   email?: string;
 }

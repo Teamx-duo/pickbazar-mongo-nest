@@ -1,14 +1,24 @@
+import { Type } from 'class-transformer';
+import { IsArray, IsMongoId, IsNumber, ValidateNested } from 'class-validator';
 import { ConnectProductOrderPivot, UserAddressInput } from './create-order.dto';
 
 export class CheckoutVerificationDto {
+  @IsNumber()
   amount: number;
+  @ValidateNested({ each: true })
+  @Type(() => ConnectProductOrderPivot)
   products: ConnectProductOrderPivot[];
+  @IsMongoId()
   billing_address?: UserAddressInput;
+  @IsMongoId()
   shipping_address?: UserAddressInput;
 }
 
 export class VerifiedCheckoutData {
+  @IsNumber()
   total_tax: number;
+  @IsNumber()
   shipping_charge: number;
-  unavailable_products: number[];
+  @IsArray()
+  unavailable_products: string[];
 }

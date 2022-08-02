@@ -10,5 +10,6 @@ import { Coupon, CouponSchema } from './schemas/coupon.shema';
   ],
   controllers: [CouponsController],
   providers: [CouponsService],
+  exports: [CouponsService, MongooseModule],
 })
 export class CouponsModule {}

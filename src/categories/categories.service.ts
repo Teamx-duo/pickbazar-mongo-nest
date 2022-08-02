@@ -68,6 +68,16 @@ export class CategoriesService {
     );
   }
 
+  async updateMultiple(ids: string[], updateCategoryDto: UpdateCategoryDto) {
+    return await this.categoryModel.updateMany(
+      { _id: { $in: ids } },
+      {
+        $set: { updateCategoryDto },
+      },
+      { new: true },
+    );
+  }
+
   async remove(id: string) {
     return await this.categoryModel.findByIdAndRemove(id, { new: true });
   }
