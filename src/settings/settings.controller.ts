@@ -24,4 +24,9 @@ export class SettingsController {
   findAll() {
     return this.settingsService.findAll();
   }
+
+  @Get(':id')
+  getById(@Param() id: string) {
+    return this.settingsService.findOne(id);
+  }
 }

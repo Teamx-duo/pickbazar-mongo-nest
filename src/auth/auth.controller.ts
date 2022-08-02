@@ -7,7 +7,10 @@ import {
   HttpStatus,
   Res,
   HttpCode,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
@@ -95,7 +98,8 @@ export class AuthController {
   }
 
   @Get('me')
-  me() {
-    return this.authService.me();
+  @UseGuards(AuthGuard('jwt'))
+  me(@Req() req) {
+    return this.authService.me(req.user._id);
   }
 }

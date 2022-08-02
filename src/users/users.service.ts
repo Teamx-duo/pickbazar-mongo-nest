@@ -72,7 +72,9 @@ export class UsersService {
     };
   }
   async findOne(id: string) {
-    return await this.userModel.findOne({ _id: id });
+    return await this.userModel
+      .findOne({ _id: id })
+      .populate(['profile', 'shops', 'address', 'managed_shop']);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -86,9 +88,18 @@ export class UsersService {
   }
 
   async addUserShop(id: string, shop_id: any) {
-    return await this.userModel.findByIdAndUpdate(id, {
-      $push: { shops: shop_id },
-    });
+    const user = await this.userModel.findById(id);
+    if (user.managed_shop) {
+      await user.update({
+        $push: { shops: shop_id },
+      });
+    } else {
+      await user.update({
+        $push: { shops: shop_id },
+        $set: { managed_shop: shop_id },
+      });
+    }
+    return user;
   }
 
   async remove(id: string) {

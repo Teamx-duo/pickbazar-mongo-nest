@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { SettingsController } from './settings.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Setting, SettingSchema } from './schemas/setting.schema';
 import {
   ContactDetail,
   ContactDetailSchema,
@@ -22,40 +21,28 @@ import {
 import { Location, LocationSchema } from './schemas/location.schema';
 import { SeoSetting, SeoSettingSchema } from './schemas/seoSettings.schema';
 import {
-  SettingOption,
-  SettingOptionSchema,
-} from './schemas/settingsOption.schema';
+  SettingsOptions,
+  SettingsOptionsSchema,
+} from './schemas/settingOptions.schema';
 import { ShopSocials, ShopSocialsSchema } from './schemas/shopSocials.schema';
+import { Setting, SettingSchema } from './schemas/setting.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Setting.name, schema: SettingSchema }]),
     MongooseModule.forFeature([
       { name: ContactDetail.name, schema: ContactDetailSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: DeliveryTime.name, schema: DeliveryTimeSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: FacebookSetting.name, schema: FacebookSettingSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: GoogleSetting.name, schema: GoogleSettingSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: Location.name, schema: LocationSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: SeoSetting.name, schema: SeoSettingSchema },
-    ]),
-    MongooseModule.forFeature([
-      { name: SettingOption.name, schema: SettingOptionSchema },
-    ]),
-    MongooseModule.forFeature([
       { name: ShopSocials.name, schema: ShopSocialsSchema },
+      { name: SettingsOptions.name, schema: SettingsOptionsSchema },
+      { name: Setting.name, schema: SettingSchema },
+      { name: DeliveryTime.name, schema: DeliveryTimeSchema },
+      { name: FacebookSetting.name, schema: FacebookSettingSchema },
+      { name: GoogleSetting.name, schema: GoogleSettingSchema },
+      { name: Location.name, schema: LocationSchema },
+      { name: SeoSetting.name, schema: SeoSettingSchema },
     ]),
   ],
   controllers: [SettingsController],
   providers: [SettingsService],
+  exports: [SettingsService, MongooseModule],
 })
 export class SettingsModule {}

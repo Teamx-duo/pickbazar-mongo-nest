@@ -26,6 +26,9 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }] })
   shops?: Shop[];
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  managed_shop?: Shop;
+
   @Prop({ default: 'inactive' })
   is_active?: string;
 

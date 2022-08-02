@@ -1,37 +1,71 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
+import { Setting } from './setting.schema';
 
 export type SeoSettingSchema = SeoSetting & Document;
 
 @Schema()
 export class SeoSetting {
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  metaTitle: string;
+  metaTitle?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  metaDescription: string;
+  metaDescription?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  ogTitle: string;
+  ogTitle?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  ogDescription: string;
+  ogDescription?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  ogImage: Attachment;
+  ogImage?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  twitterHandle: string;
+  twitterHandle?: string;
 
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
   @Prop()
-  twitterCardType: string;
+  twitterCardType?: string;
 
+  @IsString()
+  @ApiProperty()
   @Prop()
-  metaTags: string;
+  metaTags?: string;
 
+  @IsMongoId()
+  @ApiProperty()
+  @IsOptional()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Setting' })
+  setting?: Setting;
+
+  @IsString()
+  @ApiProperty()
   @Prop()
-  canonicalUrl: string;
+  canonicalUrl?: string;
 }
 
 export const SeoSettingSchema = SchemaFactory.createForClass(SeoSetting);

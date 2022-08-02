@@ -1,31 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
-import { Setting } from './entities/setting.entity';
-import settingsJson from './settings.json';
-
-const settings = plainToClass(Setting, settingsJson);
+import { SeoSettingSchema, SeoSetting } from './schemas/seoSettings.schema';
+import { Setting, SettingSchema } from './schemas/setting.schema';
 @Injectable()
 export class SettingsService {
-  private settings: Setting = settings;
-  create(createSettingDto: CreateSettingDto) {
-    return this.settings;
+  constructor(
+    @InjectModel(Setting.name)
+    private settingsModel: PaginateModel<SettingSchema>,
+    @InjectModel(SeoSetting.name)
+    private seoSettingsModel: PaginateModel<SeoSettingSchema>,
+  ) {}
+  async create(createSettingDto: CreateSettingDto) {
+    // const seo = await this.seoSettingsModel.create(
+    //   createSettingDto.options.seo,
+    // );
+    const settings = await this.settingsModel.create(createSettingDto);
+    // await seo.update({ $set: { setting: settings._id } });
+    return settings;
   }
 
-  findAll() {
-    return this.settings;
+  async findAll() {
+    return await this.settingsModel.find({});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} setting`;
+  async findOne(id: string) {
+    return await this.settingsModel.findById(id);
   }
 
-  update(id: number, updateSettingDto: UpdateSettingDto) {
-    return this.settings;
+  async update(id: string, updateSettingDto: UpdateSettingDto) {
+    return await this.settingsModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateSettingDto,
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} setting`;
+  async remove(id: string) {
+    return await this.settingsModel.findByIdAndRemove(id, {
+      new: true,
+    });
   }
 }

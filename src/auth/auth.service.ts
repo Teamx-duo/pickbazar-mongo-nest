@@ -34,7 +34,7 @@ export class AuthService {
     private readonly jwtService: JWTService,
   ) {}
 
-  async register(createUserInput: RegisterDto): Promise<AuthResponse> {
+  async register(createUserInput: RegisterDto) {
     const user = {
       ...createUserInput,
     };
@@ -45,13 +45,17 @@ export class AuthService {
         user.email,
         savedUser.roles,
       );
-      return { token: access_token, user: savedUser };
+      return {
+        token: access_token,
+        user: savedUser,
+        permissions: savedUser.roles,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  async login(loginInput: LoginDto): Promise<AuthResponse> {
+  async login(loginInput: LoginDto) {
     const userFromDb = await this.userModel
       .findOne({
         email: loginInput.email,
@@ -72,7 +76,11 @@ export class AuthService {
         loginInput.email,
         userFromDb.roles,
       );
-      return { token: access_token, user: userFromDb };
+      return {
+        token: access_token,
+        user: userFromDb,
+        permissions: userFromDb.roles,
+      };
     } else {
       throw new HttpException('LOGIN.ERROR', HttpStatus.UNAUTHORIZED);
     }
@@ -178,8 +186,8 @@ export class AuthService {
   // public getUser(getUserArgs: GetUserArgs): User {
   //   return this.users.find((user) => user.id === getUserArgs.id);
   // }
-  me(): User {
-    return users[0];
+  async me(id: string) {
+    return await this.userService.findOne(id);
   }
 
   // updateUser(id: number, updateUserInput: UpdateUserInput) {

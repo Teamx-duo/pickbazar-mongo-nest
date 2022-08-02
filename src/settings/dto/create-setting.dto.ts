@@ -1,7 +1,4 @@
-import { OmitType } from '@nestjs/swagger';
-import { Setting } from '../entities/setting.entity';
+import { OmitType, PickType } from '@nestjs/swagger';
+import { Setting } from '../schemas/setting.schema';
 
-export class CreateSettingDto extends OmitType(Setting, [
-  'created_at',
-  'updated_at',
-]) {}
+export class CreateSettingDto extends PickType(Setting, ['options']) {}

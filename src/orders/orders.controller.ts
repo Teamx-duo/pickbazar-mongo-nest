@@ -28,9 +28,9 @@ export class OrdersController {
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto, @Req() req: Request) {
-    let ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     console.log(ip);
-    return this.ordersService.create(createOrderDto, lookup(ip));
+    return this.ordersService.create(createOrderDto, lookup(ip.toString()));
   }
 
   @Get()
