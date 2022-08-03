@@ -36,7 +36,7 @@ import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor'
 import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
 
 @Controller('categories')
-@UseInterceptors(LoggingInterceptor, TransformInterceptor)
+@UseInterceptors(LoggingInterceptor)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 

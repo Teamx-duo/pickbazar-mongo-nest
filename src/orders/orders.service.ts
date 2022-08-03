@@ -93,7 +93,7 @@ export class OrdersService {
         ...(shop ? { shop } : {}),
         ...(id ? { _id: id } : {}),
       },
-      { limit, page },
+      { limit, page, populate: ['shop', 'coupon', 'products', 'billing_address', 'shipping_address', 'status'] },
     );
     return PaginationResponse(response);
   }

@@ -2,7 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Address } from 'src/addresses/schemas/address.schema';
 import { Shop } from 'src/shops/schemas/shop.shema';
-import { Profile } from './../entities/profile.entity';
+import { Profile } from './../schema/profile.schema';
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type UserSchema = User & Document;
 
@@ -44,3 +45,5 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.plugin(mongoosePaginate);

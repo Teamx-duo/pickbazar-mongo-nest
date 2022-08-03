@@ -35,7 +35,7 @@ import {
 } from './dto/update-variation.dto';
 
 @Controller('products')
-@UseInterceptors(LoggingInterceptor, TransformInterceptor)
+@UseInterceptors(LoggingInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 

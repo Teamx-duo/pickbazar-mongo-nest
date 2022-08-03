@@ -31,7 +31,7 @@ export class AttributesService {
   async findAll({ limit, page, shop }: GetAttributesArgs) {
     const response = await this.attributeModel.paginate(
       { ...(shop ? { shop } : {}) },
-      { limit, page },
+      { limit, page, populate: ['shop', 'values'] },
     );
     return PaginationResponse(response);
   }

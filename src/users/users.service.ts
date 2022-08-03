@@ -9,9 +9,8 @@ import Fuse from 'fuse.js';
 import { User, UserSchema } from './schema/user.schema';
 import { Profile, ProfileSchema } from './schema/profile.schema';
 import usersJson from './users.json';
-import { paginate } from 'src/common/pagination/paginate';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PaginateModel } from 'mongoose';
 import { UpdateUserPermissionsDto } from './dto/update-permission.dto';
 const users = plainToClass(User, usersJson);
 
@@ -23,7 +22,7 @@ const fuse = new Fuse(users, options);
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<UserSchema>,
+    @InjectModel(User.name) private userModel: PaginateModel<UserSchema>,
     @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
   ) {}
   private users: User[] = users;
@@ -54,22 +53,13 @@ export class UsersService {
     }
   }
 
-  async getUsers({ text, limit, page }: GetUsersDto): Promise<UserPaginator> {
-    if (!page) page = 1;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    let data: User[] = this.users;
-    if (text?.replace(/%/g, '')) {
-      data = fuse.search(text)?.map(({ item }) => item);
-    }
-    const results = data.slice(startIndex, endIndex);
-    const url = `/users?limit=${limit}`;
-
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+  async getUsers({ text, limit, page }: GetUsersDto) {
+    return await this.userModel.paginate(
+      {
+        ...(text ? { name: text } : {}),
+      },
+      { limit, page, populate: ['shops', 'address', 'profile'] },
+    );
   }
   async findOne(id: string) {
     return await this.userModel
