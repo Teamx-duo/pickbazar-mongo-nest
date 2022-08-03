@@ -15,6 +15,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
+import config from 'src/config';
 import { UploadsService } from './uploads.service';
 import { editFileName, imageFileFilter } from './uploads.utils';
 
@@ -50,15 +51,111 @@ export class UploadsController {
       fileFilter: imageFileFilter,
     }),
   )
-  async uploadMultipleFiles(
+  async uploadMiscalleneousImages(
     @UploadedFiles() attachment: Express.Multer.File[],
   ) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = {
-        originalname: file.originalname,
-        filename: file.filename,
-      };
+      const fileReponse = `${config.app.imageUrl}/${file.filename}`;
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Post('product/images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images/product',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadProductImages(
+    @UploadedFiles() attachment: Express.Multer.File[],
+  ) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = `${config.app.imageUrl}/product/${file.filename}`;
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Post('category/images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images/category',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadCategoryFiles(
+    @UploadedFiles() attachment: Express.Multer.File[],
+  ) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = `${config.app.imageUrl}/category/${file.filename}`;
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Post('tag/images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images/tag',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadTagFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = `${config.app.imageUrl}/tag/${file.filename}`;
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Post('type/images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images/type',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadTypeFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = `${config.app.imageUrl}/type/${file.filename}`;
+      response.push(fileReponse);
+    });
+    return response;
+  }
+
+  @Post('user/images')
+  @UseInterceptors(
+    FilesInterceptor('attachment', 20, {
+      storage: diskStorage({
+        destination: './uploads/images/user',
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  async uploadUserFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
+    const response = [];
+    attachment.forEach((file) => {
+      const fileReponse = `${config.app.imageUrl}/user/${file.filename}`;
       response.push(fileReponse);
     });
     return response;

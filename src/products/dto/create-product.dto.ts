@@ -4,6 +4,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
@@ -43,11 +44,13 @@ export class CreateProductDto {
 
   @IsNumber()
   @ApiProperty()
+  @IsOptional()
   @Transform((val) => parseInt(val.value))
   public max_price: number;
 
   @IsNumber()
   @ApiProperty()
+  @IsOptional()
   @Transform((val) => parseInt(val.value))
   public min_price: number;
 
@@ -74,37 +77,42 @@ export class CreateProductDto {
   @ApiProperty()
   public status: string;
 
-  @IsString()
+  @IsString({ each: true })
   @IsArray()
   @IsOptional()
   @ApiProperty()
   public gallery: string[];
 
+  @IsString()
   @IsOptional()
-  @IsEnum(ProductStatuses)
   @ApiProperty()
   public image: string;
 
-  @IsString()
+  @IsString({ each: true })
+  @IsArray()
   @IsOptional()
   @ApiProperty()
   public variations: string;
 
+  @IsString({ each: true })
+  @IsArray()
   @IsString()
   @IsOptional()
   @ApiProperty()
   public variation_options: string;
 
+  @IsMongoId({ each: true })
   @IsArray()
   @ApiProperty()
   public categories: string[];
 
+  @IsMongoId({ each: true })
   @IsArray()
   @ApiProperty()
   @IsOptional()
   public tags: string[];
 
-  @IsString()
+  @IsMongoId()
   @ApiProperty()
   public shop: string;
 

@@ -76,7 +76,7 @@ export class ShopsService {
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      { limit, page },
+      { limit, page, populate: ['owner'] },
     );
     return PaginationResponse(responses);
   }

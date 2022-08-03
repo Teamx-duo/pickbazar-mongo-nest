@@ -92,7 +92,7 @@ export class ShopsController {
     return this.shopsService.remove(id);
   }
 
-  @Post('approve')
+  @Post('approve-shop')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   approveShop(@Body() approveShopDto: ApproveShopDto) {

@@ -17,11 +17,9 @@ import {
 } from 'src/common/schemas/attachment.schema';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 import { convertToSlug } from 'src/common/constants/common.function';
+import { ObjectId } from 'mongodb';
 const categories = plainToClass(Category, categoriesJson);
-const options = {
-  keys: ['name', 'type.slug'],
-  threshold: 0.3,
-};
+
 @Injectable()
 export class CategoriesService {
   constructor(
@@ -43,9 +41,12 @@ export class CategoriesService {
     });
   }
 
-  async getCategories({ limit, page, search }: GetCategoriesDto) {
+  async getCategories({ limit, page, search, type }: GetCategoriesDto) {
     const categories = await this.categoryModel.paginate(
-      { ...(search ? { name: { $regex: search, $options: 'i' } } : {}) },
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(type ? { type } : {}),
+      },
       { page, limit, populate: ['parent', 'type'] },
     );
 

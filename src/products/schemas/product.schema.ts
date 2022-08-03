@@ -24,7 +24,7 @@ export class Product {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true })
   type: Type;
 
-  @Prop({ enum: ['simple', 'variable'] })
+  @Prop({ enum: ['simple', 'variable'], default: 'simple' })
   product_type: string;
 
   @Prop({

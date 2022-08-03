@@ -46,6 +46,7 @@ export class ProductsService {
           { path: 'categories', select: '_id name image icon' },
           { path: 'tags', select: '_id name slug image icon' },
           { path: 'shop', select: '_id name' },
+          { path: 'type', select: '_id name' },
         ],
       },
     );

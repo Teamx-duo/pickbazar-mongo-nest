@@ -1,3 +1,5 @@
+import { Transform } from 'class-transformer';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -9,9 +11,20 @@ export class CategoryPaginator extends Paginator<Category> {
 }
 
 export class GetCategoriesDto extends PaginationArgs {
+  @IsString()
+  @IsOptional()
   orderBy?: QueryCategoriesOrderByColumn;
+  @IsString()
+  @IsOptional()
   sortedBy?: SortOrder;
+  @IsMongoId()
+  @IsOptional()
+  type?: string;
+  @IsString()
+  @IsOptional()
   search?: string;
+  @IsMongoId()
+  @IsOptional()
   parent?: number = null;
 }
 
