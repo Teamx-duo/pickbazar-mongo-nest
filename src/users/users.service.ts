@@ -10,7 +10,7 @@ import { User, UserSchema } from './schema/user.schema';
 import { Profile, ProfileSchema } from './schema/profile.schema';
 import usersJson from './users.json';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PaginateModel } from 'mongoose';
+import { Model, ObjectId, PaginateModel } from 'mongoose';
 import { UpdateUserPermissionsDto } from './dto/update-permission.dto';
 const users = plainToClass(User, usersJson);
 
@@ -71,13 +71,16 @@ export class UsersService {
     return await this.userModel.findByIdAndUpdate(id, { $set: updateUserDto });
   }
 
-  async addUserPermission(id: string, updateUserDto: UpdateUserPermissionsDto) {
+  async addUserPermission(
+    id: string | ObjectId,
+    updateUserDto: UpdateUserPermissionsDto,
+  ) {
     return await this.userModel.findByIdAndUpdate(id, {
       $push: { roles: updateUserDto.permissions },
     });
   }
 
-  async addUserShop(id: string, shop_id: any) {
+  async addUserShop(id: string | ObjectId, shop_id: any) {
     const user = await this.userModel.findById(id);
     if (user.managed_shop) {
       await user.update({

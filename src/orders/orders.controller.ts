@@ -76,9 +76,9 @@ export class OrderStatusController {
     return this.ordersService.getOrderStatuses(query);
   }
 
-  @Get(':slug')
-  findOne(@Param('slug') slug: string) {
-    return this.ordersService.getOrderById(slug);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.ordersService.getOrderStatusById(id);
   }
 
   @Put(':id')

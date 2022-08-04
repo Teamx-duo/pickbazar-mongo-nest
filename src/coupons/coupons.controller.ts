@@ -31,22 +31,9 @@ export class CouponsController {
   @Post()
   @Roles(Role.SUPER_ADMIN)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/images/coupon',
-        filename: editFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  createCoupon(
-    @UploadedFile() image: Express.Multer.File,
-    @Body() createCouponDto: CreateCouponDto,
-  ) {
+  createCoupon(@Body() createCouponDto: CreateCouponDto) {
     return this.couponsService.create({
       ...createCouponDto,
-      image: `${config.app.imageUrl}/coupon/${image.filename}`,
     });
   }
 

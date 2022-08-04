@@ -19,7 +19,7 @@ export enum AddressType {
   SHIPPING = 'shipping',
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Address {
   @Prop({ required: true })
   @ApiProperty({ required: true })

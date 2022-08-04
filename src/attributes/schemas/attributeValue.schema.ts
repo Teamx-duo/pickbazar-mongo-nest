@@ -7,12 +7,8 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type AttributeValueSchema = AttributeValue & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class AttributeValue {
-  @IsMongoId()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
-  shop: Shop;
-
   @IsString()
   @Prop({ required: true })
   value: string;
@@ -25,7 +21,6 @@ export class AttributeValue {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Attribute',
-    required: true,
   })
   attribute: Attribute;
 }

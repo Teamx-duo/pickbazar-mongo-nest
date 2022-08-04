@@ -43,30 +43,9 @@ export class CategoriesController {
   @Post()
   @Roles(Role.SUPER_ADMIN)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'icon', maxCount: 1 },
-        { name: 'image', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads/images/category',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
-  )
-  create(
-    @UploadedFiles()
-    images: { icon: Express.Multer.File[]; image: Express.Multer.File[] },
-    @Body() body: CreateCategoryDto,
-  ) {
+  create(@Body() body: CreateCategoryDto) {
     return this.categoriesService.create({
       ...body,
-      icon: `${config.app.imageUrl}/category/${images.icon[0].filename}`,
-      image: `${config.app.imageUrl}/category/${images.image[0].filename}`,
     });
   }
   // @UseInterceptors(
@@ -107,8 +86,7 @@ export class CategoriesController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
-  @UseGuards(RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   update(
     @Param('id') id: string,

@@ -25,7 +25,7 @@ export enum CouponType {
   DEFAULT_COUPON = 'fixed',
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Coupon {
   @IsString()
   @ApiProperty()
@@ -62,8 +62,8 @@ export class Coupon {
 
   @IsBoolean()
   @ApiProperty()
-  @Transform((val) => JSON.parse(val.value.toLowerCase()))
-  @Prop({ required: true })
+  @IsOptional()
+  @Prop({ default: true })
   is_valid: boolean;
 
   @Prop({ required: true })

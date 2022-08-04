@@ -1,6 +1,12 @@
 // import { ApiProperty, PickType } from '@nestjs/swagger';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateVariationDto {
   @IsString()
@@ -15,9 +21,15 @@ export class CreateVariationDto {
   @IsString()
   @IsOptional()
   public is_disable: string;
+  @IsMongoId()
+  @IsOptional()
+  public product: string;
   @IsString()
   @IsOptional()
   public quantity: string;
+  @IsMongoId()
+  @IsOptional()
+  public id?: string;
 }
 
 export class CreateVariationOptionDto {
@@ -25,8 +37,11 @@ export class CreateVariationOptionDto {
   public name: string;
   @IsString()
   public value: string;
-  @IsString()
+  @IsMongoId()
   public variation: string;
+  @IsMongoId()
+  @IsOptional()
+  public product: string;
 }
 
 export class MultipleVariationOptionsDto {
@@ -43,6 +58,7 @@ export class CreateVariationOptionsDto {
   })
   @IsArray()
   options: CreateVariationOptionDto[];
-  @IsString()
-  public variation: string;
+  @IsOptional()
+  @IsMongoId()
+  public variation?: string;
 }

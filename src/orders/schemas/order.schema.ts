@@ -29,7 +29,7 @@ export enum PaymentGatewayType {
   PAYPAL = 'paypal',
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Order {
   @IsString()
   @ApiProperty({ minLength: 10, maxLength: 15 })
@@ -47,17 +47,15 @@ export class Order {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order' })
   parent_order: this;
 
-  @IsMongoId()
+  @IsMongoId({ each: true })
   @IsOptional()
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
   children: this[];
 
-  @IsArray()
+  @IsMongoId()
   @ApiProperty()
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus' }],
-  })
-  status: OrderStatus[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus' })
+  status: OrderStatus;
 
   @IsNumber()
   @ApiProperty()
@@ -112,7 +110,7 @@ export class Order {
   @ApiProperty()
   @IsOptional()
   @Prop()
-  discount: number;
+  discount?: number;
 
   @IsNumber()
   @ApiProperty()
@@ -123,9 +121,10 @@ export class Order {
   @Transform((val) => new Date(val.value))
   @ApiProperty()
   @Prop({ required: true })
-  delivery_time: string;
+  delivery_time: Date;
 
   @IsArray()
+  @IsMongoId()
   @ApiProperty()
   @Prop({
     type: [

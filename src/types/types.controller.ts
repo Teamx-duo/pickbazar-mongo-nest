@@ -25,36 +25,9 @@ export class TypesController {
   constructor(private readonly typesService: TypesService) {}
 
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        {
-          name: 'icon',
-          maxCount: 1,
-        },
-        {
-          name: 'image',
-          maxCount: 1,
-        },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads/images/types',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
-  )
-  create(
-    @UploadedFiles()
-    images: { icon: Express.Multer.File[]; image: Express.Multer.File[] },
-    @Body() createTypeDto: CreateTypeDto,
-  ) {
+  create(@Body() createTypeDto: CreateTypeDto) {
     return this.typesService.create({
       ...createTypeDto,
-      icon: `${config.app.imageUrl}/types/${images.icon[0].filename}`,
-      image: `${config.app.imageUrl}/types/${images.image[0].filename}`,
     });
   }
 

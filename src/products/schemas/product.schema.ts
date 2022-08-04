@@ -12,8 +12,12 @@ import { VariationOption } from './variationOption.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type ProductSchema = Product & Document;
+export enum ProductType {
+  SIMPLE = 'simple',
+  VARIABLE = 'variable',
+}
 
-@Schema()
+@Schema({ timestamps: true })
 export class Product {
   @Prop({ required: true, unique: true })
   name: string;
@@ -24,7 +28,10 @@ export class Product {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true })
   type: Type;
 
-  @Prop({ enum: ['simple', 'variable'], default: 'simple' })
+  @Prop({
+    enum: [ProductType.SIMPLE, ProductType.VARIABLE],
+    default: ProductType.SIMPLE,
+  })
   product_type: string;
 
   @Prop({

@@ -6,7 +6,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type VariationSchema = Variation & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Variation {
   @Prop()
   title: string;
@@ -26,8 +26,8 @@ export class Variation {
   @Prop()
   quantity: number;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] })
-  product: Product[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Product' })
+  product: Product;
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VariationOption' }],

@@ -56,14 +56,15 @@ export class CategoriesService {
   async getCategory(id: string) {
     return await this.categoryModel
       .findById(id)
-      .populate(['image', 'parent', 'children', 'products']);
+      .populate(['image', 'parent', 'children', 'products', 'type']);
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    console.log(updateCategoryDto);
     return await this.categoryModel.findByIdAndUpdate(
       id,
       {
-        $set: { updateCategoryDto },
+        $set: updateCategoryDto,
       },
       { new: true },
     );

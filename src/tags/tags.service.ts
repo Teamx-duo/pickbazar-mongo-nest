@@ -24,12 +24,15 @@ export class TagsService {
   }
 
   async findAll({ page, limit }: GetTagsDto) {
-    const response = await this.tagModel.paginate({}, { page, limit });
+    const response = await this.tagModel.paginate(
+      {},
+      { page, limit, populate: ['type'] },
+    );
     return PaginationResponse(response);
   }
 
   async findOne(id: string) {
-    return await this.tagModel.findById(id);
+    return await this.tagModel.findById(id).populate(['type']);
   }
 
   async update(id: string, updateTagDto: UpdateTagDto) {

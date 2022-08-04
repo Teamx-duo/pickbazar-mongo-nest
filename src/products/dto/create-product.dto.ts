@@ -8,7 +8,13 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  ValidateNested,
 } from 'class-validator';
+import {
+  CreateVariationDto,
+  CreateVariationOptionDto,
+  CreateVariationOptionsDto,
+} from './create-variation.dto';
 
 enum ProductStatuses {
   DRAFT = 'draft',
@@ -29,16 +35,15 @@ export class CreateProductDto {
 
   @IsBoolean()
   @ApiProperty()
-  @Transform((val) => JSON.parse(val.value.toLowerCase()))
   public in_stock: boolean;
 
   @IsBoolean()
   @ApiProperty()
-  @Transform((val) => JSON.parse(val.value.toLowerCase()))
   public is_taxable: boolean;
 
   @IsNumber()
   @ApiProperty()
+  @IsOptional()
   @Transform((val) => parseInt(val.value))
   public sale_price: number;
 
@@ -56,6 +61,7 @@ export class CreateProductDto {
 
   @IsNumber()
   @ApiProperty()
+  @IsOptional()
   @Transform((val) => parseInt(val.value))
   public price: number;
 
@@ -88,18 +94,19 @@ export class CreateProductDto {
   @ApiProperty()
   public image: string;
 
-  @IsString({ each: true })
+  @IsMongoId({ each: true })
   @IsArray()
   @IsOptional()
   @ApiProperty()
-  public variations: string;
+  public variations: string[];
 
-  @IsString({ each: true })
-  @IsArray()
-  @IsString()
+  @ValidateNested({ each: true })
   @IsOptional()
   @ApiProperty()
-  public variation_options: string;
+  public variation_options: {
+    upsert: CreateVariationDto[];
+    delete: CreateVariationDto[];
+  };
 
   @IsMongoId({ each: true })
   @IsArray()

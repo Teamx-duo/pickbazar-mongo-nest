@@ -17,6 +17,7 @@ import {
 import { VariationsService } from './variations.service';
 import { TagsModule } from 'src/tags/tags.module';
 import { Model } from 'mongoose';
+import { ShopsModule } from 'src/shops/shops.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Model } from 'mongoose';
       { name: Variation.name, schema: VariationSchema },
     ]),
     TagsModule,
+    ShopsModule,
   ],
   controllers: [
     ProductsController,

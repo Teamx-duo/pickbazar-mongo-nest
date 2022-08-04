@@ -8,7 +8,7 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 
 export type AttributeSchema = Attribute & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Attribute {
   @IsString()
   @ApiProperty()

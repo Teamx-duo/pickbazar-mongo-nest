@@ -39,36 +39,33 @@ export class ShopsService {
   ) {}
 
   async create(createShopDto: CreateShopDto, user: any) {
+    console.log(createShopDto)
     const shop = await this.shopModel.create({
       ...createShopDto,
       slug: convertToSlug(createShopDto.name),
     });
-    const balance = await this.createBalance({
-      shop: shop._id,
-      admin_commission_rate: 2,
-    });
-    const settings = await this.createShopSettings({ shop: shop._id });
-    const savedShop = await this.shopModel
-      .findByIdAndUpdate(
-        shop._id,
-        { $set: { balance: balance._id, settings: settings._id } },
-        { new: true },
-      )
-      .populate(['settings', 'owner'])
-      .populate({
-        path: 'balance',
-        populate: {
-          path: 'payment_info',
-          model: 'PaymentInfo',
-        },
-      });
+    // const settings = await this.createShopSettings({ shop: shop._id });
+    // const savedShop = await this.shopModel
+    //   .findByIdAndUpdate(
+    //     shop._id,
+    //     { $set: { balance: balance._id, settings: settings._id } },
+    //     { new: true },
+    //   )
+    //   .populate(['settings', 'owner'])
+    //   .populate({
+    //     path: 'balance',
+    //     populate: {
+    //       path: 'payment_info',
+    //       model: 'PaymentInfo',
+    //     },
+    //   });
     if (!user.roles.includes(Role.STORE_OWNER)) {
       await this.userService.addUserPermission(createShopDto.owner, {
         permissions: Role.STORE_OWNER,
       });
     }
     await this.userService.addUserShop(createShopDto.owner, shop._id);
-    return savedShop;
+    return shop;
   }
 
   async getShops({ search, limit, page }: GetShopsDto) {

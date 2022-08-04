@@ -29,6 +29,10 @@ export class VariationsService {
     const variant = await this.variationModel.create(createVariationDto);
     return variant;
   }
+  async createMultiple(createVariationsDto: CreateVariationDto[]) {
+    const variant = await this.variationModel.insertMany(createVariationsDto);
+    return variant;
+  }
   async createVariationOption(
     createVariationOptionDto: CreateVariationOptionDto,
   ) {
@@ -55,7 +59,6 @@ export class VariationsService {
         variation: createVariationOptionDto.variation,
       })),
     );
-    console.log(options);
     const variation = await this.variationModel
       .findOneAndUpdate(
         { _id: createVariationOptionDto.variation },

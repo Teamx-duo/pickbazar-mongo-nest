@@ -24,30 +24,9 @@ export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 
   @Post()
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'image', maxCount: 1 },
-        { name: 'icon', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads/images/tag',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
-  )
-  create(
-    @UploadedFiles()
-    images: { image: Express.Multer.File[]; icon: Express.Multer.File[] },
-    @Body() createTagDto: CreateTagDto,
-  ) {
+  create(@Body() createTagDto: CreateTagDto) {
     return this.tagsService.create({
       ...createTagDto,
-      image: `${config.app.imageUrl}/category/${images.image[0].filename}`,
-      icon: `${config.app.imageUrl}/category/${images.icon[0].filename}`,
     });
   }
 
@@ -62,39 +41,9 @@ export class TagsController {
   }
 
   @Put(':id')
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'image', maxCount: 1 },
-        { name: 'icon', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads/images/tag',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
-  )
-  update(
-    @Param('id') id: string,
-    @UploadedFiles()
-    images: { image: Express.Multer.File[]; icon: Express.Multer.File[] },
-    @Body() updateTagDto: UpdateTagDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateTagDto: UpdateTagDto) {
     return this.tagsService.update(id, {
       ...updateTagDto,
-      ...(images.image
-        ? {
-            image: `${config.app.imageUrl}/tag/${images.image[0].filename}`,
-          }
-        : {}),
-      ...(images.icon
-        ? {
-            icon: `${config.app.imageUrl}/tag/${images.icon[0].filename}`,
-          }
-        : {}),
     });
   }
 

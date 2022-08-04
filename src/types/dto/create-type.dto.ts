@@ -1,12 +1,45 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from '../schemas/type.schema';
 
-export class CreateTypeDto {
+export class UpdateSettingsDto {
+  @IsMongoId()
+  id: string;
   @IsString()
-  public name: string;
+  isHome: string;
   @IsString()
+  layoutType: string;
+  @IsString()
+  productCard: string;
+}
+
+export class UpdateBannerDto {
+  @IsMongoId()
+  id: string;
+  @IsString()
+  type: Type;
+  @IsString()
+  title: string;
+  @IsString()
+  description: string;
+  @IsString()
+  image: string;
+}
+
+export class CreateTypeDto extends PickType(Type, [
+  'icon',
+  'name',
+  'promotional_sliders',
+]) {
+  @IsArray()
   @IsOptional()
-  public icon: string;
-  @IsString()
+  banners: UpdateBannerDto[];
   @IsOptional()
-  public image: string;
+  settings: UpdateSettingsDto;
 }

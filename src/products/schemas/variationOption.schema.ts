@@ -5,7 +5,7 @@ import { Variation } from './variation.schema';
 
 export type VariationOptionSchema = VariationOption & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class VariationOption {
   @Prop({ required: true })
   name: string;

@@ -25,7 +25,20 @@ export class AttributesService {
   private attributes: Attribute[] = attributes;
 
   async create(createAttributeDto: CreateAttributeDto) {
-    return this.attributeModel.create(createAttributeDto);
+    const attr = await this.attributeModel.create({
+      name: createAttributeDto.name,
+      shop: createAttributeDto.shop,
+      slug: createAttributeDto.slug,
+    });
+    const values = await this.attributeValueModel.insertMany(
+      createAttributeDto.values.map((val) => ({
+        value: val.value,
+        meta: val.meta,
+        attribute: attr._id,
+      })),
+    );
+    attr.values = values.map((val) => val._id);
+    return await attr.save();
   }
 
   async findAll({ limit, page, shop }: GetAttributesArgs) {
@@ -37,14 +50,35 @@ export class AttributesService {
   }
 
   async findOne(id: string) {
-    return this.attributeModel.findById(id);
+    return this.attributeModel.findById(id).populate(['values']);
   }
 
   async update(id: string, updateAttributeDto: UpdateAttributeDto) {
+    const attrList: any = [];
+
+    for (let i = 0; i < updateAttributeDto.values?.length; i++) {
+      const attr = updateAttributeDto.values[i];
+      let attrValue: any;
+      if (attr.id) {
+        attrValue = await this.attributeValueModel.findByIdAndUpdate(attr.id, {
+          $set: { meta: attr.meta, value: attr.value },
+        });
+      } else {
+        attrValue = await this.attributeValueModel.create({
+          value: attr.value,
+          meta: attr.meta,
+          attribute: id,
+        });
+      }
+      attrList.push(attrValue._id);
+    }
     return await this.attributeModel.findByIdAndUpdate(
       id,
       {
-        $set: updateAttributeDto,
+        $set: {
+          name: updateAttributeDto.name,
+          values: attrList,
+        },
       },
       { new: true },
     );
