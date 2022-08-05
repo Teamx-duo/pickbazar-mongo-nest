@@ -35,34 +35,12 @@ export class ShopsController {
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.CUSTOMER, Role.SUPER_ADMIN)
-  @UseInterceptors(
-    FileFieldsInterceptor(
-      [
-        { name: 'cover_image', maxCount: 1 },
-        { name: 'logo', maxCount: 1 },
-      ],
-      {
-        storage: diskStorage({
-          destination: './uploads/images/shop',
-          filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-      },
-    ),
-  )
-  create(
-    @UploadedFiles()
-    images: { cover_image: Express.Multer.File[]; logo: Express.Multer.File[] },
-    @Body() createShopDto: CreateShopDto,
-    @Req() req: Request,
-  ) {
+  create(@Body() createShopDto: CreateShopDto, @Req() req: Request) {
     return this.shopsService.create(
       {
         ...createShopDto,
         // @ts-ignore
         owner: req.user?._id,
-        cover_image: `${config.app.imageUrl}/shop/${images.logo[0].filename}`,
-        logo: `${config.app.imageUrl}/shop/${images.cover_image[0].filename}`,
       },
       req.user,
     );
@@ -116,10 +94,10 @@ export class StaffsController {
     return this.shopsService.create(createShopDto, req.user);
   }
 
-  // @Get()
-  // async getStaffs(@Query() query: GetStaffsDto): Promise<UserPaginator> {
-  //   return this.shopsService.getStaffs(query);
-  // }
+  @Get()
+  async getStaffs(@Query() query: GetStaffsDto) {
+    return this.shopsService.getStaffs(query);
+  }
 
   @Get(':slug')
   async getShop(@Param('slug') slug: string) {

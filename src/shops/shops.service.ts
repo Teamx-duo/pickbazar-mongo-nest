@@ -1,7 +1,11 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
 import mongoose, { ObjectId, PaginateModel } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { ApproveShopDto, CreateShopDto } from './dto/create-shop.dto';
+import {
+  ApproveShopDto,
+  CreateShopDto,
+  DisApproveDto,
+} from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { GetShopsDto } from './dto/get-shops.dto';
 import { GetStaffsDto } from './dto/get-staffs.dto';
@@ -39,26 +43,11 @@ export class ShopsService {
   ) {}
 
   async create(createShopDto: CreateShopDto, user: any) {
-    console.log(createShopDto)
+    console.log(createShopDto);
     const shop = await this.shopModel.create({
       ...createShopDto,
       slug: convertToSlug(createShopDto.name),
     });
-    // const settings = await this.createShopSettings({ shop: shop._id });
-    // const savedShop = await this.shopModel
-    //   .findByIdAndUpdate(
-    //     shop._id,
-    //     { $set: { balance: balance._id, settings: settings._id } },
-    //     { new: true },
-    //   )
-    //   .populate(['settings', 'owner'])
-    //   .populate({
-    //     path: 'balance',
-    //     populate: {
-    //       path: 'payment_info',
-    //       model: 'PaymentInfo',
-    //     },
-    //   });
     if (!user.roles.includes(Role.STORE_OWNER)) {
       await this.userService.addUserPermission(createShopDto.owner, {
         permissions: Role.STORE_OWNER,
@@ -87,6 +76,7 @@ export class ShopsService {
   }
 
   async update(id: string, updateShopDto: UpdateShopDto) {
+    console.log(updateShopDto);
     return await this.shopModel.findByIdAndUpdate(
       id,
       { $set: updateShopDto },
@@ -103,14 +93,20 @@ export class ShopsService {
   }
 
   async approve({ id, admin_commission_rate }: ApproveShopDto) {
-    await this.balanceModel.findOneAndUpdate(
-      { shop: id },
-      { $set: { admin_commission_rate } },
-    );
     return await this.shopModel.findByIdAndUpdate(
       id,
       {
-        $set: { is_active: true },
+        $set: { is_active: true, balance: { admin_commission_rate } },
+      },
+      { new: true },
+    );
+  }
+
+  async disApprove({ id }: DisApproveDto) {
+    return await this.shopModel.findByIdAndUpdate(
+      id,
+      {
+        $set: { is_active: false },
       },
       { new: true },
     );

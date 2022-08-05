@@ -23,6 +23,7 @@ export type ShopSchema = Shop & Document;
 @Schema({ timestamps: true })
 export class Shop {
   @IsMongoId()
+  @IsOptional()
   @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   owner: mongoose.Schema.Types.ObjectId;
@@ -56,8 +57,8 @@ export class Shop {
   @Prop({ required: true, default: 0, min: 0 })
   products_count: number;
 
-  @ValidateNested()
   @ApiProperty()
+  @IsOptional()
   @Prop(
     raw({
       admin_commission_rate: { type: Number },
@@ -69,13 +70,13 @@ export class Shop {
       current_balance: { type: Number },
 
       payment_info: {
-        account: { type: String, required: true },
+        account: { type: String },
 
-        name: { type: Boolean, required: true },
+        name: { type: String },
 
-        email: { type: String, required: true },
+        email: { type: String },
 
-        bank: { type: String, required: true },
+        bank: { type: String },
       },
     }),
   )
@@ -110,8 +111,8 @@ export class Shop {
   })
   logo: string;
 
-  @ValidateNested()
   @ApiProperty()
+  @IsOptional()
   @Prop(
     raw({
       street_address: { type: String },
@@ -127,8 +128,8 @@ export class Shop {
   )
   address: Record<string, any>;
 
-  @ValidateNested()
   @ApiProperty()
+  @IsOptional()
   @Prop(
     raw({
       socials: [
@@ -137,7 +138,7 @@ export class Shop {
           url: { type: String, required: true },
         },
       ],
-      contact: { type: Boolean },
+      contact: { type: String },
       location: { type: String },
       website: { type: String },
     }),

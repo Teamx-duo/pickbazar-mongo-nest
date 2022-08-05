@@ -66,9 +66,14 @@ export class CreateShopDto extends PickType(Shop, [
 // }
 
 export class ApproveShopDto {
-  @IsString()
+  @IsMongoId()
   public id: string;
 
   @IsNumber()
   public admin_commission_rate: number;
+}
+
+export class DisApproveDto {
+  @IsMongoId()
+  public id: string;
 }

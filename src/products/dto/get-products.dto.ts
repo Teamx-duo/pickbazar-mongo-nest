@@ -1,3 +1,4 @@
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -9,8 +10,17 @@ export class ProductPaginator extends Paginator<Product> {
 }
 
 export class GetProductsDto extends PaginationArgs {
-  orderBy?: QueryProductsOrderByColumn;
-  sortedBy?: SortOrder;
+  @IsString()
+  @IsOptional()
+  orderBy?: SortOrder;
+  @IsString()
+  @IsOptional()
+  sortedBy?: QueryProductsOrderByColumn;
+  @IsMongoId()
+  @IsOptional()
+  shop?: string;
+  @IsString()
+  @IsOptional()
   search?: string;
 }
 
@@ -23,6 +33,11 @@ export class GetVariationsDto extends PaginationArgs {
 
 export enum QueryProductsOrderByColumn {
   CREATED_AT = 'createdAt',
+  PRICE = 'price',
+  MIN_PRICE = 'min_price',
+  MAX_PRICE = 'max_price',
+  SALE_PRICE = 'sale_price',
+  QUANTITY = 'quantity',
   NAME = 'name',
   UPDATED_AT = 'updatedAt',
 }

@@ -4,7 +4,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductsDto } from './dto/get-products.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductSchema, ProductType } from './schemas/product.schema';
-import { PaginateModel } from 'mongoose';
+import mongoose, { PaginateModel } from 'mongoose';
 import { GetPopularProductsDto } from './dto/get-popular-products.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
@@ -59,8 +59,6 @@ export class ProductsService {
       dbProduct.variations = variantIds;
     }
 
-    console.log(dbProduct);
-
     await dbProduct.save();
     return dbProduct;
   }
@@ -70,16 +68,18 @@ export class ProductsService {
     page,
     search,
     orderBy,
+    shop,
     sortedBy,
   }: GetProductsDto) {
     const response = await this.productModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(shop ? { shop: shop } : {}),
       },
       {
         limit,
         page,
-        sort: { [sortedBy]: orderBy },
+        sort: { [orderBy]: sortedBy },
         populate: [
           { path: 'variations' },
           { path: 'variation_options' },
