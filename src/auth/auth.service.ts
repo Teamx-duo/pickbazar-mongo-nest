@@ -24,12 +24,14 @@ import { Model } from 'mongoose';
 import usersJson from 'src/users/users.json';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from 'src/users/users.service';
+import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 const users = plainToClass(User, usersJson);
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserSchema>,
+    @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
     private readonly userService: UsersService,
     private readonly jwtService: JWTService,
   ) {}
@@ -84,11 +86,6 @@ export class AuthService {
     } else {
       throw new HttpException('LOGIN.ERROR', HttpStatus.UNAUTHORIZED);
     }
-    // const user = this.userModel.find();
-    // return {
-    //   token: 'jwt token',
-    //   user: users[0],
-    // };
   }
 
   async changePassword(
@@ -143,15 +140,20 @@ export class AuthService {
   }
 
   async otpLogin(otpLoginDto: OtpLoginDto): Promise<AuthResponse> {
-    console.log(otpLoginDto);
     return {
       token: 'jwt token',
       user: users[0],
     };
   }
 
-  async verifyOtpCode(verifyOtpInput: VerifyOtpDto): Promise<CoreResponse> {
-    console.log(verifyOtpInput);
+  async verifyOtpCode(
+    verifyOtpInput: VerifyOtpDto,
+    user?: any,
+  ): Promise<CoreResponse> {
+    await this.profileModel.findOneAndUpdate(
+      { user },
+      { $set: { contact: verifyOtpInput.phone_number } },
+    );
     return {
       message: 'success',
       success: true,
@@ -159,7 +161,7 @@ export class AuthService {
   }
 
   async sendOtpCode(otpInput: OtpDto): Promise<OtpResponse> {
-    console.log(otpInput);
+    // return await this.userModel.findByIdAndUpdate();
     return {
       message: 'success',
       success: true,

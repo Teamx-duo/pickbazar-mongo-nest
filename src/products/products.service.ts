@@ -70,11 +70,17 @@ export class ProductsService {
     orderBy,
     shop,
     sortedBy,
+    category,
   }: GetProductsDto) {
     const response = await this.productModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
         ...(shop ? { shop: shop } : {}),
+        ...(category
+          ? {
+              categories: category,
+            }
+          : {}),
       },
       {
         limit,
@@ -83,10 +89,10 @@ export class ProductsService {
         populate: [
           { path: 'variations' },
           { path: 'variation_options' },
-          { path: 'categories', select: '_id name image icon' },
-          { path: 'tags', select: '_id name slug image icon' },
-          { path: 'shop', select: '_id name' },
-          { path: 'type', select: '_id name' },
+          { path: 'categories' },
+          { path: 'tags' },
+          { path: 'shop' },
+          { path: 'type' },
         ],
       },
     );
@@ -102,6 +108,7 @@ export class ProductsService {
         'variations',
         'variation_options',
         'shop',
+        'type',
       ]);
   }
 

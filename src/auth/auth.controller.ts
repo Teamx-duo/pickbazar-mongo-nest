@@ -11,6 +11,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Role } from 'src/common/constants/roles.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from 'src/common/guards/roles.guards';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
@@ -71,8 +74,10 @@ export class AuthController {
     return this.authService.sendOtpCode(otpDto);
   }
   @Post('verify-otp-code')
-  verifyOtpCode(@Body() verifyOtpDto: VerifyOtpDto) {
-    return this.authService.verifyOtpCode(verifyOtpDto);
+  @Roles(Role.CUSTOMER, Role.STORE_OWNER)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  verifyOtpCode(@Body() verifyOtpDto: VerifyOtpDto, @Req() req) {
+    return this.authService.verifyOtpCode(verifyOtpDto, req.user._id);
   }
   @Post('forget-password')
   forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {

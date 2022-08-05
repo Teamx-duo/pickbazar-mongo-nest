@@ -22,6 +22,9 @@ export class GetProductsDto extends PaginationArgs {
   @IsString()
   @IsOptional()
   search?: string;
+  @IsMongoId()
+  @IsOptional()
+  category?: string;
 }
 
 export class GetVariationsDto extends PaginationArgs {
