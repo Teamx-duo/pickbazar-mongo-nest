@@ -32,6 +32,7 @@ import configuration, { ConfigType } from './configuration/config';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const config = configService.get<ConfigType['db']>('db');
+        const mongoConfig = configService.get<ConfigType['mongodb']>('mongodb');
 
         const userString =
           config.user && config.pass
@@ -43,15 +44,16 @@ import configuration, { ConfigType } from './configuration/config';
           : '';
 
         return {
-          uri:
-            'mongodb://' +
-            userString +
-            config.host +
-            ':' +
-            config.port +
-            '/' +
-            config.database +
-            authSource,
+          uri: mongoConfig.uri
+            ? mongoConfig.uri
+            : 'mongodb://' +
+              userString +
+              config.host +
+              ':' +
+              config.port +
+              '/' +
+              config.database +
+              authSource,
         };
       },
       inject: [ConfigService],

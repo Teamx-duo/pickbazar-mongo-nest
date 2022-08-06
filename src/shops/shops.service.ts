@@ -96,7 +96,10 @@ export class ShopsService {
     return await this.shopModel.findByIdAndUpdate(
       id,
       {
-        $set: { is_active: true, balance: { admin_commission_rate } },
+        $set: {
+          is_active: true,
+          'balance.admin_commission_rate': admin_commission_rate,
+        },
       },
       { new: true },
     );

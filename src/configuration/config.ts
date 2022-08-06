@@ -1,5 +1,8 @@
 export interface ConfigType {
   port: string;
+  mongodb: {
+    uri: string;
+  };
   db: {
     user: string;
     pass: string;
@@ -35,6 +38,9 @@ export interface ConfigType {
 
 export default () => ({
   port: parseInt(process.env.PORT, 10) || 5000,
+  mongodb: {
+    uri: process.env.MONGO_URI,
+  },
   db: {
     user: process.env.DATABASE_USER,
     pass: process.env.DATABASE_PASSWORD,

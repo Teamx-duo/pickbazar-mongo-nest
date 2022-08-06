@@ -90,7 +90,6 @@ export class ProductsService {
         'tags',
         'categories',
         'variations',
-        'variations.attribute',
         'variation_options',
         'shop',
         'type',
@@ -104,7 +103,6 @@ export class ProductsService {
         'tags',
         'categories',
         'variations',
-        'variations.attribute',
         'variation_options',
         'shop',
       ]);
@@ -125,7 +123,6 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    const deleteVariationIds: any = updateProductDto.variation_options.delete;
     const addVariationObjects: any = updateProductDto.variation_options.upsert;
     delete updateProductDto.variation_options;
     return await this.productModel.findByIdAndUpdate(
