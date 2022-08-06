@@ -33,33 +33,17 @@ export class ProductsService {
     private readonly variationService: VariationsService,
   ) {}
   async create(createProductDto: CreateProductDto) {
-    const variantIds: any = createProductDto.variations;
-    const dbProduct = await this.productModel.create({
+    const createObj = {
       ...createProductDto,
+      variation_options: createProductDto.variation_options.upsert,
+    };
+    const dbProduct = await this.productModel.create({
+      ...createObj,
       slug: convertToSlug(createProductDto.name),
     });
-    await this.shopModel.findByIdAndUpdate(createProductDto.shop, {
+    await this.shopModel.findByIdAndUpdate(createObj.shop, {
       $inc: { products_count: 1 },
     });
-    if (
-      createProductDto.type === ProductType.VARIABLE &&
-      createProductDto.variation_options &&
-      createProductDto.variation_options?.upsert &&
-      createProductDto.variation_options?.upsert?.length
-    ) {
-      const variations: any = await this.variationService.createMultiple(
-        createProductDto.variation_options.upsert.map((option) => ({
-          ...option,
-          product: dbProduct._id,
-        })),
-      );
-      dbProduct.variation_options = variations.map((variant) => variant._id);
-    }
-    if (createProductDto.variations) {
-      dbProduct.variations = variantIds;
-    }
-
-    await dbProduct.save();
     return dbProduct;
   }
 
@@ -106,6 +90,7 @@ export class ProductsService {
         'tags',
         'categories',
         'variations',
+        'variations.attribute',
         'variation_options',
         'shop',
         'type',
@@ -119,6 +104,7 @@ export class ProductsService {
         'tags',
         'categories',
         'variations',
+        'variations.attribute',
         'variation_options',
         'shop',
       ]);
@@ -139,41 +125,15 @@ export class ProductsService {
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
-    let variationOptions = [];
-    if (
-      updateProductDto.type === ProductType.VARIABLE &&
-      updateProductDto.variation_options &&
-      updateProductDto.variation_options?.upsert &&
-      updateProductDto.variation_options?.upsert?.length
-    ) {
-      for (
-        let i = 0;
-        i < updateProductDto.variation_options.upsert?.length;
-        i++
-      ) {
-        const var_option = updateProductDto.variation_options.upsert[i];
-        let savedVarOption: any;
-        if (var_option.id) {
-          savedVarOption = await this.variationModel.findByIdAndUpdate(
-            var_option.id,
-            {
-              $set: { ...var_option },
-            },
-          );
-        } else {
-          savedVarOption = await this.variationService.create({
-            ...var_option,
-          });
-        }
-        variationOptions.push(savedVarOption._id);
-      }
-    }
+    const deleteVariationIds: any = updateProductDto.variation_options.delete;
+    const addVariationObjects: any = updateProductDto.variation_options.upsert;
+    delete updateProductDto.variation_options;
     return await this.productModel.findByIdAndUpdate(
       id,
       {
         $set: {
           ...updateProductDto,
-          variation_options: variationOptions,
+          variation_options: addVariationObjects,
         },
       },
       { new: true },

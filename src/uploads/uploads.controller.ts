@@ -9,6 +9,7 @@ import {
   Res,
   Body,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   AnyFilesInterceptor,
   FileInterceptor,
@@ -16,12 +17,18 @@ import {
 } from '@nestjs/platform-express';
 import multer, { diskStorage } from 'multer';
 import config from 'src/config';
+import { ConfigType } from 'src/configuration/config';
 import { UploadsService } from './uploads.service';
 import { editFileName, imageFileFilter } from './uploads.utils';
 
 @Controller('attachments')
 export class UploadsController {
-  constructor(private readonly uploadsService: UploadsService) {}
+  constructor(
+    private readonly uploadsService: UploadsService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  imageUrl = this.configService.get<ConfigType['app']>('app').imageUrl;
 
   @Post('image')
   @UseInterceptors(
@@ -56,7 +63,7 @@ export class UploadsController {
   ) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/${file.filename}`;
       response.push(fileReponse);
     });
     return response;
@@ -77,7 +84,7 @@ export class UploadsController {
   ) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/product/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/product/${file.filename}`;
       response.push(fileReponse);
     });
     return response;
@@ -98,7 +105,7 @@ export class UploadsController {
   ) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/category/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/category/${file.filename}`;
       response.push(fileReponse);
     });
     return response;
@@ -117,7 +124,7 @@ export class UploadsController {
   async uploadTagFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/tag/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/tag/${file.filename}`;
       response.push(fileReponse);
     });
     return response;
@@ -136,7 +143,7 @@ export class UploadsController {
   async uploadTypeFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/type/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/type/${file.filename}`;
       response.push(fileReponse);
     });
     return response;
@@ -155,7 +162,7 @@ export class UploadsController {
   async uploadUserFiles(@UploadedFiles() attachment: Express.Multer.File[]) {
     const response = [];
     attachment.forEach((file) => {
-      const fileReponse = `${config.app.imageUrl}/user/${file.filename}`;
+      const fileReponse = `${this.imageUrl}/user/${file.filename}`;
       response.push(fileReponse);
     });
     return response;

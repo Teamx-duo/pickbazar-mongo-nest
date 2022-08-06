@@ -1,36 +1,51 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Product } from 'src/products/schemas/product.schema';
-import { VariationOption } from './variationOption.schema';
+import {
+  VariationOption,
+  VariationOptionSchema,
+} from './variationOption.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export type VariationSchema = Variation & Document;
 
 @Schema({ timestamps: true })
 export class Variation {
-  @Prop()
+  @IsString()
+  @IsOptional()
+  id?: string;
+
+  @IsString()
+  @Prop({ required: true })
   title: string;
 
-  @Prop()
+  @IsNumber()
+  @Prop({ required: true })
   price: number;
 
+  @IsString()
+  @IsOptional()
   @Prop()
   sku: string;
 
-  @Prop()
+  @IsBoolean()
+  @IsOptional()
+  @Prop({ default: false })
   is_disable: boolean;
 
+  @IsNumber()
+  @IsOptional()
   @Prop()
   sale_price: number;
 
-  @Prop()
+  @IsNumber()
+  @Prop({ required: true })
   quantity: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Product' })
-  product: Product;
-
+  @IsOptional()
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VariationOption' }],
+    type: [VariationOptionSchema],
   })
   options: VariationOption[];
 }

@@ -2,14 +2,22 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { AttributeValue } from 'src/attributes/schemas/attributeValue.schema';
 import { Category } from 'src/categories/schemas/category.schema';
-import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Order } from 'src/orders/schemas/order.schema';
 import { Shop } from 'src/shops/schemas/shop.shema';
 import { Tag } from 'src/tags/schemas/tag.schema';
 import { Type } from 'src/types/schemas/type.schema';
-import { Variation } from './variation.schema';
-import { VariationOption } from './variationOption.schema';
+import { Variation, VariationSchema } from './variation.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export type ProductSchema = Product & Document;
 export enum ProductType {
@@ -17,42 +25,72 @@ export enum ProductType {
   VARIABLE = 'variable',
 }
 
+export enum ProductStatus {
+  PUBLISH = 'publish',
+  DRAFT = 'draft',
+}
+
 @Schema({ timestamps: true })
 export class Product {
+  @IsString()
+  @ApiProperty()
   @Prop({ required: true, unique: true })
+  @ApiProperty()
   name: string;
 
+  @IsString()
+  @IsOptional()
   @Prop({ required: true, unique: true })
+  @ApiProperty()
   slug: string;
 
+  @IsMongoId()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Type', required: true })
+  @ApiProperty()
   type: Type;
 
+  @IsEnum(ProductType)
+  @IsOptional()
   @Prop({
     enum: [ProductType.SIMPLE, ProductType.VARIABLE],
     default: ProductType.SIMPLE,
   })
+  @ApiProperty()
   product_type: string;
 
+  @IsMongoId({ each: true })
+  @IsArray()
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
     required: true,
   })
+  @ApiProperty()
   categories: Category[];
 
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }] })
-  tags: Tag[];
+  @ApiProperty()
+  tags?: Tag[];
 
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Variation' }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'AttributeValue' }],
   })
-  variations: Variation[];
+  @ApiProperty()
+  variations?: AttributeValue[];
 
+  @IsOptional()
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'VariationOption' }],
+    type: [VariationSchema],
   })
-  variation_options: VariationOption[];
+  @ApiProperty()
+  variation_options?: Variation[];
 
+  @IsOptional()
   @Prop(
     raw({
       variation_option_id: { type: Number },
@@ -61,60 +99,116 @@ export class Product {
       subtotal: { type: Number },
     }),
   )
-  pivot: Record<string, any>;
+  @ApiProperty()
+  pivot?: Record<string, any>;
 
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
+  @ApiProperty()
   orders: Order[];
 
+  @IsMongoId()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
+  @ApiProperty()
   shop: Shop;
 
+  @IsString()
   @Prop({ required: true })
+  @ApiProperty()
   description: string;
 
-  @Prop({ required: true })
+  @IsBoolean()
+  @IsOptional()
+  @Prop({ required: true, default: true })
+  @ApiProperty()
   in_stock: boolean;
 
-  @Prop({ required: true })
+  @IsBoolean()
+  @IsOptional()
+  @Prop({ required: true, default: true })
+  @ApiProperty()
   is_taxable: boolean;
 
-  @Prop({ required: true })
+  @IsNumber()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   sale_price: number;
 
-  @Prop({ required: true })
+  @IsNumber()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   max_price: number;
 
-  @Prop({ required: true })
+  @IsNumber()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   min_price: number;
 
-  @Prop({ required: true })
+  @IsString()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   sku: string;
 
+  @IsString({ each: true })
+  @IsArray()
   @Prop({ required: true })
+  @ApiProperty()
   gallery: string[];
 
+  @IsString({ each: true })
   @Prop({ required: true })
+  @ApiProperty()
   image: string;
 
-  @Prop({ enum: ['published', 'draft'], default: 'published' })
-  status: string;
+  @IsEnum(ProductStatus)
+  @IsOptional()
+  @Prop({
+    enum: [ProductStatus.PUBLISH, ProductStatus.DRAFT],
+    default: ProductStatus.PUBLISH,
+  })
+  @ApiProperty()
+  status: ProductStatus;
 
+  @IsString()
+  @IsOptional()
   @Prop()
+  @ApiProperty()
   height: string;
 
+  @IsString()
+  @IsOptional()
   @Prop()
+  @ApiProperty()
   length: string;
 
+  @IsString()
+  @IsOptional()
   @Prop()
+  @ApiProperty()
   width: string;
 
-  @Prop({ required: true })
+  @IsNumber()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   price: number;
 
-  @Prop({ required: true })
+  @IsNumber()
+  @IsOptional()
+  @Prop()
+  @ApiProperty()
   quantity: number;
 
+  @IsString()
+  @IsOptional()
   @Prop({ required: true })
+  @ApiProperty()
   unit: string;
 }
 

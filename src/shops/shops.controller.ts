@@ -8,21 +8,18 @@ import {
   Param,
   Delete,
   Query,
-  UseInterceptors,
-  UploadedFiles,
   UseGuards,
   Req,
 } from '@nestjs/common';
 import { ShopsService } from './shops.service';
-import { ApproveShopDto, CreateShopDto } from './dto/create-shop.dto';
+import {
+  ApproveShopDto,
+  CreateShopDto,
+  DisApproveDto,
+} from './dto/create-shop.dto';
 import { UpdateShopDto } from './dto/update-shop.dto';
 import { GetShopsDto } from './dto/get-shops.dto';
 import { GetStaffsDto } from './dto/get-staffs.dto';
-import { UserPaginator } from 'src/users/dto/get-users.dto';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
-import config from 'src/config';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
 import { AuthGuard } from '@nestjs/passport';
@@ -35,11 +32,10 @@ export class ShopsController {
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.CUSTOMER, Role.SUPER_ADMIN)
-  create(@Body() createShopDto: CreateShopDto, @Req() req: Request) {
+  create(@Body() createShopDto: CreateShopDto, @Req() req) {
     return this.shopsService.create(
       {
         ...createShopDto,
-        // @ts-ignore
         owner: req.user?._id,
       },
       req.user,
@@ -76,11 +72,11 @@ export class ShopsController {
   approveShop(@Body() approveShopDto: ApproveShopDto) {
     return this.shopsService.approve(approveShopDto);
   }
-  @Post('disapprove')
+  @Post('disapprove-shop')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  disapproveShop(@Body() approveShopDto: ApproveShopDto) {
-    return this.shopsService.approve(approveShopDto);
+  disapproveShop(@Body() disapproveShopDto: DisApproveDto) {
+    return this.shopsService.disApprove(disapproveShopDto);
   }
 }
 @Controller('staffs')

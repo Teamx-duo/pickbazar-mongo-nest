@@ -1,3 +1,4 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
@@ -19,23 +20,42 @@ import { AddressesModule } from './addresses/addresses.module';
 import { ImportsModule } from './imports/imports.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
-import config from './config';
-import { APP_GUARD } from '@nestjs/core';
-import { RolesGuard } from './common/guards/roles.guards';
-
-const userString =
-  config.db.user && config.db.pass
-    ? config.db.user + ':' + config.db.pass + '@'
-    : '';
-const authSource = config.db.authSource
-  ? '?authSource=' + config.db.authSource + '&w=1'
-  : '';
+import configuration, { ConfigType } from './configuration/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017', { dbName: 'nest' }),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const config = configService.get<ConfigType['db']>('db');
+
+        const userString =
+          config.user && config.pass
+            ? config.user + ':' + config.pass + '@'
+            : '';
+
+        const authSource = config.authSource
+          ? '?authSource=' + config.authSource + '&w=1'
+          : '';
+
+        return {
+          uri:
+            'mongodb://' +
+            userString +
+            config.host +
+            ':' +
+            config.port +
+            '/' +
+            config.database +
+            authSource,
+        };
+      },
+      inject: [ConfigService],
+    }),
     UsersModule,
     CommonModule,
     ProductsModule,

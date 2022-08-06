@@ -45,7 +45,8 @@ export class TypesService {
   }
 
   async create(createTypeDto: CreateTypeDto) {
-    let bannerIds = [];
+    console.log(createTypeDto);
+    const bannerIds = [];
     const createObj = { ...createTypeDto };
     const dbType = await this.typeModel.create({
       promotional_sliders: createObj.promotional_sliders,
@@ -56,10 +57,11 @@ export class TypesService {
     });
     if (createTypeDto.banners) {
       const banners = await this.bannerModel.insertMany(createTypeDto.banners);
-      bannerIds.push(banners.map((banner) => banner._id));
+      bannerIds.push(...banners.map((banner) => banner._id));
     }
     createObj.banners = bannerIds;
     dbType.banners = bannerIds;
+    console.log('UPDATE', createObj);
     return await dbType.save();
   }
 
@@ -76,7 +78,7 @@ export class TypesService {
     const bannerIds = [];
 
     for (let i = 0; i < updateObj.banners.length; i++) {
-      let banner = updateObj.banners[i];
+      const banner = updateObj.banners[i];
       let savedBanner;
       if (banner.id) {
         savedBanner = await this.bannerModel.findByIdAndUpdate(id, {
