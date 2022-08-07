@@ -1,4 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
 import { User } from './user.schema';
@@ -7,12 +8,17 @@ export type ProfileSchema = Profile & Document;
 
 @Schema()
 export class Profile {
+  @IsString()
+  @IsOptional()
   @Prop()
-  avatar: Attachment;
+  avatar: string;
 
+  @IsString()
+  @IsOptional()
   @Prop()
-  bio: boolean;
+  bio: string;
 
+  @IsOptional()
   @Prop(
     raw({
       type: { type: String },
@@ -21,11 +27,10 @@ export class Profile {
   )
   socials: Record<string, any>[];
 
+  @IsString()
+  @IsOptional()
   @Prop()
   contact: string;
-
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  customer: User;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile);

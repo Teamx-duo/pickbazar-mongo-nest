@@ -38,12 +38,7 @@ export class UsersService {
       const userData = new this.userModel(user);
       const password = await bcrypt.hash(user.password, 10);
       userData.password = password;
-      const savedUser = await userData.save();
-      const profile = await this.profileModel.create({
-        customer: savedUser._id,
-      });
-      savedUser.profile = profile._id;
-      await savedUser.save();
+      await userData.save();
       return user;
     } else {
       throw new HttpException(

@@ -25,6 +25,7 @@ import usersJson from 'src/users/users.json';
 import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from 'src/users/users.service';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 const users = plainToClass(User, usersJson);
 
 @Injectable()
@@ -190,6 +191,10 @@ export class AuthService {
   // }
   async me(id: string) {
     return await this.userService.findOne(id);
+  }
+
+  async updateMe(id: string, updateUserDto: UpdateUserDto) {
+    return await this.userService.update(id, updateUserDto);
   }
 
   // updateUser(id: number, updateUserInput: UpdateUserInput) {

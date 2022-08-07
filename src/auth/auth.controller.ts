@@ -9,11 +9,13 @@ import {
   HttpCode,
   Req,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guards';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
@@ -106,5 +108,11 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   me(@Req() req) {
     return this.authService.me(req.user._id);
+  }
+
+  @Put('me')
+  @UseGuards(AuthGuard('jwt'))
+  updateMe(@Req() req, @Body() updateUserBody: UpdateUserDto) {
+    return this.authService.updateMe(req.user._id, updateUserBody);
   }
 }

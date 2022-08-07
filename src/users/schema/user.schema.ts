@@ -2,44 +2,80 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Address } from 'src/addresses/schemas/address.schema';
 import { Shop } from 'src/shops/schemas/shop.shema';
-import { Profile } from './../schema/profile.schema';
+import { Profile, ProfileSchema } from './../schema/profile.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsMongoId,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/common/constants/roles.enum';
 
 export type UserSchema = User & Document;
 
 @Schema()
 export class User {
+  @IsString()
+  @ApiProperty()
   @Prop({ required: true })
   name: string;
 
+  @IsEmail()
+  @ApiProperty()
   @Prop({ required: true, unique: true })
   email: string;
 
+  @IsString()
+  @ApiProperty()
   @Prop({ required: true })
   password: string;
 
+  @IsMongoId()
+  @IsOptional()
+  @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
   shop?: Shop;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Profile' })
+  @ApiProperty()
+  @IsOptional()
+  @Prop({ type: ProfileSchema })
   profile?: Profile;
 
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
+  @ApiProperty()
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }] })
   shops?: Shop[];
 
+  @IsMongoId()
+  @IsOptional()
+  @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
   managed_shop?: Shop;
 
-  @Prop({ default: 'inactive' })
-  is_active?: string;
+  @IsBoolean()
+  @IsOptional()
+  @Prop({ default: false })
+  is_active?: boolean;
 
+  @IsEnum(Role)
+  @IsOptional()
   @Prop({
-    enum: ['Super admin', 'Store owner', 'Staff', 'Customer'],
-    default: 'Customer',
+    enum: [Role.SUPER_ADMIN, Role.STORE_OWNER, Role.STAFF, Role.CUSTOMER],
+    default: Role.CUSTOMER,
     type: [String],
   })
-  roles?: string[];
+  roles?: Role[];
 
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }] })
   address?: Address[];
 }
