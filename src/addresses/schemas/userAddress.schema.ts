@@ -33,14 +33,6 @@ export class UserAddress {
   @ApiProperty({ required: true })
   @IsString()
   zip: string;
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Address',
-  })
-  @IsMongoId()
-  @IsOptional()
-  address: Address;
 }
 
 export const UserAddressSchema = SchemaFactory.createForClass(UserAddress);

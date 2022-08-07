@@ -26,6 +26,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { UsersService } from 'src/users/users.service';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { Otp, OtpSchema } from './schemas/otp.schema';
 const users = plainToClass(User, usersJson);
 
 @Injectable()
@@ -33,6 +34,7 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserSchema>,
     @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
+    @InjectModel(Otp.name) private otpModel: Model<OtpSchema>,
     private readonly userService: UsersService,
     private readonly jwtService: JWTService,
   ) {}
@@ -66,8 +68,6 @@ export class AuthService {
       .populate(['profile', 'address', 'shops']);
     if (!userFromDb)
       throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
-    // if (!userFromDb.is_active)
-    //   throw new HttpException('LOGIN.EMAIL_NOT_VERIFIED', HttpStatus.FORBIDDEN);
 
     const isValidPass = await bcrypt.compare(
       loginInput.password,
@@ -140,10 +140,33 @@ export class AuthService {
     };
   }
 
-  async otpLogin(otpLoginDto: OtpLoginDto): Promise<AuthResponse> {
+  async otpLogin(otpLoginDto: OtpLoginDto) {
+    const otp = await this.otpModel.findOne({
+      code: otpLoginDto.code,
+      $or: [
+        { phone_number: otpLoginDto.phone_number },
+        { email: otpLoginDto.email },
+      ],
+    });
+    if (!otp) {
+      throw new HttpException('Unable to login', HttpStatus.NOT_FOUND);
+    }
+    const userFromDb = await this.userModel
+      .findOne({
+        email: otpLoginDto.email,
+      })
+      .populate(['profile', 'address', 'shops']);
+    if (!userFromDb)
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+
+    const { access_token } = await this.jwtService.createToken(
+      otpLoginDto.email,
+      userFromDb.roles,
+    );
     return {
-      token: 'jwt token',
-      user: users[0],
+      token: access_token,
+      user: userFromDb,
+      permissions: userFromDb.roles,
     };
   }
 
@@ -161,14 +184,17 @@ export class AuthService {
     };
   }
 
-  async sendOtpCode(otpInput: OtpDto): Promise<OtpResponse> {
-    // return await this.userModel.findByIdAndUpdate();
+  async sendOtpCode(otpInput: OtpDto) {
+    const otp = await this.otpModel.create({
+      code: Math.floor(1000 + Math.random() * 9000),
+      phone_number: otpInput.phone_number,
+    });
     return {
       message: 'success',
       success: true,
-      id: '1',
-      provider: 'google',
-      phone_number: '+919494949494',
+      id: otp._id,
+      provider: 'local',
+      phone_number: otpInput.phone_number,
       is_contact_exist: true,
     };
   }

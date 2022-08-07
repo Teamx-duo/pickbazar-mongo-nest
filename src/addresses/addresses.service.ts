@@ -2,32 +2,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
+import { UsersService } from 'src/users/users.service';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { Address, AddressSchema } from './schemas/address.schema';
-import { UserAddress, UserAddressSchema } from './schemas/userAddress.schema';
 
 @Injectable()
 export class AddressesService {
   constructor(
     @InjectModel(Address.name)
     private addressModel: PaginateModel<AddressSchema>,
-    @InjectModel(UserAddress.name)
-    private userAddressModel: PaginateModel<UserAddressSchema>,
+    private readonly userService: UsersService,
   ) {}
   async create(createAddressDto: CreateAddressDto) {
-    const userAddress = await this.userAddressModel.create(
-      createAddressDto.address,
+    const address = await this.addressModel.create(createAddressDto);
+    await this.userService.addUserAddress(
+      createAddressDto.customer,
+      address._id,
     );
-    const address = await this.addressModel.create({
-      title: createAddressDto.title,
-      default: createAddressDto.default,
-      address: userAddress._id,
-      type: createAddressDto.type,
-      customer: createAddressDto.customer,
-    });
-    userAddress.address = address._id;
-    await userAddress.save();
     return address;
   }
 

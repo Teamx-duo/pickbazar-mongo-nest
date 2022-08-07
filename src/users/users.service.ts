@@ -75,6 +75,12 @@ export class UsersService {
     });
   }
 
+  async addUserAddress(id: string | ObjectId, addressId: any) {
+    return await this.userModel.findByIdAndUpdate(id, {
+      $push: { address: addressId },
+    });
+  }
+
   async addUserShop(id: string | ObjectId, shop_id: any) {
     const user = await this.userModel.findById(id);
     if (user.managed_shop) {

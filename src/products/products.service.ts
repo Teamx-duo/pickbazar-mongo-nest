@@ -84,28 +84,36 @@ export class ProductsService {
   }
 
   async getProductBySlug(slug: string): Promise<Product> {
-    return await this.productModel
-      .findOne({ slug })
-      .populate([
-        'tags',
-        'categories',
-        'variations',
-        'variation_options',
-        'shop',
-        'type',
-      ]);
+    return await this.productModel.findOne({ slug }).populate([
+      { path: 'tags' },
+      { path: 'categories' },
+      {
+        path: 'variations',
+        populate: {
+          path: 'attribute',
+        },
+      },
+      { path: 'variation_options' },
+      { path: 'shop' },
+      { path: 'type' },
+    ]);
   }
 
   async getProductById(id: string): Promise<Product> {
-    return await this.productModel
-      .findById(id)
-      .populate([
-        'tags',
-        'categories',
-        'variations',
-        'variation_options',
-        'shop',
-      ]);
+    return await this.productModel.findById(id).populate([
+      { path: 'tags' },
+      { path: 'categories' },
+      {
+        path: 'variations',
+        populate: {
+          path: 'attribute',
+          model: 'Attribute',
+        },
+      },
+      { path: 'variation_options' },
+      { path: 'shop' },
+      { path: 'type' },
+    ]);
   }
 
   async getPopularProducts({

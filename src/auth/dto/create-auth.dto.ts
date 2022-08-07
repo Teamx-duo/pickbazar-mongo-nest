@@ -1,7 +1,7 @@
 import { PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
-import { IsString, IsEnum } from 'class-validator';
+import { IsString, IsEnum, IsOptional, isString } from 'class-validator';
 
 enum Permission {
   SUPER_ADMIN = 'Super admin',
@@ -73,12 +73,21 @@ export class OtpResponse {
   is_contact_exist: boolean;
 }
 export class OtpDto {
+  @IsString()
   phone_number: string;
 }
 export class OtpLoginDto {
-  otp_id: string;
+  @IsString()
+  @IsOptional()
+  otp_id?: string;
+  @IsString()
   code: string;
+  @IsString()
   phone_number: string;
+  @IsString()
+  @IsOptional()
   name?: string;
+  @IsString()
+  @IsOptional()
   email?: string;
 }

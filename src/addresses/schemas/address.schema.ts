@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { User } from 'src/users/schema/user.schema';
-import { UserAddress } from './userAddress.schema';
+import { UserAddress, UserAddressSchema } from './userAddress.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -9,7 +9,7 @@ import {
   IsString,
   IsMongoId,
   IsEnum,
-  ValidateNested,
+  IsOptional,
 } from 'class-validator';
 
 export type AddressSchema = Address & Document;
@@ -26,15 +26,15 @@ export class Address {
   @IsString()
   title: string;
 
-  @Prop({ required: true })
-  @ApiProperty({ required: true })
+  @Prop({ default: false })
   @IsBoolean()
+  @IsOptional()
   default: boolean;
 
+  @ApiProperty()
+  @IsOptional()
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'UserAddress',
-    required: true,
+    type: UserAddressSchema,
   })
   address: UserAddress;
 
@@ -43,9 +43,8 @@ export class Address {
   @IsEnum(AddressType)
   type: AddressType;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  @ApiProperty({ required: true })
-  @IsMongoId()
+  @ApiProperty()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   customer: User;
 }
 export const AddressSchema = SchemaFactory.createForClass(Address);
