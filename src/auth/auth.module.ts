@@ -3,32 +3,41 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/users/schema/user.schema';
-import { EmailVerificationSchema } from './schemas/emailVerification.schema';
-import { ForgottenPasswordSchema } from './schemas/forgotPassword.schema';
-import { ConsentRegistrySchema } from './schemas/consentregistry.schema';
+import {
+  EmailVerification,
+  EmailVerificationSchema,
+} from './schemas/emailVerification.schema';
+import {
+  ForgottenPassword,
+  ForgottenPasswordSchema,
+} from './schemas/forgotPassword.schema';
+import {
+  ConsentRegistry,
+  ConsentRegistrySchema,
+} from './schemas/consentregistry.schema';
 import { JWTService } from './jwt.service';
 import { UsersService } from 'src/users/users.service';
 import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
-import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import config from 'src/config';
 import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from 'src/users/users.module';
 import { Otp, OtpSchema } from './schemas/otp.schema';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'EmailVerification', schema: EmailVerificationSchema },
-      { name: 'ForgottenPassword', schema: ForgottenPasswordSchema },
-      { name: 'ConsentRegistry', schema: ConsentRegistrySchema },
+      { name: EmailVerification.name, schema: EmailVerificationSchema },
+      { name: ForgottenPassword.name, schema: ForgottenPasswordSchema },
+      { name: ConsentRegistry.name, schema: ConsentRegistrySchema },
       { name: Otp.name, schema: OtpSchema },
     ]),
     UsersModule,
     HttpModule,
     PassportModule,
+    MailModule,
     JwtModule.register({
       secret: config.jwt.secretOrKey,
       signOptions: { expiresIn: config.jwt.expiresIn },

@@ -90,8 +90,12 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
   @Post('change-password')
-  changePassword(@Body() changePasswordDto: ChangePasswordDto) {
-    return this.authService.changePassword(changePasswordDto);
+  @UseGuards(AuthGuard('jwt'))
+  changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() req) {
+    return this.authService.changePassword({
+      ...changePasswordDto,
+      user: req.user,
+    });
   }
   @Post('logout')
   async logout(): Promise<boolean> {

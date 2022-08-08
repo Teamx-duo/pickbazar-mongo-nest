@@ -61,9 +61,21 @@ export class UsersService {
       .findOne({ _id: id })
       .populate(['profile', 'shops', 'address', 'managed_shop']);
   }
+  async findOneByEmail(email: string) {
+    return await this.userModel
+      .findOne({ email })
+      .populate(['profile', 'shops', 'address', 'managed_shop']);
+  }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.userModel.findByIdAndUpdate(id, { $set: updateUserDto });
+  }
+
+  async updateByEmail(email: string, updateUserDto: UpdateUserDto) {
+    return await this.userModel.findOneAndUpdate(
+      { email },
+      { $set: updateUserDto },
+    );
   }
 
   async addUserPermission(

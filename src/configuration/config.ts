@@ -44,7 +44,7 @@ export default () => ({
   db: {
     user: process.env.DATABASE_USER,
     pass: process.env.DATABASE_PASSWORD,
-    host: process.env.DATABASE_HOST || 'localhost',
+    host: process.env.DATABASE_HOST || 'usamairfan',
     port: parseInt(process.env.DATABASE_PORT, 10) || 27017,
     database: process.env.DATABASE_NAME || 'nest',
     authSource: null,

@@ -21,6 +21,28 @@ export class JWTService {
     };
   }
 
+  async createForgetPasswordToken(email: string) {
+    const expiresIn = '15 min',
+      secretOrKey = config.jwt.secretOrKey;
+    const userInfo = { email };
+    const token = jwt.sign(userInfo, secretOrKey, { expiresIn });
+    return {
+      expires_in: expiresIn,
+      access_token: token,
+    };
+  }
+
+  async createResetPasswordToken(email: string) {
+    const expiresIn = '3 min',
+      secretOrKey = config.jwt.secretOrKey;
+    const userInfo = { email };
+    const token = jwt.sign(userInfo, secretOrKey, { expiresIn });
+    return {
+      expires_in: expiresIn,
+      access_token: token,
+    };
+  }
+
   async validateUser(signedUser): Promise<User> {
     const userFromDb = await this.userModel.findOne({
       email: signedUser.email,

@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
 import { IsString, IsEnum, IsOptional, isString } from 'class-validator';
@@ -35,19 +35,32 @@ export class SocialLoginDto {
   access_token: string;
 }
 export class ChangePasswordDto {
+  @IsString()
   oldPassword: string;
+  @IsString()
   newPassword: string;
+  @IsOptional()
+  user: any;
 }
 export class ForgetPasswordDto {
+  @IsString()
   email: string;
 }
 export class VerifyForgetPasswordDto {
+  @IsString()
   email: string;
+  @IsString()
   token: string;
 }
 export class ResetPasswordDto {
+  @ApiProperty()
+  @IsString()
   email: string;
+  @ApiProperty()
+  @IsString()
   token: string;
+  @ApiProperty()
+  @IsString()
   password: string;
 }
 

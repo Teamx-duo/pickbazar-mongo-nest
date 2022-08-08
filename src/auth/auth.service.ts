@@ -27,6 +27,11 @@ import { UsersService } from 'src/users/users.service';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { Otp, OtpSchema } from './schemas/otp.schema';
+import {
+  ForgottenPassword,
+  ForgottenPasswordSchema,
+} from './schemas/forgotPassword.schema';
+import { MailService } from 'src/mail/mail.service';
 const users = plainToClass(User, usersJson);
 
 @Injectable()
@@ -35,8 +40,11 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserSchema>,
     @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
     @InjectModel(Otp.name) private otpModel: Model<OtpSchema>,
+    @InjectModel(ForgottenPassword.name)
+    private forgottenPasswordModel: Model<ForgottenPasswordSchema>,
     private readonly userService: UsersService,
     private readonly jwtService: JWTService,
+    private readonly mailService: MailService,
   ) {}
 
   async register(createUserInput: RegisterDto) {
@@ -50,6 +58,7 @@ export class AuthService {
         user.email,
         savedUser.roles,
       );
+      await this.mailService.sendUserConfirmationEmail(savedUser, access_token);
       return {
         token: access_token,
         user: savedUser,
@@ -67,7 +76,7 @@ export class AuthService {
       })
       .populate(['profile', 'address', 'shops']);
     if (!userFromDb)
-      throw new HttpException('LOGIN.USER_NOT_FOUND', HttpStatus.NOT_FOUND);
+      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
 
     const isValidPass = await bcrypt.compare(
       loginInput.password,
@@ -85,52 +94,161 @@ export class AuthService {
         permissions: userFromDb.roles,
       };
     } else {
-      throw new HttpException('LOGIN.ERROR', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Unable to login', HttpStatus.UNAUTHORIZED);
     }
   }
 
-  async changePassword(
-    changePasswordInput: ChangePasswordDto,
-  ): Promise<CoreResponse> {
-    console.log(changePasswordInput);
+  async changePassword(changePasswordInput: ChangePasswordDto) {
+    const isValidPass = await bcrypt.compare(
+      changePasswordInput.oldPassword,
+      changePasswordInput.user?.password,
+    );
+    if (isValidPass) {
+      const password = await bcrypt.hash(changePasswordInput.newPassword, 10);
+      await this.userService.update(changePasswordInput.user?._id, {
+        password,
+      });
 
-    return {
-      success: true,
-      message: 'Password change successful',
-    };
+      return {
+        success: true,
+        message: 'Password change successful',
+      };
+    } else {
+      throw new HttpException('Unable to login', HttpStatus.UNAUTHORIZED);
+    }
   }
 
-  async forgetPassword(
-    forgetPasswordInput: ForgetPasswordDto,
-  ): Promise<CoreResponse> {
-    console.log(forgetPasswordInput);
+  async forgetPassword(forgetPasswordInput: ForgetPasswordDto) {
+    const forgottenPassword: any = await this.forgottenPasswordModel.findOne({
+      email: forgetPasswordInput.email,
+    });
+    if (
+      forgottenPassword &&
+      (new Date().getTime() -
+        new Date(forgottenPassword?.updatedAt).getTime()) /
+        60000 <
+        5
+    ) {
+      throw new HttpException(
+        'Email has already been sent.',
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      const user = await this.userService.findOneByEmail(
+        forgetPasswordInput.email,
+      );
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found.',
+        };
+      }
+      const code = (Math.floor(Math.random() * 9000000) + 1000000).toString();
+      const forgottenPasswordModel =
+        await this.forgottenPasswordModel.findOneAndUpdate(
+          { email: forgetPasswordInput.email },
+          {
+            $set: {
+              email: forgetPasswordInput.email,
+              newPasswordToken: code, //Generate 7 digits number,
+            },
+          },
+          { upsert: true, new: true },
+        );
 
-    return {
-      success: true,
-      message: 'Password change successful',
-    };
+      const { access_token } = await this.jwtService.createForgetPasswordToken(
+        forgetPasswordInput.email,
+      );
+      await this.mailService.sendForgetPasswordEmail(
+        forgetPasswordInput.email,
+        access_token,
+        code,
+      );
+      if (forgottenPasswordModel) {
+        return {
+          token: access_token,
+          email: forgottenPasswordModel.email,
+          success: true,
+          message: 'Email has been sent successfully.',
+        };
+      } else {
+        throw new HttpException(
+          'Unable to create forgot password token.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
   }
 
   async verifyForgetPasswordToken(
     verifyForgetPasswordTokenInput: VerifyForgetPasswordDto,
-  ): Promise<CoreResponse> {
-    console.log(verifyForgetPasswordTokenInput);
-
-    return {
-      success: true,
-      message: 'Password change successful',
-    };
+  ) {
+    const emailVerif: any = await this.forgottenPasswordModel.findOne({
+      newPasswordToken: verifyForgetPasswordTokenInput.token,
+      email: verifyForgetPasswordTokenInput.email,
+    });
+    if (
+      emailVerif &&
+      (new Date().getTime() - new Date(emailVerif?.updatedAt).getTime()) /
+        60000 >
+        10
+    ) {
+      throw new HttpException(
+        'Your verification code has expired.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (emailVerif && emailVerif.email) {
+      const { access_token } = await this.jwtService.createResetPasswordToken(
+        emailVerif.email,
+      );
+      return {
+        token: access_token,
+        success: true,
+        message: 'Please change your password.',
+      };
+    } else {
+      throw new HttpException(
+        'Invalid code or unable to authenticate.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  async resetPassword(
-    resetPasswordInput: ResetPasswordDto,
-  ): Promise<CoreResponse> {
-    console.log(resetPasswordInput);
-
-    return {
-      success: true,
-      message: 'Password change successful',
-    };
+  async resetPassword(resetPasswordInput: ResetPasswordDto) {
+    const emailVerif: any = await this.forgottenPasswordModel.findOneAndDelete(
+      {
+        newPasswordToken: resetPasswordInput.token,
+        email: resetPasswordInput.email,
+      },
+      { new: true },
+    );
+    if (
+      emailVerif &&
+      (new Date().getTime() - new Date(emailVerif?.updatedAt).getTime()) /
+        60000 >
+        10
+    ) {
+      throw new HttpException(
+        'Your verification code has expired.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (emailVerif) {
+      const password = await bcrypt.hash(resetPasswordInput.password, 10);
+      await this.userService.updateByEmail(resetPasswordInput.email, {
+        password,
+      });
+      return {
+        success: true,
+        message: 'Password change successful',
+      };
+    } else {
+      throw new HttpException(
+        'Invalid token or unable to authenticate.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   async socialLogin(socialLoginDto: SocialLoginDto): Promise<GetUsersResponse> {

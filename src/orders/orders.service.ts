@@ -93,7 +93,18 @@ export class OrdersService {
         ...(shop ? { shop } : {}),
         ...(id ? { _id: id } : {}),
       },
-      { limit, page, populate: ['shop', 'coupon', 'products', 'billing_address', 'shipping_address', 'status'] },
+      {
+        limit,
+        page,
+        populate: [
+          'shop',
+          'coupon',
+          'products',
+          'billing_address',
+          'shipping_address',
+          'status',
+        ],
+      },
     );
     return PaginationResponse(response);
   }
@@ -101,7 +112,15 @@ export class OrdersService {
   async getOrderById(id: string) {
     return await this.orderModel
       .findById(id)
-      .populate(['shop', 'coupon', 'products', 'status', 'customer', 'billing_address', 'shipping_address']);
+      .populate([
+        'shop',
+        'coupon',
+        'products',
+        'status',
+        'customer',
+        'billing_address',
+        'shipping_address',
+      ]);
   }
   // getOrderByTrackingNumber(tracking_number: string): Order {
   //   const parentOrder = this.orders.find(
