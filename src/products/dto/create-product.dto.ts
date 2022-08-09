@@ -15,7 +15,6 @@ export class CreateProductDto extends PickType(Product, [
   'min_price',
   'name',
   'orders',
-  'pivot',
   'price',
   'product_type',
   'quantity',

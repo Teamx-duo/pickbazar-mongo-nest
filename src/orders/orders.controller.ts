@@ -8,6 +8,7 @@ import {
   Query,
   Put,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -21,16 +22,24 @@ import { GetOrderStatusesDto } from './dto/get-order-statuses.dto';
 import { CheckoutVerificationDto } from './dto/verify-checkout.dto';
 import { Request } from 'express';
 import { lookup } from 'geoip-lite';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Role } from 'src/common/constants/roles.enum';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto, @Req() req: Request) {
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.CUSTOMER, Role.SUPER_ADMIN)
+  create(@Body() createOrderDto: CreateOrderDto, @Req() req) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    console.log(ip);
-    return this.ordersService.create(createOrderDto, lookup(ip.toString()));
+    return this.ordersService.create(
+      { ...createOrderDto, customer: req.user._id },
+      lookup(ip.toString()),
+    );
   }
 
   @Get()
@@ -58,8 +67,10 @@ export class OrdersController {
   }
 
   @Post('checkout/verify')
-  verifyCheckout(@Query() query: CheckoutVerificationDto) {
-    return this.ordersService.verifyCheckout(query);
+  verifyCheckout(@Body() body: CheckoutVerificationDto, @Req() req: Request) {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    console.log(ip);
+    return this.ordersService.verifyCheckout(body);
   }
 }
 

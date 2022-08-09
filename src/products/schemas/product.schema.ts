@@ -18,6 +18,7 @@ import {
   IsString,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductPivot } from './productPivot.schema';
 
 export type ProductSchema = Product & Document;
 export enum ProductType {
@@ -89,18 +90,6 @@ export class Product {
   })
   @ApiProperty()
   variation_options?: Variation[];
-
-  @IsOptional()
-  @Prop(
-    raw({
-      variation_option_id: { type: Number },
-      order_quantity: { type: Number },
-      unit_price: { type: Number },
-      subtotal: { type: Number },
-    }),
-  )
-  @ApiProperty()
-  pivot?: Record<string, any>;
 
   @IsMongoId({ each: true })
   @IsArray()

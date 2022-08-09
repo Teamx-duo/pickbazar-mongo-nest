@@ -53,7 +53,10 @@ export class AuthService {
     };
 
     try {
-      const savedUser = await this.userService.create(user);
+      const savedUser = await this.userService.create({
+        ...user,
+        roles: [user.permission],
+      });
       const { access_token } = await this.jwtService.createToken(
         user.email,
         savedUser.roles,

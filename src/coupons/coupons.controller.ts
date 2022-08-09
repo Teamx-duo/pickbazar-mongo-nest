@@ -23,6 +23,7 @@ import { CouponsService } from './coupons.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { GetCouponsDto } from './dto/get-coupons.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
+import { VerifyCouponInput } from './dto/verify-coupon.dto';
 
 @Controller('coupons')
 export class CouponsController {
@@ -49,6 +50,10 @@ export class CouponsController {
   @Get(':id/verify')
   verify(@Param('id') id: string) {
     return this.couponsService.getCoupon(id);
+  }
+  @Post('verify')
+  getVerifiedCoupon(@Body() body: VerifyCouponInput) {
+    return this.couponsService.verify(body);
   }
 
   @Put(':id')

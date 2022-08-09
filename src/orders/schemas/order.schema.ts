@@ -13,20 +13,24 @@ import {
   ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
-import { UserAddress } from 'src/addresses/schemas/userAddress.schema';
+import {
+  UserAddress,
+  UserAddressSchema,
+} from 'src/addresses/schemas/userAddress.schema';
 import { Coupon } from 'src/coupons/schemas/coupon.shema';
-import { Product } from 'src/products/schemas/product.schema';
+import { Product, ProductSchema } from 'src/products/schemas/product.schema';
 import { Shop } from 'src/shops/schemas/shop.shema';
 import { User } from 'src/users/schema/user.schema';
 import { OrderStatus } from './orderStatus.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { ProductPivot } from 'src/products/schemas/productPivot.schema';
 
 export type OrderSchema = Order & Document;
 
 export enum PaymentGatewayType {
-  STRIPE = 'stripe',
-  CASH_ON_DELIVERY = 'cod',
-  PAYPAL = 'paypal',
+  STRIPE = 'STRIPE',
+  CASH_ON_DELIVERY = 'CASH_ON_DELIVERY',
+  PAYPAL = 'PAYPAL',
 }
 
 @Schema({ timestamps: true })
@@ -102,9 +106,11 @@ export class Order {
   coupon: mongoose.Schema.Types.ObjectId;
 
   @ApiProperty()
-  @IsMongoId()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
-  shop: mongoose.Schema.Types.ObjectId;
+  @IsMongoId({ each: true })
+  @IsArray()
+  @IsOptional()
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }] })
+  shop: mongoose.Schema.Types.ObjectId[];
 
   @IsNumber()
   @ApiProperty()
@@ -120,31 +126,26 @@ export class Order {
   @IsDate()
   @Transform((val) => new Date(val.value))
   @ApiProperty()
-  @Prop({ required: true })
+  @IsOptional()
+  @Prop()
   delivery_time: Date;
 
+  @IsMongoId({ each: true })
   @IsArray()
-  @IsMongoId()
   @ApiProperty()
   @Prop({
-    type: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true,
-      },
-    ],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ProductPivot' }],
   })
-  products: Product[];
+  products: ProductPivot[];
 
-  @IsMongoId()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'UserAddress' })
+  @Prop({ type: UserAddressSchema })
   billing_address: UserAddress;
 
-  @IsMongoId()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'UserAddress' })
+  @Prop({ type: UserAddressSchema })
   shipping_address: UserAddress;
 }
 

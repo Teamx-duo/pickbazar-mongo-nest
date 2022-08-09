@@ -1,5 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsMongoId, IsNumber, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 import { ConnectProductOrderPivot, UserAddressInput } from './create-order.dto';
 
 export class CheckoutVerificationDto {
@@ -8,9 +14,9 @@ export class CheckoutVerificationDto {
   @ValidateNested({ each: true })
   @Type(() => ConnectProductOrderPivot)
   products: ConnectProductOrderPivot[];
-  @IsMongoId()
+  @IsOptional()
   billing_address?: UserAddressInput;
-  @IsMongoId()
+  @IsOptional()
   shipping_address?: UserAddressInput;
 }
 

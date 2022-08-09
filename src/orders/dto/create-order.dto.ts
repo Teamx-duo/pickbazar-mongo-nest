@@ -1,18 +1,20 @@
 import { PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEmail,
   IsMongoId,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
+import { ProductPivot } from 'src/products/schemas/productPivot.schema';
 import { PaymentGatewayType, Order } from '../schemas/order.schema';
 
 export class CreateOrderDto extends PickType(Order, [
   'billing_address',
   'children',
   'coupon',
-  'customer',
   'customer_contact',
   'delivery_fee',
   'delivery_time',
@@ -24,24 +26,38 @@ export class CreateOrderDto extends PickType(Order, [
   'payment_id',
   'shipping_address',
   'shop',
-  'status',
 ]) {
+  @IsMongoId()
+  @IsOptional()
+  customer: string;
+  @IsNumber()
+  @Transform((val) => parseInt(val.value))
+  status: number;
   @IsArray()
-  products: string[];
+  products: ProductPivot[];
 }
 
 export class UserAddressInput {
+  @IsString()
   street_address: string;
+  @IsString()
   country: string;
+  @IsString()
   city: string;
+  @IsString()
   state: string;
+  @IsString()
   zip: string;
+  @IsMongoId()
+  @IsOptional()
+  _id: string;
 }
 
 export class ConnectProductOrderPivot {
   @IsMongoId()
   product_id: string;
   @IsMongoId()
+  @IsOptional()
   variation_option_id?: string;
   @IsNumber()
   order_quantity: number;

@@ -20,7 +20,7 @@ export class OrderStatus {
 
   @IsNumber()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   serial: number;
 }
 

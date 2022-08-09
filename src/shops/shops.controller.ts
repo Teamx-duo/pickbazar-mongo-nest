@@ -31,7 +31,7 @@ export class ShopsController {
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.CUSTOMER, Role.SUPER_ADMIN)
+  @Roles(Role.STORE_OWNER, Role.SUPER_ADMIN)
   create(@Body() createShopDto: CreateShopDto, @Req() req) {
     return this.shopsService.create(
       {

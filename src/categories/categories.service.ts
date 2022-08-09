@@ -6,10 +6,9 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './schemas/category.schema';
 import Fuse from 'fuse.js';
 import categoriesJson from './categories.json';
-// import { paginate } from 'src/common/pagination/paginate';
 import { GetCategoriesAlongChildrenDto } from './dto/get-categories-along-children.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PaginateModel } from 'mongoose';
+import mongoose, { Model, PaginateModel } from 'mongoose';
 import { CategorySchema } from './schemas/category.schema';
 import {
   Attachment,
@@ -17,7 +16,9 @@ import {
 } from 'src/common/schemas/attachment.schema';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 import { convertToSlug } from 'src/common/constants/common.function';
-import { ObjectId } from 'mongodb';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+import { AggregatePaginateModel } from 'mongoose';
+
 const categories = plainToClass(Category, categoriesJson);
 
 @Injectable()
@@ -25,6 +26,8 @@ export class CategoriesService {
   constructor(
     @InjectModel(Category.name)
     private categoryModel: PaginateModel<CategorySchema>,
+    @InjectModel(Category.name)
+    private categoryAggregateModel: AggregatePaginateModel<CategorySchema>,
   ) {}
   private categories: Category[] = categories;
 
@@ -41,16 +44,50 @@ export class CategoriesService {
     });
   }
 
+  // async getCategories({ limit, page, search, type }: GetCategoriesDto) {
+  //   const categories = await this.categoryModel.paginate(
+  //     {
+  //       ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+  //       ...(type ? { type } : {}),
+  //     },
+  //     { page, limit, populate: ['parent', 'type'] },
+  //   );
+
+  //   return PaginationResponse(categories);
+  // }
+
   async getCategories({ limit, page, search, type }: GetCategoriesDto) {
-    const categories = await this.categoryModel.paginate(
+    const aggregate = this.categoryAggregateModel.aggregate([
       {
-        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
-        ...(type ? { type } : {}),
+        $match: {
+          ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+          ...(type ? { type: new mongoose.Types.ObjectId(type) } : {}),
+        },
       },
-      { page, limit, populate: ['parent', 'type'] },
+      {
+        $sort: { createdAt: 1 },
+      },
+      {
+        $graphLookup: {
+          from: 'categories',
+          startWith: '$_id',
+          connectFromField: '_id',
+          connectToField: 'parent',
+          as: 'children',
+        },
+      },
+      {
+        $match: {
+          parent: null,
+        },
+      },
+    ]);
+    const data = await this.categoryAggregateModel.aggregatePaginate(
+      aggregate,
+      { limit, page },
     );
 
-    return PaginationResponse(categories);
+    return data;
   }
 
   async getCategory(id: string) {

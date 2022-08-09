@@ -1,25 +1,18 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
-import { IsString, IsEnum, IsOptional, isString } from 'class-validator';
+import { IsString, IsEnum, IsOptional } from 'class-validator';
+import { Role } from './../../common/constants/roles.enum';
 
-enum Permission {
-  SUPER_ADMIN = 'Super admin',
-  STORE_OWNER = 'Store owner',
-  STAFF = 'Staff',
-  CUSTOMER = 'Customer',
-}
 export class RegisterDto extends PickType(User, ['name', 'email', 'password']) {
   @IsString()
   name: string;
   @IsString()
   email: string;
-
   @IsString()
   password: string;
-
-  @IsEnum(Permission)
-  permission: Permission = Permission.CUSTOMER;
+  @IsEnum(Role)
+  permission: Role = Role.CUSTOMER;
 }
 
 export class LoginDto extends PickType(User, ['email', 'password']) {

@@ -10,11 +10,10 @@ import { ShopsModule } from 'src/shops/shops.module';
 import { AttributesModule } from 'src/attributes/attributes.module';
 import { CouponsModule } from 'src/coupons/coupons.module';
 import { TaxesModule } from 'src/taxes/taxes.module';
-
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
     MongooseModule.forFeature([
+      { name: Order.name, schema: OrderSchema },
       { name: OrderStatus.name, schema: OrderStatusSchema },
     ]),
     ProductsModule,
@@ -22,7 +21,7 @@ import { TaxesModule } from 'src/taxes/taxes.module';
     ShopsModule,
     AttributesModule,
     CouponsModule,
-    TaxesModule
+    TaxesModule,
   ],
   controllers: [OrdersController, OrderStatusController],
   providers: [OrdersService],

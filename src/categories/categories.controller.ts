@@ -72,6 +72,11 @@ export class CategoriesController {
   findAll(@Query() query: GetCategoriesDto) {
     return this.categoriesService.getCategories(query);
   }
+
+  // @Get('new')
+  // findAllNew(@Query() query: GetCategoriesDto) {
+  //   return this.categoriesService.getCategoriesNew(query);
+  // }
   // @Get('parents')
   // async getCategoriesAlongChildren(
   //   @Query() getCategoriesAlongChildrenArgs: GetCategoriesAlongChildrenDto,

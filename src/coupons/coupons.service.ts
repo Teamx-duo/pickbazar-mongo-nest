@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { VerifyCouponInput } from './dto/verify-coupon.dto';
+import { HttpException, Injectable } from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { Coupon, CouponSchema } from './schemas/coupon.shema';
@@ -28,6 +29,19 @@ export class CouponsService {
 
   async getCoupon(id: ObjectId | string) {
     return this.couponModel.findById(id);
+  }
+
+  async verify(verifyCouponDto: VerifyCouponInput) {
+    const coupon = await this.couponModel.findOne({
+      code: verifyCouponDto.code,
+    });
+    if (!coupon) {
+      throw new HttpException('Coupon not found.', 400);
+    }
+    return {
+      coupon,
+      is_valid: new Date(coupon.expire_at).getTime() < new Date().getTime(),
+    };
   }
 
   async update(id: string, updateCouponDto: UpdateCouponDto) {

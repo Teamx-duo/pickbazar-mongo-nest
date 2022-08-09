@@ -40,8 +40,8 @@ export class MailService {
       template: './verifyEmail', // `.hbs` extension is appended automatically
       context: {
         // ✏️ filling curly brackets with content
-        name: user.name,
-        url,
+        email: user.name,
+        link: url,
       },
     });
   }

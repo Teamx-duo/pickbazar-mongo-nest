@@ -99,7 +99,23 @@ export class ProductsService {
     ]);
   }
 
-  async getProductById(id: string): Promise<Product> {
+  async findProduct(searchObj: any): Promise<Product> {
+    return await this.productModel.findOne(searchObj).populate([
+      { path: 'tags' },
+      { path: 'categories' },
+      {
+        path: 'variations',
+        populate: {
+          path: 'attribute',
+        },
+      },
+      { path: 'variation_options' },
+      { path: 'shop' },
+      { path: 'type' },
+    ]);
+  }
+
+  async getProductById(id: string) {
     return await this.productModel.findById(id).populate([
       { path: 'tags' },
       { path: 'categories' },

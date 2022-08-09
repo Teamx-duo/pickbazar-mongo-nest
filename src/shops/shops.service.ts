@@ -135,6 +135,18 @@ export class ShopsService {
     });
   }
 
+  async addOrderMultiple(ids: any[], amount: any) {
+    return await this.shopModel.updateMany(
+      {
+        _id: { $in: ids },
+      },
+      {
+        $push: { orders: amount },
+      },
+      { new: true },
+    );
+  }
+
   async addOrder(id: ObjectId, ordersCount: number) {
     return await this.shopModel.findByIdAndUpdate(
       id,

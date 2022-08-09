@@ -18,6 +18,10 @@ import { VariationsService } from './variations.service';
 import { TagsModule } from 'src/tags/tags.module';
 import { Model } from 'mongoose';
 import { ShopsModule } from 'src/shops/shops.module';
+import {
+  ProductPivot,
+  ProductPivotSchema,
+} from './schemas/productPivot.schema';
 
 @Module({
   imports: [
@@ -25,6 +29,7 @@ import { ShopsModule } from 'src/shops/shops.module';
       { name: Product.name, schema: ProductSchema },
       { name: VariationOption.name, schema: VariationOptionSchema },
       { name: Variation.name, schema: VariationSchema },
+      { name: ProductPivot.name, schema: ProductPivotSchema },
     ]),
     TagsModule,
     ShopsModule,

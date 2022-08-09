@@ -4,6 +4,7 @@ import { Product } from 'src/products/schemas/product.schema';
 import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Type } from 'src/types/schemas/type.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -66,3 +67,4 @@ export class Category {
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
 CategorySchema.plugin(mongoosePaginate);
+CategorySchema.plugin(mongooseAggregatePaginate);
