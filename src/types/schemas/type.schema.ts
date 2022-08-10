@@ -1,6 +1,5 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { TypeSetting } from './typeSetting.schema';
 import { Banner } from './banner.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import {
@@ -9,7 +8,6 @@ import {
   IsOptional,
   IsString,
   ValidateNested,
-  ValidationError,
 } from 'class-validator';
 
 export type TypeSchema = Type & Document;
@@ -39,6 +37,7 @@ export class Type {
   banners: Banner[];
 
   @IsString({ each: true })
+  @IsOptional()
   @IsArray()
   @Prop()
   promotional_sliders: string[];

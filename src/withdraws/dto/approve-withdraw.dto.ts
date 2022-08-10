@@ -1,4 +1,8 @@
 import { PickType } from '@nestjs/swagger';
-import { Withdraw } from '../entities/withdraw.entity';
+import { IsMongoId } from 'class-validator';
+import { Withdraw } from '../schemas/withdraw.schema';
 
-export class ApproveWithdrawDto extends PickType(Withdraw, ['id', 'status']) {}
+export class ApproveWithdrawDto extends PickType(Withdraw, ['status']) {
+  @IsMongoId()
+  id: string;
+}

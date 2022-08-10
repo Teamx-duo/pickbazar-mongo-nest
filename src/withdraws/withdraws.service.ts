@@ -1,57 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
 import { ApproveWithdrawDto } from './dto/approve-withdraw.dto';
-import { Withdraw } from './entities/withdraw.entity';
 import { GetWithdrawsDto, WithdrawPaginator } from './dto/get-withdraw.dto';
 import { paginate } from 'src/common/pagination/paginate';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
+import { WithdrawSchema, Withdraw } from './schemas/withdraw.schema';
+import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 
 @Injectable()
 export class WithdrawsService {
-  private withdraws: Withdraw[] = [];
+  constructor(
+    @InjectModel(Withdraw.name)
+    private withdrawModel: PaginateModel<WithdrawSchema>,
+  ) {}
 
-  create(createWithdrawDto: CreateWithdrawDto) {
-    return {
-      id: this.withdraws.length + 1,
-      ...createWithdrawDto,
-    };
+  async create(createWithdrawDto: CreateWithdrawDto) {
+    return await this.withdrawModel.create(createWithdrawDto);
   }
 
-  getWithdraws({
-    limit,
-    page,
-    status,
-    shop_id,
-  }: GetWithdrawsDto): WithdrawPaginator {
-    if (!page) page = 1;
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    let data: Withdraw[] = this.withdraws;
-    // if (status) {
-    //   data = fuse.search(status)?.map(({ item }) => item);
-    // }
-
-    if (shop_id) {
-      data = this.withdraws.filter((p) => p.shop_id === shop_id);
-    }
-    const results = data.slice(startIndex, endIndex);
-    const url = `/withdraws?limit=${limit}`;
-
-    return {
-      data: results,
-      ...paginate(data.length, page, limit, results.length, url),
-    };
+  async getWithdraws({ limit, page, status, shop_id }: GetWithdrawsDto) {
+    const data = await this.withdrawModel.paginate(
+      { ...(status ? { status } : {}), ...(shop_id ? { shop: shop_id } : {}) },
+      { limit, page, populate: [{ path: 'shop' }] },
+    );
+    return PaginationResponse(data);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} withdraw`;
+  async findOne(id: string) {
+    return await this.withdrawModel.findById(id).populate([{ path: 'shop' }]);
   }
 
-  update(id: number, updateWithdrawDto: ApproveWithdrawDto) {
-    return this.withdraws[0];
+  async update(id: string, updateWithdrawDto: ApproveWithdrawDto) {
+    return await this.withdrawModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateWithdrawDto,
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} withdraw`;
+  async remove(id: string) {
+    return await this.withdrawModel.findByIdAndRemove(id, { new: true });
   }
 }

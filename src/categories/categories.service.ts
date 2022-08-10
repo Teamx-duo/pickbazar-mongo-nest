@@ -84,7 +84,7 @@ export class CategoriesService {
     ]);
     const data = await this.categoryAggregateModel.aggregatePaginate(
       aggregate,
-      { limit, page },
+      { ...(limit ? { limit } : {}), ...(page ? { page } : {}) },
     );
 
     return data;
@@ -97,7 +97,6 @@ export class CategoriesService {
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    console.log(updateCategoryDto);
     return await this.categoryModel.findByIdAndUpdate(
       id,
       {

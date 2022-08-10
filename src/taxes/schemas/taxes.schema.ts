@@ -27,7 +27,7 @@ export class Tax {
   @IsString()
   @IsOptional()
   @ApiProperty()
-  @Prop({ unique: true, required: true })
+  @Prop({ unique: true })
   country: string;
 
   @IsString()
@@ -54,9 +54,10 @@ export class Tax {
   priority: number;
 
   @IsBoolean()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ default: false })
-  on_shipping: boolean;
+  @Prop({ default: true })
+  on_shipping: boolean = true;
 }
 
 export const TaxesSchema = SchemaFactory.createForClass(Tax);

@@ -12,5 +12,6 @@ import { Withdraw, WithdrawSchema } from './schemas/withdraw.schema';
   ],
   controllers: [WithdrawsController],
   providers: [WithdrawsService],
+  exports: [MongooseModule, WithdrawsService],
 })
 export class WithdrawsModule {}

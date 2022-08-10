@@ -1,32 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
+import { InjectModel } from '@nestjs/mongoose';
+import { PaginateModel } from 'mongoose';
 import { CreateShippingDto } from './dto/create-shipping.dto';
 import { GetShippingsDto } from './dto/get-shippings.dto';
 import { UpdateShippingDto } from './dto/update-shipping.dto';
-import { Shipping } from './entities/shipping.entity';
-import shippingsJson from './shippings.json';
-const shippings = plainToClass(Shipping, shippingsJson);
+import { ShippingSchema, Shipping } from './schemas/shipping.schema';
 @Injectable()
 export class ShippingsService {
-  private shippings: Shipping[] = shippings;
+  constructor(
+    @InjectModel(Shipping.name)
+    private shippingModel: PaginateModel<ShippingSchema>,
+  ) {}
 
-  create(createShippingDto: CreateShippingDto) {
-    return this.shippings[0];
+  async create(createShippingDto: CreateShippingDto) {
+    return await this.shippingModel.create(createShippingDto);
   }
 
-  getShippings({}: GetShippingsDto) {
-    return this.shippings;
+  async getShippings({ text }: GetShippingsDto) {
+    return await this.shippingModel.find({
+      ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+    });
   }
 
-  findOne(id: number) {
-    return this.shippings.find((shipping) => shipping.id === Number(id));
+  async findOne(id: string) {
+    return await this.shippingModel.findById(id);
   }
 
-  update(id: number, updateShippingDto: UpdateShippingDto) {
-    return this.shippings[0];
+  async update(id: string, updateShippingDto: UpdateShippingDto) {
+    return await this.shippingModel.findByIdAndUpdate(
+      id,
+      {
+        $set: updateShippingDto,
+      },
+      { new: true },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} shipping`;
+  async remove(id: string) {
+    return await this.shippingModel.findByIdAndRemove(id, { new: true });
   }
 }
