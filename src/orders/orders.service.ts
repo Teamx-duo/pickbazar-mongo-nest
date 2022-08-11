@@ -113,7 +113,7 @@ export class OrdersService {
       taxes = await this.taxServices.getAllTaxes({ global: true });
     }
     if (taxes.length > 0) {
-      tax = taxes[0].rate;
+      tax = (taxes[0].rate / 100) * total;
       total += (taxes[0].rate / 100) * total;
     }
     if (coupon) {
@@ -161,7 +161,7 @@ export class OrdersService {
         populate: [
           { path: 'shop' },
           { path: 'coupon' },
-          { path: 'products' },
+          { path: 'products', populate: { path: 'product_id' } },
           { path: 'billing_address' },
           { path: 'shipping_address' },
           { path: 'status' },
@@ -258,7 +258,7 @@ export class OrdersService {
       taxes = await this.taxServices.getAllTaxes({ global: true });
     }
     if (taxes.length > 0) {
-      tax = taxes[0].rate;
+      tax = (taxes[0].rate / 100) * total;
       total += (taxes[0].rate / 100) * total;
     }
     verifiedCheckout.total_tax = tax;

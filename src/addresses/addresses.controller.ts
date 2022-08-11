@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   UseInterceptors,
+  UseFilters,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Role } from 'src/common/constants/roles.enum';

@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/exceptions.filter';
+import { MongoExceptionFilter } from './common/filters/mongoexception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });

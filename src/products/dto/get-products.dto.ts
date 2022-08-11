@@ -19,6 +19,9 @@ export class GetProductsDto extends PaginationArgs {
   @IsMongoId()
   @IsOptional()
   shop?: string;
+  @IsMongoId()
+  @IsOptional()
+  type?: string;
   @IsString()
   @IsOptional()
   search?: string;

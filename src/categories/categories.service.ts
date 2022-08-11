@@ -44,17 +44,17 @@ export class CategoriesService {
     });
   }
 
-  // async getCategories({ limit, page, search, type }: GetCategoriesDto) {
-  //   const categories = await this.categoryModel.paginate(
-  //     {
-  //       ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
-  //       ...(type ? { type } : {}),
-  //     },
-  //     { page, limit, populate: ['parent', 'type'] },
-  //   );
+  async getCategoriesAll({ limit, page, search, type }: GetCategoriesDto) {
+    const categories = await this.categoryModel.paginate(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(type ? { type } : {}),
+      },
+      { page, limit, populate: ['parent', 'type'] },
+    );
 
-  //   return PaginationResponse(categories);
-  // }
+    return PaginationResponse(categories);
+  }
 
   async getCategories({ limit, page, search, type }: GetCategoriesDto) {
     const aggregate = this.categoryAggregateModel.aggregate([

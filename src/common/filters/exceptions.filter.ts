@@ -28,15 +28,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
       response.status(status).json({
         status: status,
         path: request.url,
-        error: type,
-        message:
-          exception instanceof HttpException
-            ? exception.getResponse()['message']
-            : message,
-        errorBody:
-          exception instanceof HttpException ? exception.getResponse() : {},
+        errorType: exception.name ? exception.name : type,
+        errorCode: exception instanceof MongoError ? exception.code : status,
+        error: exception instanceof HttpException ? exception.message : message,
+        message,
       });
     };
+
+    if (exception instanceof MongoError) {
+      if (exception.code) {
+        responseMessage(exception.name, 'Already exists.');
+      }
+    }
 
     // API Not Found
     if (exception.message === 'Not Found') {
@@ -45,7 +48,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     // API Not Found
     if (exception.name === 'CastError') {
-      responseMessage('Not Found', 'Record not found.');
+      responseMessage('Cast Error', 'Record not found.');
     }
 
     // Throw an exceptions for either

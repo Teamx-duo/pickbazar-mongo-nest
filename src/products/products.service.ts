@@ -55,11 +55,13 @@ export class ProductsService {
     shop,
     sortedBy,
     category,
+    type,
   }: GetProductsDto) {
     const response = await this.productModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
         ...(shop ? { shop: shop } : {}),
+        ...(type ? { type } : {}),
         ...(category
           ? {
               categories: category,
