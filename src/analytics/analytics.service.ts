@@ -38,6 +38,7 @@ export class AnalyticsService {
 
   async findAll() {
     let TODAY = new Date(new Date().setMonth(new Date().getMonth() + 1));
+    let YESTERDAY = new Date().setDate(new Date().getDate() - 1);
     let YEAR_BEFORE = new Date(
       new Date().setFullYear(new Date().getFullYear() - 1),
     );
@@ -52,7 +53,9 @@ export class AnalyticsService {
     const todaysRevenue = this.orderModel.aggregate([
       {
         $match: {
-          createdAt: { $gte: TODAY },
+          createdAt: {
+            $gte: new Date(new Date(YESTERDAY).setUTCHours(0, 0, 0, 0)),
+          },
         },
       },
       {
@@ -146,7 +149,7 @@ export class AnalyticsService {
           : 0,
       todaysRevenue:
         todaysRevenueData && todaysRevenueData?.length > 0
-          ? todaysRevenueData
+          ? todaysRevenueData?.[0]?.data
           : 0,
       totalProducts: totalProductsData ? totalProductsData : 0,
       totalShops: totalShopsData ? totalShopsData : 0,
