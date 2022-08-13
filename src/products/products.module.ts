@@ -16,12 +16,12 @@ import {
 } from './schemas/variationOption.schema';
 import { VariationsService } from './variations.service';
 import { TagsModule } from 'src/tags/tags.module';
-import { Model } from 'mongoose';
 import { ShopsModule } from 'src/shops/shops.module';
 import {
   ProductPivot,
   ProductPivotSchema,
 } from './schemas/productPivot.schema';
+import { Rating, RatingSchema } from './schemas/rating.schema';
 
 @Module({
   imports: [
@@ -30,6 +30,7 @@ import {
       { name: VariationOption.name, schema: VariationOptionSchema },
       { name: Variation.name, schema: VariationSchema },
       { name: ProductPivot.name, schema: ProductPivotSchema },
+      { name: Rating.name, schema: RatingSchema },
     ]),
     TagsModule,
     ShopsModule,

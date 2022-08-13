@@ -28,6 +28,7 @@ export class CreateProductDto extends PickType(Product, [
   'unit',
   'variations',
   'width',
+  'rating_count',
 ]) {
   @IsOptional()
   @ApiProperty()

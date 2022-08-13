@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+  Put,
+} from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { GetReviewsDto } from './dto/get-review.dto';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -13,22 +23,22 @@ export class ReviewsController {
   }
 
   @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  findAll(@Query() getReviewFilter: GetReviewsDto) {
+    return this.reviewsService.findAll(getReviewFilter);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+    return this.reviewsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
+    return this.reviewsService.update(id, updateReviewDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+    return this.reviewsService.remove(id);
   }
 }

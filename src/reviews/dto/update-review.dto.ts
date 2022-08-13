@@ -1,4 +1,6 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateReviewDto } from './create-review.dto';
+import { OmitType, PartialType } from '@nestjs/swagger';
+import { Review } from '../schemas/review.schema';
 
-export class UpdateReviewDto extends PartialType(CreateReviewDto) {}
+export class UpdateReviewDto extends PartialType(
+  OmitType(Review, ['user', 'product', 'shop']),
+) {}

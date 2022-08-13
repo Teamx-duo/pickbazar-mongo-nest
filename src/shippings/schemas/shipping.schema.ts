@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEnum,
@@ -20,19 +21,23 @@ export enum ShippingType {
 @Schema()
 export class Shipping {
   @IsString()
+  @ApiProperty()
   @Prop()
   name: string;
 
   @IsNumber()
+  @ApiProperty()
   @Prop()
   amount: string;
 
   @IsBoolean()
+  @ApiProperty()
   @IsOptional()
   @Prop({ default: false })
   is_global: boolean = false;
 
   @IsEnum(ShippingType)
+  @ApiPropertyOptional({ enum: ShippingType })
   @Prop({ enum: ShippingType })
   type: ShippingType = ShippingType.FIXED;
 }

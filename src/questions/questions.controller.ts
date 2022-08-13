@@ -7,19 +7,30 @@ import {
   Delete,
   Query,
   Put,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { GetQuestionsDto } from './dto/get-questions.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/constants/roles.enum';
 
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly questionsService: QuestionsService) {}
 
   @Post()
-  create(@Body() createQuestionDto: CreateQuestionDto) {
-    return this.questionsService.create(createQuestionDto);
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.CUSTOMER, Role.STORE_OWNER)
+  create(@Body() createQuestionDto: CreateQuestionDto, @Req() req) {
+    return this.questionsService.create({
+      ...createQuestionDto,
+      user: req?.user?._id,
+    });
   }
 
   @Get('product/:id')
@@ -41,6 +52,8 @@ export class QuestionsController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.STORE_OWNER)
   update(
     @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
@@ -49,6 +62,8 @@ export class QuestionsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.STORE_OWNER)
   remove(@Param('id') id: string) {
     return this.questionsService.remove(id);
   }

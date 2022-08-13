@@ -17,8 +17,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductPivot } from './productPivot.schema';
+import { Rating, RatingSchema } from './rating.schema';
 
 export type ProductSchema = Product & Document;
 export enum ProductType {
@@ -107,6 +108,12 @@ export class Product {
   @Prop({ required: true })
   @ApiProperty()
   description: string;
+
+  @IsArray()
+  @IsOptional()
+  @Prop({ required: true, type: [RatingSchema] })
+  @ApiPropertyOptional()
+  rating_count: Rating[];
 
   @IsBoolean()
   @IsOptional()

@@ -13,13 +13,12 @@ import {
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-export type QuestionSchema = Question & Document;
+export type ReviewSchema = Review & Document;
 
 @Schema({ timestamps: true })
-export class Question {
+export class Review {
   @IsMongoId()
   @ApiProperty()
-  @IsOptional()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: mongoose.Schema.Types.ObjectId;
 
@@ -40,19 +39,24 @@ export class Question {
   @IsString()
   @ApiProperty()
   @Prop({ required: true })
-  question: string;
+  comment: string;
 
-  @IsString()
-  @ApiProperty()
+  @IsString({ each: true })
+  @IsArray()
   @IsOptional()
+  @ApiPropertyOptional()
   @Prop()
-  answer: string;
+  photos: string;
 
   @IsNumber()
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty()
   @Prop({ default: 0, min: 0 })
   positive_feedbacks_count: number;
+
+  @IsNumber()
+  @ApiProperty()
+  @Prop({ default: 0, min: 0, max: 5, required: true })
+  rating: number;
 
   @IsNumber()
   @ApiPropertyOptional()
@@ -73,6 +77,6 @@ export class Question {
   my_feedback: string;
 }
 
-export const QuestionSchema = SchemaFactory.createForClass(Question);
+export const ReviewSchema = SchemaFactory.createForClass(Review);
 
-QuestionSchema.plugin(mongoosePaginate);
+ReviewSchema.plugin(mongoosePaginate);
