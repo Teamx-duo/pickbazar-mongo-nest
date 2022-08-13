@@ -128,6 +128,12 @@ export class Product {
 
   @IsNumber()
   @IsOptional()
+  @ApiProperty()
+  @Prop({ default: 0, min: 0, max: 5 })
+  ratings: number;
+
+  @IsNumber()
+  @IsOptional()
   @Prop()
   @ApiProperty()
   max_price: number;

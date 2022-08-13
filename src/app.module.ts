@@ -23,6 +23,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import configuration, { ConfigType } from './configuration/config';
 import { MailController } from './mail/mail.controller';
 import { MailModule } from './mail/mail.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { QuestionsModule } from './questions/questions.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -80,6 +83,9 @@ import { MailModule } from './mail/mail.module';
     ImportsModule,
     AuthModule,
     MailModule,
+    NotificationsModule,
+    QuestionsModule,
+    ReviewsModule,
   ],
   controllers: [MailController],
   providers: [],

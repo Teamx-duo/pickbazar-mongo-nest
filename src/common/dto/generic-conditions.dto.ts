@@ -9,8 +9,8 @@ export class WhereHasConditionsRelation {
 }
 
 export enum SortOrder {
-  ASC = 1,
-  DESC = -1,
+  ASC = 'asc',
+  DESC = 'desc',
 }
 
 export enum SQLOperator {
