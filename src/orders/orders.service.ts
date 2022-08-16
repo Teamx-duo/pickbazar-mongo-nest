@@ -68,7 +68,7 @@ export class OrdersService {
           if (prod.product_type === ProductType.VARIABLE) {
             const productSelectedVariation = prod.variation_options.find(
               (variant: any) =>
-                variant._id === pivotProduct.variation_option_id,
+                variant._id.equals(pivotProduct.variation_option_id),
             );
             if (
               pivotProduct.order_quantity > productSelectedVariation.quantity
@@ -147,7 +147,16 @@ export class OrdersService {
     return order;
   }
 
-  async getOrders({ limit, page, customer, id, search, shop }: GetOrdersDto) {
+  async getOrders({
+    limit,
+    page,
+    customer,
+    id,
+    search,
+    shop,
+    sortedBy,
+    orderBy,
+  }: GetOrdersDto) {
     const response = await this.orderModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
@@ -166,6 +175,9 @@ export class OrdersService {
           { path: 'shipping_address' },
           { path: 'status' },
         ],
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
       },
     );
     return PaginationResponse(response);
@@ -234,7 +246,8 @@ export class OrdersService {
       const pivotProduct = products.find((p) => prod._id.equals(p.product_id));
       if (prod.product_type === ProductType.VARIABLE) {
         const productSelectedVariation = prod.variation_options.find(
-          (variant) => variant._id === pivotProduct.variation_option_id,
+          (variant: any) =>
+            variant._id.equals(pivotProduct.variation_option_id),
         );
         if (pivotProduct.order_quantity > productSelectedVariation.quantity) {
           verifiedCheckout.unavailable_products.push(prod);

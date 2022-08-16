@@ -6,7 +6,13 @@ import {
   VariationOptionSchema,
 } from './variationOption.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsMongoId,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export type RatingSchema = Rating & Document;
@@ -18,29 +24,34 @@ export class Rating {
   @Prop({ default: 0, min: 0, max: 5 })
   rating: number;
 
-  @IsNumber()
-  @ApiPropertyOptional()
-  @IsOptional()
-  @Prop({ default: 0, min: 0 })
-  positive_feedbacks_count: number;
+  @IsMongoId()
+  @ApiProperty()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  user: mongoose.Schema.Types.ObjectId;
 
   @IsNumber()
   @ApiPropertyOptional()
   @IsOptional()
   @Prop({ default: 0, min: 0 })
-  negative_feedbacks_count: number;
+  positive_feedbacks_count?: number;
 
   @IsNumber()
   @ApiPropertyOptional()
   @IsOptional()
   @Prop({ default: 0, min: 0 })
-  abusive_reports_count: number;
+  negative_feedbacks_count?: number;
+
+  @IsNumber()
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Prop({ default: 0, min: 0 })
+  abusive_reports_count?: number;
 
   @IsNumber()
   @ApiPropertyOptional()
   @IsOptional()
   @Prop()
-  my_feedback: string;
+  my_feedback?: string;
 }
 
 export const RatingSchema = SchemaFactory.createForClass(Rating);

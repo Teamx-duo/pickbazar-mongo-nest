@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNumber, IsOptional } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsMongoId, IsNumber, IsOptional } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Product } from './product.schema';
 
@@ -15,6 +15,12 @@ export class ProductPivot {
     ref: 'Product',
   })
   product_id: mongoose.Schema.Types.ObjectId;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Prop({ default: false })
+  has_reviewed: boolean;
 
   @IsNumber()
   @ApiProperty()

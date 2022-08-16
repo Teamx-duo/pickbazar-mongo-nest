@@ -18,6 +18,7 @@ export type ReviewSchema = Review & Document;
 @Schema({ timestamps: true })
 export class Review {
   @IsMongoId()
+  @IsOptional()
   @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
   user: mongoose.Schema.Types.ObjectId;
@@ -46,7 +47,7 @@ export class Review {
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
-  photos: string;
+  photos: string[];
 
   @IsNumber()
   @ApiProperty()

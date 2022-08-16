@@ -7,19 +7,30 @@ import {
   Delete,
   Query,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { GetReviewsDto } from './dto/get-review.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/constants/roles.enum';
 
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.CUSTOMER, Role.STORE_OWNER)
+  create(@Body() createReviewDto: CreateReviewDto, @Req() req) {
+    return this.reviewsService.create({
+      ...createReviewDto,
+      user: req.user?._id,
+    });
   }
 
   @Get()

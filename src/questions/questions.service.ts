@@ -18,8 +18,9 @@ export class QuestionsService {
       user: createQuestionDto.user,
       shop: createQuestionDto.shop,
       product: createQuestionDto.product,
+      answer: { $exists: false },
     });
-    if (existingQuestions && existingQuestions.length > 0) {
+    if (existingQuestions && existingQuestions.length > 1) {
       throw new HttpException(
         'You cannot ask more than 2 questions over the same product.',
         400,
@@ -48,8 +49,9 @@ export class QuestionsService {
       {
         page,
         limit,
+        populate: [{ path: 'product' }, { path: 'user' }, { path: 'shop' }],
         sort: {
-          [orderBy]: sortedBy,
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
         },
       },
     );
