@@ -61,7 +61,7 @@ export class User {
 
   @IsBoolean()
   @IsOptional()
-  @Prop({ default: false })
+  @Prop({ default: true })
   is_active?: boolean;
 
   @IsEnum(Role)

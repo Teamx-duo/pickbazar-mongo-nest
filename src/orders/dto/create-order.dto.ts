@@ -22,6 +22,7 @@ export class CreateOrderDto extends PickType(Order, [
   'paid_total',
   'parent_order',
   'payment_gateway',
+  'status',
   'payment_gateway',
   'payment_id',
   'shipping_address',
@@ -30,9 +31,6 @@ export class CreateOrderDto extends PickType(Order, [
   @IsMongoId()
   @IsOptional()
   customer: string;
-  @IsNumber()
-  @Transform((val) => parseInt(val.value))
-  status: number;
   @IsArray()
   products: ProductPivot[];
 }

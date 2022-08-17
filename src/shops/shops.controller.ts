@@ -24,6 +24,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Controller('shops')
 export class ShopsController {
@@ -84,10 +86,10 @@ export class StaffsController {
   constructor(private readonly shopsService: ShopsService) {}
 
   @Post()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.STAFF, Role.SUPER_ADMIN)
-  create(@Body() createShopDto: CreateShopDto, @Req() req: Request) {
-    return this.shopsService.create(createShopDto, req.user);
+  // @Roles(Role.STORE_OWNER, Role.SUPER_ADMIN)
+  // @UseGuards(AuthGuard('jwt'), RolesGuard)
+  create(@Body() createUserDto: CreateUserDto, @Req() req: Request) {
+    return this.shopsService.createShopStaff(createUserDto, req.user);
   }
 
   @Get()
@@ -95,18 +97,13 @@ export class StaffsController {
     return this.shopsService.getStaffs(query);
   }
 
-  @Get(':slug')
-  async getShop(@Param('slug') slug: string) {
-    return this.shopsService.getShop(slug);
-  }
-
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateShopDto: UpdateShopDto) {
-    return this.shopsService.update(id, updateShopDto);
+  update(@Param('id') id: string, @Body() updateStaffDto: UpdateUserDto) {
+    return this.shopsService.updateStaff(id, updateStaffDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.shopsService.remove(id);
+    return this.shopsService.removeStaff(id);
   }
 }

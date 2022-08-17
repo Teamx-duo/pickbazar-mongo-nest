@@ -6,7 +6,7 @@ import { Type } from 'src/types/schemas/type.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export type CategorySchema = Category & Document;
 
@@ -42,7 +42,8 @@ export class Category {
   details: string;
 
   @IsString()
-  @ApiProperty()
+  @IsOptional()
+  @ApiPropertyOptional()
   @Prop()
   image: string;
 

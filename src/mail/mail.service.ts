@@ -46,6 +46,23 @@ export class MailService {
     });
   }
 
+  async sendStaffLoginCredentials(user: User) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      // from: '"Support Team" <support@example.com>', // override default from
+      subject:
+        'Welcome to Multivendor! Please login with the given credentials',
+      template: './staffJoining', // `.hbs` extension is appended automatically
+      context: {
+        // ✏️ filling curly brackets with content
+        name: user.name,
+        email: user.email,
+        password: user.password,
+        link: this.configService.get<ConfigType['app']>('app').adminUrl,
+      },
+    });
+  }
+
   async sendForgetPasswordEmail(email: string, token: string, code: string) {
     const url = `http:localhost:3003/auth/forget?token=${token}`;
 

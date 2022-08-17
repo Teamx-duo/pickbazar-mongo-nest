@@ -48,12 +48,50 @@ export class UsersService {
     }
   }
 
-  async getUsers({ text, limit, page }: GetUsersDto) {
+  async createStaff(
+    createUserDto: CreateUserDto,
+  ): Promise<User & { _id?: any }> {
+    const user = {
+      ...createUserDto,
+    };
+    const userRegistered = await this.userModel.findOne({
+      email: user.email,
+    });
+    if (!userRegistered) {
+      const userData = new this.userModel(user);
+      const password = await bcrypt.hash(user.password, 10);
+      userData.password = password;
+      await userData.save();
+      return user;
+    } else {
+      throw new HttpException(
+        'REGISTRATION.USER_ALREADY_REGISTERED',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async getUsers({
+    text,
+    shop,
+    roles,
+    limit,
+    page,
+    orderBy,
+    sortedBy,
+  }: GetUsersDto) {
     return await this.userModel.paginate(
       {
         ...(text ? { name: text } : {}),
+        ...(shop ? { shop: shop } : {}),
+        ...(roles ? { roles: roles } : {}),
       },
-      { limit, page, populate: ['shops', 'address', 'profile'] },
+      {
+        limit,
+        page,
+        populate: ['shops', 'address', 'profile'],
+        sort: { [orderBy]: sortedBy === 'asc' ? 1 : -1 },
+      },
     );
   }
   async findOne(id: string) {

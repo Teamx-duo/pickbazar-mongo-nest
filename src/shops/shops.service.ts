@@ -1,5 +1,5 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
-import mongoose, { ObjectId, PaginateModel } from 'mongoose';
+import mongoose, { Model, ObjectId, PaginateModel } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import {
   ApproveShopDto,
@@ -26,7 +26,10 @@ import { UpdateShopSettingDto } from './dto/update-shopsettings.dto';
 import { convertToSlug } from 'src/common/constants/common.function';
 import { UsersService } from 'src/users/users.service';
 import { Role } from 'src/common/constants/roles.enum';
-import { User } from 'src/users/schema/user.schema';
+import { User, UserSchema } from 'src/users/schema/user.schema';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { MailService } from 'src/mail/mail.service';
+import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 
 @Injectable()
 export class ShopsService {
@@ -39,11 +42,12 @@ export class ShopsService {
     private settingsModel: PaginateModel<ShopSettingsSchema>,
     @InjectModel(PaymentInfo.name)
     private paymentModel: PaginateModel<PaymentInfoSchema>,
+    @InjectModel(User.name) private userModel: Model<UserSchema>,
     private readonly userService: UsersService,
+    private readonly mailService: MailService,
   ) {}
 
   async create(createShopDto: CreateShopDto, user: any) {
-    console.log(createShopDto);
     const shop = await this.shopModel.create({
       ...createShopDto,
       slug: convertToSlug(createShopDto.name),
@@ -57,6 +61,23 @@ export class ShopsService {
     return shop;
   }
 
+  async createShopStaff(createStaffDto: CreateUserDto, shopUser: any) {
+    const user = await this.userService.createStaff({
+      ...createStaffDto,
+      shop: createStaffDto.shop,
+      shops: [createStaffDto.shop],
+      roles: [Role.STAFF],
+    });
+    await this.shopModel.findByIdAndUpdate(createStaffDto.shop, {
+      $push: { staffs: user._id },
+    });
+    await this.mailService.sendStaffLoginCredentials({
+      ...user,
+      password: createStaffDto.password,
+    });
+    return user;
+  }
+
   async getShops({ search, limit, page }: GetShopsDto) {
     const responses = await this.shopModel.paginate(
       {
@@ -66,9 +87,13 @@ export class ShopsService {
     );
     return PaginationResponse(responses);
   }
+
   async getStaffs({ shop_id }: GetStaffsDto) {
-    const shop = await this.shopModel.findById(shop_id).populate(['staffs']);
-    return shop.staffs;
+    const staff = await this.userModel.find({
+      $or: [{ shops: shop_id }, { shop: shop_id }],
+      roles: Role.STAFF,
+    });
+    return staff;
   }
 
   async getShop(slug: string): Promise<Shop> {
@@ -76,12 +101,15 @@ export class ShopsService {
   }
 
   async update(id: string, updateShopDto: UpdateShopDto) {
-    console.log(updateShopDto);
     return await this.shopModel.findByIdAndUpdate(
       id,
       { $set: updateShopDto },
       { new: true },
     );
+  }
+
+  async updateStaff(id: string, updateStaffDto: UpdateUserDto) {
+    return await this.userService.update(id, updateStaffDto);
   }
 
   async updateMultiple(ids: string, updateShopDto: UpdateShopDto) {
@@ -117,6 +145,10 @@ export class ShopsService {
 
   async remove(id: string) {
     return await this.shopModel.findByIdAndRemove(id, { new: true });
+  }
+
+  async removeStaff(id: string) {
+    return await this.userService.remove(id);
   }
 
   async createBalance(createBalanceDto: CreateBalanceDto) {

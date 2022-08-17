@@ -57,6 +57,7 @@ export class Order {
   children: this[];
 
   @IsMongoId()
+  @IsOptional()
   @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus' })
   status: OrderStatus;

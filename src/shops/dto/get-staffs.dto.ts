@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 
 export class GetStaffsDto extends PaginationArgs {
@@ -10,6 +10,7 @@ export class GetStaffsDto extends PaginationArgs {
   @IsOptional()
   sortedBy?: string;
 
-  @IsString()
+  @IsMongoId()
+  @IsOptional()
   shop_id?: string;
 }

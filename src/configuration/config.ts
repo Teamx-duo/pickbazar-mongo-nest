@@ -33,6 +33,8 @@ export interface ConfigType {
     baseUrl?: string | 'http://localhost:5000/api';
     imageUrl?: string | 'http://localhost:5000/api/attachments/images';
     imageStoreFolder?: string | '/uploads/images';
+    shopUrl?: string;
+    adminUrl?: string;
   };
 }
 
@@ -73,5 +75,7 @@ export default () => ({
       process.env.BASE_IMAGE_URL ||
       'http://localhost:5000/api/attachments/images',
     imageStoreFolder: process.env.BASE_IMAGES_FOLDER || '/uploads/images',
+    shopUrl: process.env.SHOP_URL,
+    adminUrl: process.env.ADMIN_URL,
   },
 });
