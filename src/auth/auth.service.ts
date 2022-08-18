@@ -1,7 +1,6 @@
 import { JWTService } from './jwt.service';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './../users/dto/create-user.dto';
-import { plainToClass } from 'class-transformer';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import {
   AuthResponse,
@@ -32,7 +31,6 @@ import {
   ForgottenPasswordSchema,
 } from './schemas/forgotPassword.schema';
 import { MailService } from 'src/mail/mail.service';
-const users = plainToClass(User, usersJson);
 
 @Injectable()
 export class AuthService {
@@ -254,11 +252,9 @@ export class AuthService {
     }
   }
 
-  async socialLogin(socialLoginDto: SocialLoginDto): Promise<GetUsersResponse> {
+  async socialLogin(socialLoginDto: SocialLoginDto) {
     console.log(socialLoginDto);
-    return {
-      users: users,
-    };
+    return {};
   }
 
   async otpLogin(otpLoginDto: OtpLoginDto) {

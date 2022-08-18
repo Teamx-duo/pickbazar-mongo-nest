@@ -4,7 +4,6 @@ import { GetOrdersDto, OrderPaginator } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import ordersJson from './orders.json';
 import orderStatusJson from './order-statuses.json';
-import { plainToClass } from 'class-transformer';
 import { Order, OrderSchema } from './schemas/order.schema';
 import { OrderStatus, OrderStatusSchema } from './schemas/orderStatus.schema';
 import { GetOrderStatusesDto } from './dto/get-order-statuses.dto';
