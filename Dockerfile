@@ -2,7 +2,7 @@ FROM node:alpine AS development
 
 WORKDIR /app
 
-COPY package*.json /usr/src/app/
+COPY package*.json ./
 
 RUN yarn install
 
@@ -17,7 +17,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /app
 
-COPY package*.json /usr/src/app/
+COPY package*.json ./
 
 RUN yarn install --only=prod
 
