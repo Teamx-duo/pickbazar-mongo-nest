@@ -1,8 +1,8 @@
 FROM node:alpine AS development
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json /usr/src/app/
 
 RUN yarn install
 
@@ -15,14 +15,14 @@ FROM node:alpine AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY package*.json /usr/src/app/
 
 RUN yarn install --only=prod
 
 COPY . .
 
-COPY --from=development /usr/src/app/dist ./dist
+COPY /app/dist ./dist
 
 CMD ["node", "dist/main"]
