@@ -1,6 +1,6 @@
 FROM node:alpine AS development
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
 
@@ -15,7 +15,7 @@ FROM node:alpine AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
 
