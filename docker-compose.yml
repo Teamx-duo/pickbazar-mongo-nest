@@ -8,7 +8,7 @@ services:
       dockerfile: ./Dockerfile
     command: npm run start:dev
     environment:
-      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
     ports:
       - 5000:5000
       - 5001:9229
@@ -38,7 +38,7 @@ services:
       dockerfile: ./Dockerfile
     command: npm run start:prod
     environment:
-      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
     ports:
       - 5000:5000
       - 9229:9229
