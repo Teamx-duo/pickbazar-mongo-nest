@@ -79,7 +79,7 @@ export class AuthService {
       })
       .populate(['profile', 'address', 'shops']);
     if (!userFromDb)
-      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid credentials', HttpStatus.NOT_FOUND);
 
     const isValidPass = await bcrypt.compare(
       loginInput.password,

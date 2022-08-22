@@ -45,7 +45,7 @@ export class Type {
   @ValidateNested()
   @Prop(
     raw({
-      isHome: { type: String },
+      isHome: { type: Boolean },
       layoutType: { type: String },
       productCard: { type: String },
     }),

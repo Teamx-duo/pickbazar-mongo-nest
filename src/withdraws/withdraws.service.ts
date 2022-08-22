@@ -19,10 +19,24 @@ export class WithdrawsService {
     return await this.withdrawModel.create(createWithdrawDto);
   }
 
-  async getWithdraws({ limit, page, status, shop_id }: GetWithdrawsDto) {
+  async getWithdraws({
+    limit,
+    page,
+    status,
+    shop_id,
+    sortedBy,
+    orderBy,
+  }: GetWithdrawsDto) {
     const data = await this.withdrawModel.paginate(
       { ...(status ? { status } : {}), ...(shop_id ? { shop: shop_id } : {}) },
-      { limit, page, populate: [{ path: 'shop' }] },
+      {
+        limit,
+        page,
+        populate: [{ path: 'shop' }],
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(data);
   }

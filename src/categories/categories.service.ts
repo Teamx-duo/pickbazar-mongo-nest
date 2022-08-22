@@ -56,7 +56,14 @@ export class CategoriesService {
     return PaginationResponse(categories);
   }
 
-  async getCategories({ limit, page, search, type }: GetCategoriesDto) {
+  async getCategories({
+    limit,
+    page,
+    search,
+    type,
+    orderBy,
+    sortedBy,
+  }: GetCategoriesDto) {
     const aggregate = this.categoryAggregateModel.aggregate([
       {
         $match: {
@@ -65,7 +72,7 @@ export class CategoriesService {
         },
       },
       {
-        $sort: { createdAt: 1 },
+        $sort: { [orderBy]: sortedBy === 'asc' ? 1 : -1 },
       },
       {
         $graphLookup: {

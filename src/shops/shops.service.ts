@@ -78,21 +78,35 @@ export class ShopsService {
     return user;
   }
 
-  async getShops({ search, limit, page }: GetShopsDto) {
+  async getShops({ search, limit, page, orderBy, sortedBy }: GetShopsDto) {
     const responses = await this.shopModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      { limit, page, populate: ['owner'] },
+      {
+        limit,
+        page,
+        populate: ['owner'],
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(responses);
   }
 
-  async getStaffs({ shop_id }: GetStaffsDto) {
-    const staff = await this.userModel.find({
-      $or: [{ shops: shop_id }, { shop: shop_id }],
-      roles: Role.STAFF,
-    });
+  async getStaffs({ shop_id, orderBy, sortedBy }: GetStaffsDto) {
+    const staff = await this.userModel.find(
+      {
+        $or: [{ shops: shop_id }, { shop: shop_id }],
+        roles: Role.STAFF,
+      },
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
+    );
     return staff;
   }
 

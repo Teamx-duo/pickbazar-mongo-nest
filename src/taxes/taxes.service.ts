@@ -19,7 +19,7 @@ export class TaxesService {
   }
 
   async findAll({
-    text,
+    search,
     orderBy,
     sortedBy,
     country,
@@ -28,23 +28,40 @@ export class TaxesService {
   }: GetTaxesDto) {
     const response = await this.taxesModel.paginate(
       {
-        ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
         ...(country ? { country } : {}),
         ...(priority ? { priority } : {}),
         ...(global !== null || global !== undefined ? { global } : {}),
       },
-      { sort: { [orderBy]: sortedBy } },
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }
 
-  async getAllTaxes({ text, country, priority }: GetTaxesDto) {
-    return await this.taxesModel.find({
-      ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
-      ...(country ? { country } : {}),
-      ...(priority ? { priority } : {}),
-      ...(priority ? { priority } : {}),
-    });
+  async getAllTaxes({
+    search,
+    country,
+    priority,
+    sortedBy,
+    orderBy,
+  }: GetTaxesDto) {
+    return await this.taxesModel.find(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(country ? { country } : {}),
+        ...(priority ? { priority } : {}),
+        ...(priority ? { priority } : {}),
+      },
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
+    );
   }
 
   async findOne(id: string | ObjectId) {

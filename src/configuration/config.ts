@@ -22,7 +22,7 @@ export interface ConfigType {
   mail?: {
     host?: string;
     port?: string;
-    secure?: string;
+    secure?: boolean;
     user?: string;
     pass?: string;
     mailFromName?: string;

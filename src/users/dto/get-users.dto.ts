@@ -18,7 +18,7 @@ export class GetUsersDto extends PaginationArgs {
   sortedBy?: SortOrder;
   @IsString()
   @IsOptional()
-  text?: string;
+  search?: string;
   @IsMongoId()
   @IsOptional()
   shop?: string;

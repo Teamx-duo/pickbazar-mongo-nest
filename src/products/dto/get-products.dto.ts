@@ -12,10 +12,10 @@ export class ProductPaginator extends Paginator<Product> {
 export class GetProductsDto extends PaginationArgs {
   @IsString()
   @IsOptional()
-  orderBy?: SortOrder;
+  orderBy?: QueryProductsOrderByColumn;
   @IsString()
   @IsOptional()
-  sortedBy?: QueryProductsOrderByColumn;
+  sortedBy?: SortOrder;
   @IsMongoId()
   @IsOptional()
   shop?: string;

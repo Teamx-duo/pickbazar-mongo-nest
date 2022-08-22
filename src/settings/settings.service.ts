@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { CreateSettingDto } from './dto/create-setting.dto';
@@ -14,16 +14,21 @@ export class SettingsService {
     private seoSettingsModel: PaginateModel<SeoSettingSchema>,
   ) {}
   async create(createSettingDto: CreateSettingDto) {
-    // const seo = await this.seoSettingsModel.create(
-    //   createSettingDto.options.seo,
-    // );
-    const settings = await this.settingsModel.create(createSettingDto);
-    // await seo.update({ $set: { setting: settings._id } });
-    return settings;
+    const isExist = await this.settingsModel.countDocuments();
+    if (isExist > 0) {
+      const dbSettings = await this.settingsModel.find({});
+      const setting = dbSettings?.[0];
+      return await setting.update({ $set: createSettingDto }, { new: true });
+    }
+    return await this.settingsModel.create(createSettingDto);
   }
 
   async findAll() {
-    return await this.settingsModel.find({});
+    const settings = await this.settingsModel.find({});
+    if (this.settingsModel.length > 0) {
+      return settings?.[0];
+    }
+    return {};
   }
 
   async findOne(id: string) {

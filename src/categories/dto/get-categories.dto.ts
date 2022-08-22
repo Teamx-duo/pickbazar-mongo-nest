@@ -10,13 +10,20 @@ export class CategoryPaginator extends Paginator<Category> {
   data: Category[];
 }
 
+export enum QueryCategoriesOrderByColumn {
+  CREATED_AT = 'createdAt',
+  NAME = 'name',
+  UPDATED_AT = 'updatedAt',
+}
+
 export class GetCategoriesDto extends PaginationArgs {
   @IsString()
   @IsOptional()
-  orderBy?: QueryCategoriesOrderByColumn;
+  orderBy?: QueryCategoriesOrderByColumn =
+    QueryCategoriesOrderByColumn.CREATED_AT;
   @IsString()
   @IsOptional()
-  sortedBy?: SortOrder;
+  sortedBy?: SortOrder = SortOrder.DESC;
   @IsMongoId()
   @IsOptional()
   type?: string;
@@ -26,10 +33,4 @@ export class GetCategoriesDto extends PaginationArgs {
   @IsMongoId()
   @IsOptional()
   parent?: number = null;
-}
-
-export enum QueryCategoriesOrderByColumn {
-  CREATED_AT = 'createdAt',
-  NAME = 'name',
-  UPDATED_AT = 'updatedAt',
 }

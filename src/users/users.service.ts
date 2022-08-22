@@ -41,10 +41,7 @@ export class UsersService {
       await userData.save();
       return user;
     } else {
-      throw new HttpException(
-        'REGISTRATION.USER_ALREADY_REGISTERED',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Email is already taken.', HttpStatus.CONFLICT);
     }
   }
 
@@ -64,15 +61,12 @@ export class UsersService {
       await userData.save();
       return user;
     } else {
-      throw new HttpException(
-        'REGISTRATION.USER_ALREADY_REGISTERED',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Email is already taken.', HttpStatus.CONFLICT);
     }
   }
 
   async getUsers({
-    text,
+    search,
     shop,
     roles,
     limit,
@@ -82,7 +76,7 @@ export class UsersService {
   }: GetUsersDto) {
     return await this.userModel.paginate(
       {
-        ...(text ? { name: text } : {}),
+        ...(search ? { name: search } : {}),
         ...(shop ? { shop: shop } : {}),
         ...(roles ? { roles: roles } : {}),
       },

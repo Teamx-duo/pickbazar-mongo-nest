@@ -37,8 +37,8 @@ export class TypesController {
   }
 
   @Get('all')
-  getAllTypes() {
-    return this.typesService.findAll();
+  getAllTypes(@Query() query: GetTypesDto) {
+    return this.typesService.findAll(query);
   }
 
   @Get(':slug')

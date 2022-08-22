@@ -11,30 +11,26 @@ import {
 import mongoose, { Document } from 'mongoose';
 import { Location } from './location.schema';
 import { Setting } from './setting.schema';
-import { ShopSocials } from './shopSocials.schema';
+import { ShopSocials, ShopSocialsSchema } from './shopSocials.schema';
 
 export type ContactDetailSchema = ContactDetail & Document;
 
 @Schema()
 export class ContactDetail {
-  @ValidateNested({ each: true })
-  @Type(() => ShopSocials)
-  @IsArray()
   @IsOptional()
   @ApiProperty()
-  @Prop()
+  @Prop({ type: [ShopSocialsSchema] })
   socials: ShopSocials[];
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   contact: string;
 
-  @ValidateNested()
-  @Type(() => Location)
   @ApiProperty()
   @IsOptional()
-  @Prop()
+  @Prop({ type: Location })
   location: Location;
 
   @IsString()

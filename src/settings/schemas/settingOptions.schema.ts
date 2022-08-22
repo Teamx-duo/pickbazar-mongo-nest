@@ -11,11 +11,14 @@ import {
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
-import { ContactDetail } from './contactDetails.schema';
-import { DeliveryTime } from './deliveryTime.schema';
-import { FacebookSetting } from './facebookSettings.schema';
-import { GoogleSetting } from './googleSettings.schema';
-import { SeoSetting } from './seoSettings.schema';
+import { ContactDetail, ContactDetailSchema } from './contactDetails.schema';
+import { DeliveryTime, DeliveryTimeSchema } from './deliveryTime.schema';
+import {
+  FacebookSetting,
+  FacebookSettingSchema,
+} from './facebookSettings.schema';
+import { GoogleSetting, GoogleSettingSchema } from './googleSettings.schema';
+import { SeoSetting, SeoSettingSchema } from './seoSettings.schema';
 
 export type SettingsOptionsSchema = SettingsOptions & Document;
 
@@ -43,12 +46,9 @@ export class SettingsOptions {
   @Prop({ default: 10 })
   minimumOrderAmount: number;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => DeliveryTime)
   @IsOptional()
   @ApiProperty()
-  @Prop()
+  @Prop({ type: [DeliveryTimeSchema] })
   deliveryTime: DeliveryTime[];
 
   @IsString()
@@ -69,25 +69,24 @@ export class SettingsOptions {
   @Prop()
   shippingClass: string;
 
-  @ValidateNested()
-  @Type(() => GoogleSetting)
   @IsOptional()
   @ApiProperty()
-  @Prop()
+  @Prop({ type: SeoSettingSchema })
+  seo?: SeoSetting;
+
+  @IsOptional()
+  @ApiProperty()
+  @Prop({ type: GoogleSettingSchema })
   google?: GoogleSetting;
 
-  @ValidateNested()
-  @Type(() => FacebookSetting)
   @IsOptional()
   @ApiProperty()
-  @Prop()
+  @Prop({ type: FacebookSettingSchema })
   facebook?: FacebookSetting;
 
-  @ValidateNested()
-  @Type(() => ContactDetail)
   @IsOptional()
   @ApiProperty()
-  @Prop()
+  @Prop({ type: ContactDetailSchema })
   contactDetails?: ContactDetail;
 }
 

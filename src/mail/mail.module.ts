@@ -14,10 +14,11 @@ import { ConfigType } from 'src/configuration/config';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         const mailConfig = configService.get<ConfigType['mail']>('mail');
+        console.log(mailConfig);
         return {
           transport: {
             host: mailConfig.host,
-            secure: true,
+            secure: mailConfig.secure,
             auth: {
               user: mailConfig.user,
               pass: mailConfig.pass,

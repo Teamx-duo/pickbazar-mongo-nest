@@ -37,8 +37,9 @@ export class Category {
   children?: mongoose.Schema.Types.ObjectId[];
 
   @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Prop()
   details: string;
 
   @IsString()
@@ -48,8 +49,9 @@ export class Category {
   image: string;
 
   @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Prop()
   icon: string;
 
   @IsMongoId()

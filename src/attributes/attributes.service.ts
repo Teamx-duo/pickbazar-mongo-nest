@@ -41,10 +41,17 @@ export class AttributesService {
     return await attr.save();
   }
 
-  async findAll({ limit, page, shop }: GetAttributesArgs) {
+  async findAll({ limit, page, shop, orderBy, sortedBy }: GetAttributesArgs) {
     const response = await this.attributeModel.paginate(
       { ...(shop ? { shop } : {}) },
-      { limit, page, populate: ['shop', 'values'] },
+      {
+        limit,
+        page,
+        populate: ['shop', 'values'],
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }

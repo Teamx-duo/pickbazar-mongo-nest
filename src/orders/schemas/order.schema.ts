@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsArray,
@@ -35,6 +35,10 @@ export enum PaymentGatewayType {
 
 @Schema({ timestamps: true })
 export class Order {
+  @IsNumber()
+  @Prop({ required: true, index: true })
+  tracking_number: number;
+
   @IsString()
   @ApiProperty({ minLength: 10, maxLength: 15 })
   @Prop({ required: true })
@@ -47,7 +51,6 @@ export class Order {
 
   @IsMongoId()
   @IsOptional()
-  @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order' })
   parent_order: this;
 
@@ -58,7 +61,8 @@ export class Order {
 
   @IsMongoId()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus' })
   status: OrderStatus;
 
@@ -80,12 +84,14 @@ export class Order {
   @IsNumber()
   @ApiProperty()
   @IsOptional()
+  @ApiPropertyOptional()
   @Prop({ default: 0 })
   paid_total: number;
 
   @IsNumber()
   @ApiProperty()
   @IsOptional()
+  @ApiPropertyOptional()
   @Prop()
   payment_id: string;
 

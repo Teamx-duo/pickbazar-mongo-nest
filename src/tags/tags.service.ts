@@ -23,10 +23,20 @@ export class TagsService {
     });
   }
 
-  async findAll({ page, limit }: GetTagsDto) {
+  async findAll({ page, limit, type, orderBy, sortedBy, search }: GetTagsDto) {
     const response = await this.tagModel.paginate(
-      {},
-      { page, limit, populate: ['type'] },
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(type ? { type } : {}),
+      },
+      {
+        page,
+        limit,
+        populate: ['type'],
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }
@@ -44,6 +54,6 @@ export class TagsService {
   }
 
   async remove(id: string) {
-    return await this.tagModel.findByIdAndUpdate(id, { new: true });
+    return await this.tagModel.findByIdAndRemove(id, { new: true });
   }
 }

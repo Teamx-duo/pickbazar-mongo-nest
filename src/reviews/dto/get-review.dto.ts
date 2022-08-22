@@ -16,12 +16,12 @@ export class GetReviewsDto extends PartialType(
   OmitType(CreateReviewDto, ['my_feedback', 'photos']),
 ) {
   @IsString()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: QueryCategoriesOrderByColumn })
   @IsOptional()
   orderBy?: QueryCategoriesOrderByColumn =
     QueryCategoriesOrderByColumn.CREATED_AT;
   @IsString()
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.ASC;
   @IsOptional()

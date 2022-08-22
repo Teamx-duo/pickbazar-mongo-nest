@@ -71,7 +71,9 @@ export class ProductsService {
       {
         limit,
         page,
-        sort: { [orderBy]: sortedBy },
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
         populate: [
           { path: 'variations' },
           { path: 'variation_options' },

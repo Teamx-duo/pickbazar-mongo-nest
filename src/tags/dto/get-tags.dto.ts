@@ -1,3 +1,5 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -8,16 +10,31 @@ export class TagPaginator extends Paginator<Tag> {
   data: Tag[];
 }
 
-export class GetTagsDto extends PaginationArgs {
-  orderBy?: QueryTagsOrderByColumn;
-  sortedBy?: SortOrder;
-  text?: string;
-  name?: string;
-  hasType?: string;
+export enum QueryTagsOrderByColumn {
+  CREATED_AT = 'createdAt',
+  NAME = 'name',
+  UPDATED_AT = 'updatedAt',
 }
 
-export enum QueryTagsOrderByColumn {
-  CREATED_AT = 'CREATED_AT',
-  NAME = 'NAME',
-  UPDATED_AT = 'UPDATED_AT',
+export class GetTagsDto extends PaginationArgs {
+  @IsString()
+  @ApiPropertyOptional({ enum: QueryTagsOrderByColumn })
+  @IsOptional()
+  orderBy?: QueryTagsOrderByColumn;
+  @IsString()
+  @ApiPropertyOptional({ enum: SortOrder })
+  @IsOptional()
+  sortedBy?: SortOrder;
+  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  search?: string;
+  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  name?: string;
+  @IsMongoId()
+  @ApiPropertyOptional()
+  @IsOptional()
+  type?: string;
 }

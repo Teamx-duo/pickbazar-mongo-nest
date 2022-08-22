@@ -16,10 +16,17 @@ export class ShippingsService {
     return await this.shippingModel.create(createShippingDto);
   }
 
-  async getShippings({ text }: GetShippingsDto) {
-    return await this.shippingModel.find({
-      ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
-    });
+  async getShippings({ text, orderBy, sortedBy }: GetShippingsDto) {
+    return await this.shippingModel.find(
+      {
+        ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+      },
+      // {
+      //   sort: {
+      //     [orderBy]: sortedBy === 'asc' ? 1 : -1,
+      //   },
+      // },
+    );
   }
 
   async findOne(id: string) {

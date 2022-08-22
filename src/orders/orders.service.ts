@@ -201,12 +201,19 @@ export class OrdersService {
     page,
     search,
     orderBy,
+    sortedBy,
   }: GetOrderStatusesDto) {
     const response = await this.orderStatusModel.paginate(
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      { limit, page, sort: { [orderBy]: 1 } },
+      {
+        limit,
+        page,
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }
