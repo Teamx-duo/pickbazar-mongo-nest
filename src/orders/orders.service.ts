@@ -102,7 +102,6 @@ export class OrdersService {
     );
     await Promise.all(verifyProductPromises);
     let total = dbProducts.reduce((acc, curr) => acc + curr.price, 0);
-    const amount = total;
     let tax = 0;
     let taxes: Tax[];
     if (location && location['country']) {
@@ -127,10 +126,10 @@ export class OrdersService {
     }
     const order = await this.orderModel.create({
       ...createOrderObj,
-      total: total < 0 ? 0 : total,
-      amount,
+      total: isNaN(total) || total < 0 ? 0 : total,
+      amount: isNaN(total) || total < 0 ? 0 : total,
       status: status._id,
-      sales_tax: tax,
+      sales_tax: !isNaN(tax) ? tax : 0,
       shop: removeDuplicates(createOrderObj.shops),
     });
     await this.orderModel.populate(order, [

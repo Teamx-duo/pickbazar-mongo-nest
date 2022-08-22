@@ -49,19 +49,12 @@ export class TaxesService {
     sortedBy,
     orderBy,
   }: GetTaxesDto) {
-    return await this.taxesModel.find(
-      {
-        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
-        ...(country ? { country } : {}),
-        ...(priority ? { priority } : {}),
-        ...(priority ? { priority } : {}),
-      },
-      {
-        sort: {
-          [orderBy]: sortedBy === 'asc' ? 1 : -1,
-        },
-      },
-    );
+    return await this.taxesModel.find({
+      ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+      ...(country ? { country } : {}),
+      ...(priority ? { priority } : {}),
+      ...(priority ? { priority } : {}),
+    });
   }
 
   async findOne(id: string | ObjectId) {

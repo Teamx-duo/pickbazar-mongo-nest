@@ -36,7 +36,7 @@ export enum PaymentGatewayType {
 @Schema({ timestamps: true })
 export class Order {
   @IsNumber()
-  @Prop({ required: true, index: true })
+  @Prop({ index: true })
   tracking_number: number;
 
   @IsString()
@@ -130,12 +130,11 @@ export class Order {
   @Prop({ default: 0 })
   delivery_fee: number;
 
-  @IsDate()
-  @Transform((val) => new Date(val.value))
-  @ApiProperty()
+  @IsString()
+  @ApiPropertyOptional()
   @IsOptional()
   @Prop()
-  delivery_time: Date;
+  delivery_time: string;
 
   @IsMongoId({ each: true })
   @IsArray()
