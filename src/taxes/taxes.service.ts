@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId, PaginateModel } from 'mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
@@ -14,7 +14,15 @@ export class TaxesService {
   ) {}
 
   async create(createTaxDto: CreateTaxDto) {
-    console.log(createTaxDto);
+    const exists = await this.taxesModel.findOne({
+      priority: createTaxDto.priority,
+    });
+    if (exists) {
+      throw new HttpException(
+        'Tax with this priority already exists.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return await this.taxesModel.create(createTaxDto);
   }
 

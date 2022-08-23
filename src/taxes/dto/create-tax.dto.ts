@@ -1,4 +1,14 @@
-import { OmitType } from '@nestjs/swagger';
+import { OmitType, PickType } from '@nestjs/swagger';
 import { Tax } from '../schemas/taxes.schema';
 
-export class CreateTaxDto extends OmitType(Tax, []) {}
+export class CreateTaxDto extends PickType(Tax, [
+  'city',
+  'country',
+  'is_global',
+  'name',
+  'on_shipping',
+  'priority',
+  'rate',
+  'state',
+  'zip',
+]) {}

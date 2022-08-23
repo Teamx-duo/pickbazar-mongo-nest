@@ -11,6 +11,8 @@ import {
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
+import { Shipping } from 'src/shippings/entities/shipping.entity';
+import { Tax } from 'src/taxes/schemas/taxes.schema';
 import { ContactDetail, ContactDetailSchema } from './contactDetails.schema';
 import { DeliveryTime, DeliveryTimeSchema } from './deliveryTime.schema';
 import {
@@ -57,17 +59,17 @@ export class SettingsOptions {
   @Prop()
   logo: string;
 
-  @IsString()
+  @IsMongoId()
   @IsOptional()
   @ApiProperty()
-  @Prop()
-  taxClass: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tax' })
+  taxClass: Tax;
 
   @IsString()
   @IsOptional()
   @ApiProperty()
-  @Prop()
-  shippingClass: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipping' })
+  shippingClass: Shipping;
 
   @IsOptional()
   @ApiProperty()

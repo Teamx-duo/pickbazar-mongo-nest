@@ -46,7 +46,8 @@ export class CouponsService {
     }
     return {
       coupon,
-      is_valid: new Date(coupon.expire_at).getTime() < new Date().getTime(),
+      is_valid:
+        new Date(coupon.expire_at).getTime() > new Date().getTime(),
     };
   }
 

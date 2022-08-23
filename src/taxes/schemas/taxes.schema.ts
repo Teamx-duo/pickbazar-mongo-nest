@@ -25,9 +25,8 @@ export class Tax {
   is_global: boolean;
 
   @IsString()
-  @IsOptional()
   @ApiProperty()
-  @Prop({ unique: true })
+  @Prop()
   country: string;
 
   @IsString()

@@ -23,12 +23,11 @@ export class SettingsService {
     return await this.settingsModel.create(createSettingDto);
   }
 
-  async findAll() {
-    const settings = await this.settingsModel.find({});
-    if (this.settingsModel.length > 0) {
-      return settings?.[0];
-    }
-    return {};
+  async findAll(): Promise<Setting> {
+    const settings = await this.settingsModel
+      .find({})
+      .populate(['options.taxClass', 'options.shippingClass']);
+    return settings?.[0];
   }
 
   async findOne(id: string) {

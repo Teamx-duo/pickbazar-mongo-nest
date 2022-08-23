@@ -28,7 +28,7 @@ export class Shipping {
   @IsNumber()
   @ApiProperty()
   @Prop()
-  amount: string;
+  amount: number;
 
   @IsBoolean()
   @ApiProperty()

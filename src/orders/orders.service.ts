@@ -28,6 +28,8 @@ import {
   ProductPivotSchema,
 } from 'src/products/schemas/productPivot.schema';
 import { removeDuplicates } from 'src/common/constants/common.function';
+import { SettingsService } from 'src/settings/settings.service';
+import { ShippingType } from 'src/shippings/schemas/shipping.schema';
 
 @Injectable()
 export class OrdersService {
@@ -42,6 +44,7 @@ export class OrdersService {
     private readonly shopServices: ShopsService,
     private readonly couponServices: CouponsService,
     private readonly taxServices: TaxesService,
+    private readonly settingServices: SettingsService,
   ) {}
   async create(createOrderInput: CreateOrderDto, location?: any) {
     const createOrderObj = { ...createOrderInput, products: [], shops: [] };
@@ -59,6 +62,7 @@ export class OrdersService {
         ),
       ],
     );
+    let total = 0;
     const verifyProductPromises = dbProducts.map(
       (prod) =>
         new Promise(async (res, rej) => {
@@ -94,6 +98,7 @@ export class OrdersService {
             }
           }
           const pivot = await this.productPivotModel.create(pivotProduct);
+          total += pivotProduct.subtotal;
           createOrderObj.products.push(pivot._id);
           const { _id: shopId }: any = prod.shop;
           createOrderObj.shops.push(shopId);
@@ -101,19 +106,33 @@ export class OrdersService {
         }),
     );
     await Promise.all(verifyProductPromises);
-    let total = dbProducts.reduce((acc, curr) => acc + curr.price, 0);
+    const settings = await this.settingServices.findAll();
     let tax = 0;
     let taxes: Tax[];
+    const shipping = settings?.options?.shippingClass;
     if (location && location['country']) {
       taxes = await this.taxServices.getAllTaxes({
         country: location['country'],
       });
     } else {
-      taxes = await this.taxServices.getAllTaxes({ global: true });
+      taxes = [settings?.options?.taxClass];
     }
     if (taxes.length > 0) {
       tax = (taxes[0].rate / 100) * total;
       total += (taxes[0].rate / 100) * total;
+    }
+    if (shipping) {
+      if (shipping.type === ShippingType.FIXED) {
+        createOrderObj.delivery_fee = Number(shipping.amount);
+        total += shipping.amount;
+      }
+      if (shipping.type === ShippingType.PERCENTAGE) {
+        createOrderObj.delivery_fee = (Number(shipping.amount) / 100) * total;
+        total += (Number(shipping.amount) / 100) * total;
+      }
+      if (shipping.type === ShippingType.FREE) {
+        createOrderObj.delivery_fee = 0;
+      }
     }
     if (coupon) {
       const dbCoupon = await this.couponServices.getCoupon(coupon);
@@ -248,6 +267,7 @@ export class OrdersService {
         this.productServices.getProductById(prod.product_id),
       ),
     ]);
+    let total = 0;
     dbProducts.forEach((prod) => {
       const pivotProduct = products.find((p) => prod._id.equals(p.product_id));
       if (prod.product_type === ProductType.VARIABLE) {
@@ -264,17 +284,32 @@ export class OrdersService {
           verifiedCheckout.unavailable_products.push(prod);
         }
       }
+      total += pivotProduct.subtotal;
     });
-    let total = dbProducts.reduce((acc, curr) => acc + curr.price, 0);
     const amount = total;
     let tax = 0;
     let taxes: Tax[];
+    const settings = await this.settingServices.findAll();
+    const shipping = settings?.options?.shippingClass;
+    if (shipping) {
+      if (shipping.type === ShippingType.FIXED) {
+        verifiedCheckout.shipping_charge = shipping.amount;
+        total = Number(shipping.amount) + Number(total);
+      }
+      if (shipping.type === ShippingType.PERCENTAGE) {
+        verifiedCheckout.shipping_charge = (shipping.amount / 100) * total;
+        total += (Number(shipping.amount) / 100) * total;
+      }
+      if (shipping.type === ShippingType.FREE) {
+        verifiedCheckout.shipping_charge = 0;
+      }
+    }
     if (location && location['country']) {
       taxes = await this.taxServices.getAllTaxes({
         country: location['country'],
       });
     } else {
-      taxes = await this.taxServices.getAllTaxes({ global: true });
+      taxes = [settings?.options?.taxClass];
     }
     if (taxes.length > 0) {
       tax = (taxes[0].rate / 100) * total;
