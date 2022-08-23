@@ -291,17 +291,16 @@ export class AuthService {
     };
   }
 
-  async verifyOtpCode(
-    verifyOtpInput: VerifyOtpDto,
-    user?: any,
-  ): Promise<CoreResponse> {
-    await this.profileModel.findOneAndUpdate(
+  async verifyOtpCode(verifyOtpInput: VerifyOtpDto, user?: any) {
+    const profile = await this.profileModel.findOneAndUpdate(
       { user },
       { $set: { contact: verifyOtpInput.phone_number } },
+      { new: true },
     );
     return {
       message: 'success',
       success: true,
+      profile,
     };
   }
 
