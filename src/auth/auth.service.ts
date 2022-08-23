@@ -117,7 +117,10 @@ export class AuthService {
         message: 'Password change successful',
       };
     } else {
-      throw new HttpException('Unable to login', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Unable to change password',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -255,7 +258,6 @@ export class AuthService {
   }
 
   async socialLogin(socialLoginDto: SocialLoginDto): Promise<GetUsersResponse> {
-    console.log(socialLoginDto);
     return {
       users: users,
     };
@@ -292,15 +294,16 @@ export class AuthService {
   }
 
   async verifyOtpCode(verifyOtpInput: VerifyOtpDto, user?: any) {
-    const profile = await this.profileModel.findOneAndUpdate(
-      { user },
-      { $set: { contact: verifyOtpInput.phone_number } },
-      { new: true },
-    );
+    const dbUser = await this.userModel.findById(user);
+    dbUser.profile = {
+      ...dbUser.profile,
+      contact: verifyOtpInput.phone_number,
+    };
+    await dbUser.save();
     return {
       message: 'success',
       success: true,
-      profile,
+      profile: dbUser,
     };
   }
 
@@ -340,10 +343,6 @@ export class AuthService {
   }
 
   async updateMe(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userService.update(id, updateUserDto);
+    return await this.userModel.findById(id, { $set: updateUserDto });
   }
-
-  // updateUser(id: number, updateUserInput: UpdateUserInput) {
-  //   return `This action updates a #${id} user`;
-  // }
 }
