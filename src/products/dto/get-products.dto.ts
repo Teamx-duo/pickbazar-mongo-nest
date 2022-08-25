@@ -43,6 +43,8 @@ export enum QueryProductsOrderByColumn {
   MIN_PRICE = 'min_price',
   MAX_PRICE = 'max_price',
   SALE_PRICE = 'sale_price',
+  RATING = 'rating',
+  ORDERS = 'orders',
   QUANTITY = 'quantity',
   NAME = 'name',
   UPDATED_AT = 'updatedAt',

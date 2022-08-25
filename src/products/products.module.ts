@@ -2,8 +2,9 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { getModelToken, MongooseModule } from '@nestjs/mongoose';
 import { ProductsService } from './products.service';
 import {
-  ProductsController,
   PopularProductsController,
+  ProductsController,
+  TopRatedProductsController,
   VariationsController,
 } from './products.controller';
 import { Product, ProductSchema } from './schemas/product.schema';
@@ -37,8 +38,9 @@ import { Rating, RatingSchema } from './schemas/rating.schema';
   ],
   controllers: [
     ProductsController,
-    PopularProductsController,
+    TopRatedProductsController,
     VariationsController,
+    PopularProductsController,
   ],
   providers: [ProductsService, VariationsService],
   exports: [ProductsService, VariationsService, MongooseModule],

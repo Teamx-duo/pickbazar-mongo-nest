@@ -183,10 +183,17 @@ export class OrdersService {
           if (!order) {
             rej('Unable to create order for shop ' + shopOrder?.shop);
           }
+          await Promise.all([
+            this.shopServices.addOrderMultiple([order.shop], 1),
+            this.productServices.addOrder(
+              shopOrder.products.map((prod: any) => prod.pivot.product_id),
+              order._id,
+            ),
+          ]);
           res(order);
         }),
     );
-    const orders = await Promise.all(orderPromises);
+    const [...orders] = await Promise.all(orderPromises);
     await this.orderModel.populate(orders, [
       { path: 'status' },
       { path: 'products' },

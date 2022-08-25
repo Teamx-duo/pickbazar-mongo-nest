@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
-import { GetProductsDto } from './dto/get-products.dto';
+import {
+  GetProductsDto,
+  QueryProductsOrderByColumn,
+} from './dto/get-products.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductSchema, ProductType } from './schemas/product.schema';
 import mongoose, { PaginateModel } from 'mongoose';
@@ -17,6 +20,7 @@ import {
   VariationOptionSchema,
 } from './schemas/variationOption.schema';
 import { VariationsService } from './variations.service';
+import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 @Injectable()
 export class ProductsService {
   constructor(
@@ -145,18 +149,20 @@ export class ProductsService {
     ]);
   }
 
-  async getPopularProducts({
-    shop_id,
-    limit,
-    page,
-  }: GetPopularProductsDto): Promise<Product[]> {
-    const response = await this.productModel.paginate(
-      {
-        ...(shop_id ? { shop: shop_id } : {}),
-      },
-      { page, limit },
-    );
-    return PaginationResponse(response);
+  async getPopularProducts(filters: GetPopularProductsDto) {
+    return await this.getProducts({
+      orderBy: QueryProductsOrderByColumn.ORDERS,
+      sortedBy: SortOrder.DESC,
+      ...filters,
+    });
+  }
+
+  async getTopRatedProducts(filters: GetPopularProductsDto) {
+    return await this.getProducts({
+      orderBy: QueryProductsOrderByColumn.RATING,
+      sortedBy: SortOrder.DESC,
+      ...filters,
+    });
   }
 
   async update(id: string, updateProductDto: UpdateProductDto) {
