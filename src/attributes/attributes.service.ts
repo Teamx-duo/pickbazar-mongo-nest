@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import attributesJson from './attributes.json';
@@ -12,6 +12,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { GetAttributesArgs } from './dto/get-attributes.dto';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
+import { Shop, ShopSchema } from 'src/shops/schemas/shop.shema';
 
 const attributes = plainToClass(Attribute, attributesJson);
 @Injectable()
@@ -21,10 +22,21 @@ export class AttributesService {
     private attributeModel: PaginateModel<AttributeSchema>,
     @InjectModel(AttributeValue.name)
     private attributeValueModel: PaginateModel<AttributeValueSchema>,
+    @InjectModel(Shop.name)
+    private shopModel: PaginateModel<ShopSchema>,
   ) {}
   private attributes: Attribute[] = attributes;
 
   async create(createAttributeDto: CreateAttributeDto) {
+    if (createAttributeDto.shop) {
+      const shop = await this.shopModel.findById(createAttributeDto.shop);
+      if (!shop || !shop.is_active) {
+        throw new HttpException(
+          'Shop is not activated or not found.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     const attr = await this.attributeModel.create({
       name: createAttributeDto.name,
       shop: createAttributeDto.shop,

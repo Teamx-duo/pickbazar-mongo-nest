@@ -47,7 +47,12 @@ export class OrdersService {
     private readonly settingServices: SettingsService,
   ) {}
   async create(createOrderInput: CreateOrderDto, location?: any) {
-    const createOrderObj = { ...createOrderInput, products: [], shops: [] };
+    const createOrderObj = {
+      ...createOrderInput,
+      products: [],
+      shops: [],
+      productsList: [],
+    };
     const { products, shop, coupon } = createOrderInput;
     const status = await this.orderStatusModel.findOne({
       serial: 1,
@@ -62,7 +67,6 @@ export class OrdersService {
         ),
       ],
     );
-    let total = 0;
     const verifyProductPromises = dbProducts.map(
       (prod) =>
         new Promise(async (res, rej) => {
@@ -98,18 +102,30 @@ export class OrdersService {
             }
           }
           const pivot = await this.productPivotModel.create(pivotProduct);
-          total += pivotProduct.subtotal;
           createOrderObj.products.push(pivot._id);
+          createOrderObj.productsList.push({ pivot, product: prod });
           const { _id: shopId }: any = prod.shop;
           createOrderObj.shops.push(shopId);
           res(pivot);
         }),
     );
     await Promise.all(verifyProductPromises);
+
+    // Remove
+    createOrderObj.shops = removeDuplicates(createOrderObj.shops);
+
+    // Creating Multiple Shop Orders
+    const data = createOrderObj.shops.map((shop) => ({
+      ...createOrderObj,
+      shop: shop,
+      products: createOrderObj.productsList.filter((prod) => {
+        return prod.product.shop._id.equals(shop);
+      }),
+    }));
+
+    // Fetching Store Settings And Calculating Coupon, Tax, Shipping
     const settings = await this.settingServices.findAll();
-    let tax = 0;
     let taxes: Tax[];
-    const shipping = settings?.options?.shippingClass;
     if (location && location['country']) {
       taxes = await this.taxServices.getAllTaxes({
         country: location['country'],
@@ -117,52 +133,65 @@ export class OrdersService {
     } else {
       taxes = [settings?.options?.taxClass];
     }
-    if (taxes.length > 0) {
-      tax = (taxes[0].rate / 100) * total;
-      total += (taxes[0].rate / 100) * total;
-    }
-    if (shipping) {
-      if (shipping.type === ShippingType.FIXED) {
-        createOrderObj.delivery_fee = Number(shipping.amount);
-        total += shipping.amount;
-      }
-      if (shipping.type === ShippingType.PERCENTAGE) {
-        createOrderObj.delivery_fee = (Number(shipping.amount) / 100) * total;
-        total += (Number(shipping.amount) / 100) * total;
-      }
-      if (shipping.type === ShippingType.FREE) {
-        createOrderObj.delivery_fee = 0;
-      }
-    }
-    if (coupon) {
-      const dbCoupon = await this.couponServices.getCoupon(coupon);
-      if (dbCoupon.type === CouponType.FIXED_COUPON) {
-        total -= dbCoupon.amount;
-      }
-      if (dbCoupon.type === CouponType.PERCENTAGE_COUPON) {
-        total -= (dbCoupon.amount / 100) * total;
-      }
-    }
-    const order = await this.orderModel.create({
-      ...createOrderObj,
-      total: isNaN(total) || total < 0 ? 0 : total,
-      amount: isNaN(total) || total < 0 ? 0 : total,
-      status: status._id,
-      sales_tax: !isNaN(tax) ? tax : 0,
-      shop: removeDuplicates(createOrderObj.shops),
-    });
-    await this.orderModel.populate(order, [
+
+    const orderPromises = data.map(
+      (shopOrder) =>
+        new Promise(async (res, rej) => {
+          let tax = 0;
+          let total = shopOrder.products.reduce(
+            (acc, prod) => acc + prod.pivot.subtotal,
+            0,
+          );
+          const shipping = settings?.options?.shippingClass;
+          if (taxes.length > 0) {
+            tax = (taxes[0].rate / 100) * total;
+            total += (taxes[0].rate / 100) * total;
+          }
+          if (shipping) {
+            if (shipping.type === ShippingType.FIXED) {
+              createOrderObj.delivery_fee = Number(shipping.amount);
+              total += shipping.amount;
+            }
+            if (shipping.type === ShippingType.PERCENTAGE) {
+              createOrderObj.delivery_fee =
+                (Number(shipping.amount) / 100) * total;
+              total += (Number(shipping.amount) / 100) * total;
+            }
+            if (shipping.type === ShippingType.FREE) {
+              createOrderObj.delivery_fee = 0;
+            }
+          }
+          if (coupon) {
+            const dbCoupon = await this.couponServices.getCoupon(coupon);
+            if (dbCoupon.type === CouponType.FIXED_COUPON) {
+              total -= dbCoupon.amount;
+            }
+            if (dbCoupon.type === CouponType.PERCENTAGE_COUPON) {
+              total -= (dbCoupon.amount / 100) * total;
+            }
+          }
+          const order = await this.orderModel.create({
+            ...createOrderObj,
+            products: shopOrder.products.map((prod) => prod.pivot),
+            total: isNaN(total) || total < 0 ? 0 : total,
+            amount: isNaN(total) || total < 0 ? 0 : total,
+            status: status._id,
+            sales_tax: !isNaN(tax) ? tax : 0,
+            shop: shopOrder.shop,
+            shops: removeDuplicates(shopOrder.shops),
+          });
+          if (!order) {
+            rej('Unable to create order for shop ' + shopOrder?.shop);
+          }
+          res(order);
+        }),
+    );
+    const orders = await Promise.all(orderPromises);
+    await this.orderModel.populate(orders, [
       { path: 'status' },
       { path: 'products' },
     ]);
-    await Promise.all([
-      this.productServices.addOrder(
-        products.map((prod: any) => prod.product_id),
-        order._id,
-      ),
-      this.shopServices.addOrderMultiple(order.shop, 1),
-    ]);
-    return order;
+    return orders;
   }
 
   async getOrders({
@@ -239,6 +268,15 @@ export class OrdersService {
     return await this.orderStatusModel.findById(id);
   }
   async update(id: string, updateOrderInput: UpdateOrderDto) {
+    if (updateOrderInput.status) {
+      const statuses = await this.orderStatusModel
+        .find()
+        .sort({ serial: -1 })
+        .limit(1);
+      if (statuses?.[0]?._id.equals(updateOrderInput.status)) {
+        console.log('FINALIZED');
+      }
+    }
     return await this.orderModel.findByIdAndUpdate(
       id,
       {

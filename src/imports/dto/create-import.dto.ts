@@ -1,4 +1,4 @@
 export class ImportDto {
-  shop_id: number;
+  file: Express.Multer.File;
   // csv: Upload;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
@@ -33,8 +33,16 @@ export class CategoriesService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     const { name, details, type, parent, icon, image } = createCategoryDto;
+    const slug = convertToSlug(name);
+    const exists = await this.categoryModel.findOne({ slug });
+    if (exists) {
+      throw new HttpException(
+        'Category with this name or slug already exists.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return this.categoryModel.create({
-      slug: convertToSlug(name),
+      slug,
       name,
       details,
       type,

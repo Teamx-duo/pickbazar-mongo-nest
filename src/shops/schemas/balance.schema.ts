@@ -1,29 +1,39 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
-import { PaymentInfo } from './paymentInfo.schema';
+import { PaymentInfo, PaymentInfoSchema } from './paymentInfo.schema';
 import { Shop } from './shop.shema';
 
 export type BalanceSchema = Balance & Document;
 
 @Schema()
 export class Balance {
-  @Prop({ required: true, min: 0 })
-  admin_commission_rate: number;
+  @IsNumber()
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Prop({ min: 0 })
+  admin_commission_rate?: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop', required: true })
-  shop: Shop;
-
+  @ApiPropertyOptional()
+  @IsOptional()
   @Prop({ default: 0 })
-  total_earnings: number;
+  total_earnings?: number;
 
+  @ApiPropertyOptional()
+  @IsOptional()
   @Prop({ default: 0 })
-  withdrawn_amount: number;
+  withdrawn_amount?: number;
 
+  @ApiPropertyOptional()
+  @IsOptional()
   @Prop({ default: 0 })
-  current_balance: number;
+  current_balance?: number;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'PaymentInfo' })
-  payment_info: PaymentInfo;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Prop({ type: PaymentInfoSchema })
+  payment_info?: PaymentInfo;
 }
 
 export const BalanceSchema = SchemaFactory.createForClass(Balance);

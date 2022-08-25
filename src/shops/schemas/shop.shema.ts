@@ -1,7 +1,7 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { ShopSettings } from './shopSettings.schema';
-import { Balance } from './balance.schema';
+import { ShopSettings, ShopSettingsSchema } from './shopSettings.schema';
+import { Balance, BalanceSchema } from './balance.schema';
 import { UserAddress } from 'src/addresses/schemas/userAddress.schema';
 import { User } from 'src/users/schema/user.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -59,28 +59,8 @@ export class Shop {
 
   @ApiProperty()
   @IsOptional()
-  @Prop(
-    raw({
-      admin_commission_rate: { type: Number },
-
-      total_earnings: { type: Number },
-
-      withdrawn_amount: { type: Number },
-
-      current_balance: { type: Number },
-
-      payment_info: {
-        account: { type: String },
-
-        name: { type: String },
-
-        email: { type: String },
-
-        bank: { type: String },
-      },
-    }),
-  )
-  balance: Record<string, any>;
+  @Prop({ type: BalanceSchema })
+  balance: Balance;
 
   @IsString()
   @ApiProperty()
@@ -130,20 +110,8 @@ export class Shop {
 
   @ApiProperty()
   @IsOptional()
-  @Prop(
-    raw({
-      socials: [
-        {
-          icon: { type: String, required: true },
-          url: { type: String, required: true },
-        },
-      ],
-      contact: { type: String },
-      location: { type: String },
-      website: { type: String },
-    }),
-  )
-  settings: Record<string, any>;
+  @Prop({ type: ShopSettingsSchema })
+  settings: ShopSettings;
 }
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);

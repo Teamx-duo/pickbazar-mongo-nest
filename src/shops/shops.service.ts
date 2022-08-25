@@ -1,6 +1,6 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
 import mongoose, { Model, ObjectId, PaginateModel } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApproveShopDto,
   CreateShopDto,
@@ -62,6 +62,15 @@ export class ShopsService {
   }
 
   async createShopStaff(createStaffDto: CreateUserDto, shopUser: any) {
+    if (createStaffDto.shop) {
+      const shop = await this.shopModel.findById(createStaffDto.shop);
+      if (!shop || !shop.is_active) {
+        throw new HttpException(
+          'Shop is not activated or not found.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     const user = await this.userService.createStaff({
       ...createStaffDto,
       shop: createStaffDto.shop,
@@ -101,11 +110,11 @@ export class ShopsService {
         $or: [{ shops: shop_id }, { shop: shop_id }],
         roles: Role.STAFF,
       },
-      {
-        sort: {
-          [orderBy]: sortedBy === 'asc' ? 1 : -1,
-        },
-      },
+      // {
+      //   sort: {
+      //     [orderBy]: sortedBy === 'asc' ? 1 : -1,
+      //   },
+      // },
     );
     return staff;
   }

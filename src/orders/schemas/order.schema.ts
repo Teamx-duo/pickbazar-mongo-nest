@@ -116,8 +116,8 @@ export class Order {
   @IsMongoId({ each: true })
   @IsArray()
   @IsOptional()
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }] })
-  shop: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  shop: mongoose.Schema.Types.ObjectId;
 
   @IsNumber()
   @ApiProperty()

@@ -26,6 +26,7 @@ import { MailModule } from './mail/mail.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { QuestionsModule } from './questions/questions.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { CsvModule } from 'nest-csv-parser';
 
 @Module({
   imports: [
@@ -86,6 +87,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     NotificationsModule,
     QuestionsModule,
     ReviewsModule,
+    CsvModule,
   ],
   controllers: [MailController],
   providers: [],

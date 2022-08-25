@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductsDto } from './dto/get-products.dto';
@@ -33,6 +33,15 @@ export class ProductsService {
     private readonly variationService: VariationsService,
   ) {}
   async create(createProductDto: CreateProductDto) {
+    if (createProductDto.shop) {
+      const shop = await this.shopModel.findById(createProductDto.shop);
+      if (!shop || !shop.is_active) {
+        throw new HttpException(
+          'Shop is not activated or not found.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     const createObj = {
       ...createProductDto,
       variation_options: createProductDto.variation_options.upsert,
