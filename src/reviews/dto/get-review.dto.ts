@@ -13,7 +13,7 @@ export enum QueryCategoriesOrderByColumn {
 }
 
 export class GetReviewsDto extends PartialType(
-  OmitType(CreateReviewDto, ['my_feedback', 'photos']),
+  OmitType(CreateReviewDto, ['feedbacks', 'photos']),
 ) {
   @IsString()
   @ApiPropertyOptional({ enum: QueryCategoriesOrderByColumn })

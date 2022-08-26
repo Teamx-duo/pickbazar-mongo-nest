@@ -10,10 +10,11 @@ export enum QueryCategoriesOrderByColumn {
   NEGATIVE_FEEDBACK = 'negative_feedbacks_count',
   POSITIVE_FEEDBACK = 'positive_feedbacks_count',
   UPDATED_AT = 'updatedAt',
+  FEEBACKS = 'feedbacks',
 }
 
 export class GetQuestionsDto extends PartialType(
-  OmitType(CreateQuestionDto, ['my_feedback']),
+  OmitType(CreateQuestionDto, ['feedbacks']),
 ) {
   @IsString()
   @ApiPropertyOptional()

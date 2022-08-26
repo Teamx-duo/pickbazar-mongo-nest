@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { Product, ProductSchema } from 'src/products/schemas/product.schema';
@@ -7,6 +7,7 @@ import {
   ProductPivotSchema,
 } from 'src/products/schemas/productPivot.schema';
 import { Rating, RatingSchema } from 'src/products/schemas/rating.schema';
+import { CreateReviewFeebackDto } from './dto/create-feedback.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { GetReviewsDto } from './dto/get-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -88,6 +89,63 @@ export class ReviewsService {
       id,
       {
         $set: updateReviewDto,
+      },
+      { new: true },
+    );
+  }
+
+  async addFeedBack(id: string, createFeedbackDto: CreateReviewFeebackDto) {
+    const { positive, negative, user } = createFeedbackDto;
+    const exists: any = await this.reviewModel.findOne({
+      feedbacks: { $elemMatch: { user } },
+    });
+    if (exists) {
+      const feed = exists.feedbacks.find((feed) => feed.user?.equals(user));
+      if (feed.positive === positive || feed.negative === negative) {
+        throw new HttpException(
+          'Your response has already been recorded',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const feedback = await this.reviewModel.findOneAndUpdate(
+        {
+          feedbacks: { $elemMatch: { user } },
+        },
+        {
+          $set: {
+            ...(positive
+              ? {
+                  'feedbacks.$.positive': true,
+                  'feedbacks.$.negative': false,
+                }
+              : {
+                  'feedbacks.$.positive': false,
+                  'feedbacks.$.negative': true,
+                }),
+          },
+          $inc: {
+            positive_feedbacks_count: positive ? 1 : -1,
+            negative_feedbacks_count: negative ? 1 : -1,
+          },
+        },
+        { new: true },
+      );
+      return feedback;
+    }
+    return await this.reviewModel.findByIdAndUpdate(
+      id,
+      {
+        $inc: {
+          ...(positive ? { positive_feedbacks_count: 1 } : {}),
+          ...(negative ? { negative_feedbacks_count: 1 } : {}),
+        },
+        $push: {
+          feedbacks: {
+            positive,
+            negative,
+            user,
+          },
+        },
       },
       { new: true },
     );

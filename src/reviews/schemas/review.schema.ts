@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
-  IsDate,
-  IsEnum,
   IsMongoId,
   IsNumber,
   IsOptional,
@@ -12,6 +10,7 @@ import {
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { UserFeedback, UserFeedbackSchema } from './user-feedback.schema';
 
 export type ReviewSchema = Review & Document;
 
@@ -71,11 +70,10 @@ export class Review {
   @Prop({ default: 0, min: 0 })
   abusive_reports_count: number;
 
-  @IsNumber()
   @ApiPropertyOptional()
   @IsOptional()
-  @Prop()
-  my_feedback: string;
+  @Prop({ type: [UserFeedbackSchema] })
+  feedbacks: UserFeedback[];
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);

@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { UserFeedback, UserFeedbackSchema } from './user-feedback.schema';
 
 export type QuestionSchema = Question & Document;
 
@@ -66,11 +67,10 @@ export class Question {
   @Prop({ default: 0, min: 0 })
   abusive_reports_count: number;
 
-  @IsNumber()
   @ApiPropertyOptional()
   @IsOptional()
-  @Prop()
-  my_feedback: string;
+  @Prop({ type: [UserFeedbackSchema] })
+  feedbacks: UserFeedback[];
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);
