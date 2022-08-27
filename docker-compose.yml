@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: main
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 5000:5000
+      - 9229:9229
+    command: npm run start:dev
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - redis
+      - mongodb
+  redis:
+    container_name: redis
+    image: redis:5
+    networks:
+      - webnet
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ./database:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - webnet
+    restart: always
+networks:
+  webnet:
+volumes:
+  pgdata:
