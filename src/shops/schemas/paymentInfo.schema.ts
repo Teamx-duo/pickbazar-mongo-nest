@@ -1,6 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsIBAN, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsIBAN,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Shop } from './shop.shema';
 
@@ -15,6 +22,7 @@ export class PaymentInfo {
   account?: string;
 
   @IsString()
+  @MaxLength(100)
   @ApiPropertyOptional()
   @IsOptional()
   @Prop()
@@ -27,6 +35,7 @@ export class PaymentInfo {
   email?: string;
 
   @IsString()
+  @MaxLength(100)
   @ApiPropertyOptional()
   @IsOptional()
   @Prop()

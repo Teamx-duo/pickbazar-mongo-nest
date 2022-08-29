@@ -8,14 +8,12 @@ export type ShopSocialsSchema = ShopSocials & Document;
 @Schema()
 export class ShopSocials {
   @IsString()
-  @MinLength(2)
   @MaxLength(500)
   @IsOptional()
   @Prop()
   icon: string;
 
   @IsString()
-  @MinLength(5)
   @MaxLength(500)
   @IsOptional()
   @Prop()

@@ -38,7 +38,6 @@ export class Coupon {
   code: string;
 
   @IsString()
-  @MinLength(10)
   @MaxLength(1000)
   @ApiProperty()
   @Prop({ required: true })

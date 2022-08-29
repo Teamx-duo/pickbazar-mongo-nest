@@ -35,7 +35,6 @@ export class Tag {
   @IsString()
   @ApiPropertyOptional()
   @IsOptional()
-  @MinLength(5)
   @MaxLength(500)
   @Prop()
   details: string;

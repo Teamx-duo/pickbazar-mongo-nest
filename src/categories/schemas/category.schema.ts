@@ -48,7 +48,6 @@ export class Category {
   children?: mongoose.Schema.Types.ObjectId[];
 
   @IsString()
-  @MinLength(5)
   @MaxLength(2000)
   @IsOptional()
   @ApiPropertyOptional()
@@ -56,7 +55,6 @@ export class Category {
   details: string;
 
   @IsString()
-  @MinLength(3)
   @MaxLength(500)
   @IsOptional()
   @ApiPropertyOptional()
@@ -64,7 +62,6 @@ export class Category {
   image: string;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(500)
   @IsOptional()
   @ApiPropertyOptional()

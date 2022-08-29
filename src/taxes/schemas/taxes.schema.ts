@@ -39,14 +39,12 @@ export class Tax {
 
   @IsString()
   @ApiProperty()
-  @MinLength(2)
   @MaxLength(20)
   @Prop()
   country: string;
 
   @IsString()
   @IsOptional()
-  @MinLength(2)
   @MaxLength(20)
   @ApiProperty()
   @Prop()
@@ -62,7 +60,6 @@ export class Tax {
 
   @IsString()
   @IsOptional()
-  @MinLength(2)
   @MaxLength(20)
   @ApiProperty()
   @Prop()

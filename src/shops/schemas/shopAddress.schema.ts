@@ -9,7 +9,6 @@ export type ShopAddressSchema = ShopAddress & Document;
 export class ShopAddress {
   @IsString()
   @MaxLength(500)
-  @MinLength(10)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
@@ -17,7 +16,6 @@ export class ShopAddress {
 
   @IsString()
   @MaxLength(20)
-  @MinLength(2)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
@@ -25,7 +23,6 @@ export class ShopAddress {
 
   @IsString()
   @MaxLength(20)
-  @MinLength(2)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
@@ -33,7 +30,6 @@ export class ShopAddress {
 
   @IsString()
   @MaxLength(20)
-  @MinLength(2)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
@@ -41,7 +37,6 @@ export class ShopAddress {
 
   @IsString()
   @MaxLength(20)
-  @MinLength(2)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()

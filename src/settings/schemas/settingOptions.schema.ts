@@ -35,7 +35,6 @@ export class SettingsOptions {
   @IsOptional()
   @ApiProperty()
   @MaxLength(100)
-  @MinLength(5)
   @Prop()
   siteTitle: string;
 
@@ -43,14 +42,12 @@ export class SettingsOptions {
   @IsOptional()
   @ApiProperty()
   @MaxLength(160)
-  @MinLength(10)
   @Prop()
   siteSubtitle: string;
 
   @IsString()
   @IsOptional()
   @MaxLength(5)
-  @MinLength(2)
   @ApiPropertyOptional()
   @Prop({ default: 'USD' })
   currency?: string;

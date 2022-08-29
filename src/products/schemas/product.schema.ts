@@ -186,7 +186,6 @@ export class Product {
   status: ProductStatus;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(50)
   @IsOptional()
   @Prop()
@@ -194,7 +193,6 @@ export class Product {
   height: string;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(50)
   @IsOptional()
   @Prop()
@@ -202,7 +200,6 @@ export class Product {
   length: string;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(50)
   @IsOptional()
   @Prop()
@@ -222,7 +219,6 @@ export class Product {
   quantity: number;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(50)
   @IsOptional()
   @Prop({ required: true })

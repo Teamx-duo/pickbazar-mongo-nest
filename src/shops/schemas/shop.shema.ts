@@ -88,7 +88,6 @@ export class Shop {
   description: string;
 
   @IsString()
-  @MinLength(7)
   @MaxLength(500)
   @ApiProperty()
   @Prop({
@@ -97,7 +96,6 @@ export class Shop {
   cover_image: string;
 
   @IsString()
-  @MinLength(2)
   @MaxLength(500)
   @ApiProperty()
   @Prop({

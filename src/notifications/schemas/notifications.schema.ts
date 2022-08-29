@@ -35,7 +35,6 @@ export class Notification {
   title: string;
 
   @IsString()
-  @MinLength(5)
   @MaxLength(1000)
   @IsOptional()
   @ApiProperty()

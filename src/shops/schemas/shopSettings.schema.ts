@@ -44,7 +44,6 @@ export class ShopSettings {
   location: Location;
 
   @IsString()
-  @MinLength(7)
   @MaxLength(500)
   @ApiPropertyOptional()
   @IsOptional()

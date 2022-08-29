@@ -50,7 +50,6 @@ export class Question {
 
   @IsString()
   @MaxLength(500)
-  @MinLength(5)
   @ApiProperty()
   @IsOptional()
   @Prop()
