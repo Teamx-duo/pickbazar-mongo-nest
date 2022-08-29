@@ -80,6 +80,11 @@ export class AuthService {
       .populate(['profile', 'address', 'shops']);
     if (!userFromDb)
       throw new HttpException('Invalid credentials', HttpStatus.NOT_FOUND);
+    if (!userFromDb.is_active)
+      throw new HttpException(
+        'Your account has been suspended temporarily. Please contact support if you think this is a mistake.',
+        HttpStatus.NOT_FOUND,
+      );
 
     const isValidPass = await bcrypt.compare(
       loginInput.password,

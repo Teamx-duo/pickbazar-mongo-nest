@@ -30,12 +30,12 @@ export class TagsService {
         ...(type ? { type } : {}),
       },
       {
-        page,
-        limit,
-        populate: ['type'],
         sort: {
           [orderBy]: sortedBy === 'asc' ? 1 : -1,
         },
+        page,
+        limit,
+        populate: ['type'],
       },
     );
     return PaginationResponse(response);

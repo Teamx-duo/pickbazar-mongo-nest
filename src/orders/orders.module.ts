@@ -11,6 +11,7 @@ import { AttributesModule } from 'src/attributes/attributes.module';
 import { CouponsModule } from 'src/coupons/coupons.module';
 import { TaxesModule } from 'src/taxes/taxes.module';
 import { SettingsModule } from 'src/settings/settings.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -24,6 +25,7 @@ import { SettingsModule } from 'src/settings/settings.module';
     CouponsModule,
     TaxesModule,
     SettingsModule,
+    NotificationsModule,
   ],
   controllers: [OrdersController, OrderStatusController],
   providers: [OrdersService],

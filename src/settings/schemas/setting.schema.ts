@@ -10,8 +10,10 @@ import {
 
 export type SettingSchema = Setting & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Setting {
+  @Type(() => SettingsOptions)
+  @ValidateNested()
   @IsOptional()
   @ApiProperty()
   @Prop({ type: SettingsOptionsSchema })

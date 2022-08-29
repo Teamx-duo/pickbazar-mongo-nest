@@ -30,6 +30,8 @@ import {
 import { removeDuplicates } from 'src/common/constants/common.function';
 import { SettingsService } from 'src/settings/settings.service';
 import { ShippingType } from 'src/shippings/schemas/shipping.schema';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotifcationType } from 'src/notifications/schemas/notifications.schema';
 
 @Injectable()
 export class OrdersService {
@@ -45,6 +47,7 @@ export class OrdersService {
     private readonly couponServices: CouponsService,
     private readonly taxServices: TaxesService,
     private readonly settingServices: SettingsService,
+    private readonly notificationServices: NotificationsService,
   ) {}
   async create(createOrderInput: CreateOrderDto, location?: any) {
     const createOrderObj = {
@@ -283,6 +286,18 @@ export class OrdersService {
       if (statuses?.[0]?._id.equals(updateOrderInput.status)) {
         console.log('FINALIZED');
       }
+      const order = await this.orderModel.findById(id);
+      await this.notificationServices.create({
+        description:
+          'Your order status has been updated to ' +
+          statuses.find((stat) => stat._id.equals(updateOrderInput.status))
+            .name,
+        notification_type: NotifcationType.ORDER,
+        user: order.customer,
+        order_id: order._id,
+        title: 'Order Status Updated',
+        unread: true,
+      });
     }
     return await this.orderModel.findByIdAndUpdate(
       id,

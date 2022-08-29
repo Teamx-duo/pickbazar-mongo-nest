@@ -18,7 +18,7 @@ import { Role } from 'src/common/constants/roles.enum';
 
 export type UserSchema = User & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @IsString()
   @ApiProperty()

@@ -7,13 +7,18 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { BanUserDto, UpdateUserDto } from './dto/update-user.dto';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { GetUsersDto } from './dto/get-users.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/constants/roles.enum';
 
 @Controller('users')
 export class UsersController {
@@ -48,10 +53,19 @@ export class UsersController {
     console.log(id);
     // return this.usersService.getUsers(updateUserInput.id);
   }
-  @Post(':id/ban')
-  banUser(@Param('id') id: number) {
-    console.log(id);
-    // return this.usersService.getUsers(updateUserInput.id);
+
+  @Post('ban-user')
+  @Roles(Role.SUPER_ADMIN)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  banUser(@Body() banUserDto: BanUserDto) {
+    return this.usersService.banUser(banUserDto.id);
+  }
+
+  @Post('active-user')
+  @Roles(Role.SUPER_ADMIN)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  activateUser(@Body() activeUserDto: BanUserDto) {
+    return this.usersService.activateUser(activeUserDto.id);
   }
 }
 

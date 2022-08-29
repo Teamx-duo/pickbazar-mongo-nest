@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { CreateNotificationDto } from './create-notification.dto';
 
@@ -19,11 +19,11 @@ export class GetNotificationsDto extends PartialType(CreateNotificationDto) {
   @IsOptional()
   @IsString()
   unread: boolean;
-  @IsString()
+  @IsEnum(QueryOrdersOrderByColumn)
   @ApiPropertyOptional({ enum: QueryOrdersOrderByColumn })
   @IsOptional()
   orderBy?: QueryOrdersOrderByColumn = QueryOrdersOrderByColumn.CREATED_AT;
-  @IsString()
+  @IsEnum(SortOrder)
   @ApiPropertyOptional()
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.ASC;

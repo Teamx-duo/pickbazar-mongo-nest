@@ -110,11 +110,12 @@ export class ShopsService {
         $or: [{ shops: shop_id }, { shop: shop_id }],
         roles: Role.STAFF,
       },
-      // {
-      //   sort: {
-      //     [orderBy]: sortedBy === 'asc' ? 1 : -1,
-      //   },
-      // },
+      {},
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return staff;
   }

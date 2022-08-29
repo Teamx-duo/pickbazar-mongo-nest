@@ -1,13 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsDefined,
   IsMongoId,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
@@ -28,67 +32,87 @@ export type SettingsOptionsSchema = SettingsOptions & Document;
 @Schema()
 export class SettingsOptions {
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @MaxLength(100)
+  @MinLength(5)
+  @Prop()
   siteTitle: string;
-
-  @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
-  siteSubtitle: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty()
+  @MaxLength(160)
+  @MinLength(10)
+  @Prop()
+  siteSubtitle: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(5)
+  @MinLength(2)
+  @ApiPropertyOptional()
   @Prop({ default: 'USD' })
   currency?: string;
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({ default: 10 })
   minimumOrderAmount: number;
 
   @IsOptional()
-  @ApiProperty()
+  @Type(() => DeliveryTime)
+  @IsArray()
+  @ValidateNested({ each: true })
+  @ApiPropertyOptional()
   @Prop({ type: [DeliveryTimeSchema] })
   deliveryTime: DeliveryTime[];
 
   @IsString()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop()
   logo: string;
 
   @IsMongoId()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tax' })
   taxClass: Tax;
 
-  @IsString()
+  @IsMongoId()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipping' })
   shippingClass: Shipping;
 
   @IsOptional()
-  @ApiProperty()
+  @Type(() => SeoSetting)
+  @ValidateNested()
+  @ApiPropertyOptional()
   @Prop({ type: SeoSettingSchema })
   seo?: SeoSetting;
 
   @IsOptional()
-  @ApiProperty()
+  @Type(() => GoogleSetting)
+  @IsDefined()
+  @ValidateNested()
+  @ApiPropertyOptional()
   @Prop({ type: GoogleSettingSchema })
   google?: GoogleSetting;
 
   @IsOptional()
-  @ApiProperty()
+  @Type(() => FacebookSetting)
+  @ValidateNested()
+  @ApiPropertyOptional()
   @Prop({ type: FacebookSettingSchema })
   facebook?: FacebookSetting;
 
   @IsOptional()
-  @ApiProperty()
+  @Type(() => ContactDetail)
+  @ValidateNested()
+  @ApiPropertyOptional()
   @Prop({ type: ContactDetailSchema })
   contactDetails?: ContactDetail;
 }

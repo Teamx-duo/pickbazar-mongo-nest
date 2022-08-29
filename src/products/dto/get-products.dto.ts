@@ -1,4 +1,5 @@
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -7,34 +8,6 @@ import { Product } from '../entities/product.entity';
 
 export class ProductPaginator extends Paginator<Product> {
   data: Product[];
-}
-
-export class GetProductsDto extends PaginationArgs {
-  @IsString()
-  @IsOptional()
-  orderBy?: QueryProductsOrderByColumn;
-  @IsString()
-  @IsOptional()
-  sortedBy?: SortOrder;
-  @IsMongoId()
-  @IsOptional()
-  shop?: string;
-  @IsMongoId()
-  @IsOptional()
-  type?: string;
-  @IsString()
-  @IsOptional()
-  search?: string;
-  @IsMongoId()
-  @IsOptional()
-  category?: string;
-}
-
-export class GetVariationsDto extends PaginationArgs {
-  orderBy?: QueryProductsOrderByColumn;
-  sortedBy?: SortOrder;
-  productId?: string;
-  search?: string;
 }
 
 export enum QueryProductsOrderByColumn {
@@ -48,4 +21,38 @@ export enum QueryProductsOrderByColumn {
   QUANTITY = 'quantity',
   NAME = 'name',
   UPDATED_AT = 'updatedAt',
+}
+
+export class GetProductsDto extends PaginationArgs {
+  @IsEnum(QueryProductsOrderByColumn)
+  @ApiPropertyOptional({ enum: QueryProductsOrderByColumn })
+  @IsOptional()
+  orderBy?: QueryProductsOrderByColumn = QueryProductsOrderByColumn.CREATED_AT;
+  @IsEnum(SortOrder)
+  @ApiPropertyOptional({ enum: SortOrder })
+  @IsOptional()
+  sortedBy?: SortOrder = SortOrder.DESC;
+  @IsMongoId()
+  @ApiPropertyOptional()
+  @IsOptional()
+  shop?: string;
+  @IsMongoId()
+  @ApiPropertyOptional()
+  @IsOptional()
+  type?: string;
+  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  search?: string;
+  @IsMongoId()
+  @ApiPropertyOptional()
+  @IsOptional()
+  category?: string;
+}
+
+export class GetVariationsDto extends PaginationArgs {
+  orderBy?: QueryProductsOrderByColumn;
+  sortedBy?: SortOrder;
+  productId?: string;
+  search?: string;
 }

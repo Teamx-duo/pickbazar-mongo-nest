@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -18,13 +18,13 @@ export enum QueryOrderStatusesOrderByColumn {
 }
 
 export class GetOrderStatusesDto extends PaginationArgs {
-  @IsString()
+  @IsEnum(QueryOrderStatusesOrderByColumn)
   @ApiPropertyOptional({ enum: QueryOrderStatusesOrderByColumn })
   @IsOptional()
   orderBy?: QueryOrderStatusesOrderByColumn =
     QueryOrderStatusesOrderByColumn.SERIAL;
 
-  @IsString()
+  @IsEnum(SortOrder)
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.ASC;

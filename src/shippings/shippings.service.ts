@@ -21,11 +21,12 @@ export class ShippingsService {
       {
         ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
       },
-      // {
-      //   sort: {
-      //     [orderBy]: sortedBy === 'asc' ? 1 : -1,
-      //   },
-      // },
+      {},
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
   }
 

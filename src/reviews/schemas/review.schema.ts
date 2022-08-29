@@ -7,6 +7,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+  ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -37,6 +42,8 @@ export class Review {
   product: mongoose.Schema.Types.ObjectId;
 
   @IsString()
+  @MinLength(10)
+  @MaxLength(100)
   @ApiProperty()
   @Prop({ required: true })
   comment: string;
@@ -54,6 +61,8 @@ export class Review {
   positive_feedbacks_count: number;
 
   @IsNumber()
+  @Max(5)
+  @Min(0)
   @ApiProperty()
   @Prop({ default: 0, min: 0, max: 5, required: true })
   rating: number;
@@ -71,6 +80,8 @@ export class Review {
   abusive_reports_count: number;
 
   @ApiPropertyOptional()
+  @Type(() => UserFeedback)
+  @ValidateNested({ each: true })
   @IsOptional()
   @Prop({ type: [UserFeedbackSchema] })
   feedbacks: UserFeedback[];

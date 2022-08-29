@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -17,14 +17,14 @@ export enum QueryTagsOrderByColumn {
 }
 
 export class GetTagsDto extends PaginationArgs {
-  @IsString()
+  @IsEnum(QueryTagsOrderByColumn)
   @ApiPropertyOptional({ enum: QueryTagsOrderByColumn })
   @IsOptional()
-  orderBy?: QueryTagsOrderByColumn;
-  @IsString()
+  orderBy?: QueryTagsOrderByColumn = QueryTagsOrderByColumn.CREATED_AT;
+  @IsEnum(SortOrder)
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
-  sortedBy?: SortOrder;
+  sortedBy?: SortOrder = SortOrder.DESC;
   @IsString()
   @ApiPropertyOptional()
   @IsOptional()

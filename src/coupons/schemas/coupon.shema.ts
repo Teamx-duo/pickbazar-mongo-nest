@@ -11,6 +11,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
+  Min,
+  MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -28,11 +31,15 @@ export enum CouponType {
 @Schema({ timestamps: true })
 export class Coupon {
   @IsString()
+  @MinLength(5)
+  @MaxLength(20)
   @ApiProperty()
   @Prop({ required: true, unique: true })
   code: string;
 
   @IsString()
+  @MinLength(10)
+  @MaxLength(1000)
   @ApiProperty()
   @Prop({ required: true })
   description: string;
@@ -68,6 +75,7 @@ export class Coupon {
 
   @Prop({ required: true })
   @IsNumber()
+  @Min(1)
   @Transform((val) => parseInt(val.value))
   @ApiProperty()
   amount: number;

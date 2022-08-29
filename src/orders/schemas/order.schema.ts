@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -8,6 +8,7 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   Validate,
   ValidateNested,
@@ -39,7 +40,9 @@ export class Order {
   @Prop({ index: true })
   tracking_number: number;
 
-  @IsString()
+  @IsPhoneNumber(null, {
+    message: 'Contact must a valid phone number (eg: +92XXXXXXXXXX)',
+  })
   @ApiProperty({ minLength: 10, maxLength: 15 })
   @Prop({ required: true })
   customer_contact: string;
@@ -47,7 +50,7 @@ export class Order {
   @IsMongoId()
   @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  customer: User;
+  customer: mongoose.Schema.Types.ObjectId;
 
   @IsMongoId()
   @IsOptional()
@@ -145,11 +148,15 @@ export class Order {
   products: ProductPivot[];
 
   @IsOptional()
+  @Type(() => UserAddress)
+  @ValidateNested()
   @ApiProperty()
   @Prop({ type: UserAddressSchema })
   billing_address: UserAddress;
 
   @IsOptional()
+  @Type(() => UserAddress)
+  @ValidateNested()
   @ApiProperty()
   @Prop({ type: UserAddressSchema })
   shipping_address: UserAddress;

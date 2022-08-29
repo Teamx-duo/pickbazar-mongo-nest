@@ -74,11 +74,12 @@ export class TypesService {
       {
         ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      // {
-      //   sort: {
-      //     [orderBy]: sortedBy === 'asc' ? 1 : -1,
-      //   },
-      // },
+      {},
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
   }
 

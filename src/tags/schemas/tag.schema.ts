@@ -4,26 +4,39 @@ import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Product } from 'src/products/schemas/product.schema';
 import { Type } from 'src/types/schemas/type.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
-import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export type TagSchema = Tag & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Tag {
   @IsString()
   @ApiProperty()
+  @MinLength(2)
+  @MaxLength(50)
   @Prop({ required: true, unique: true })
   name: string;
 
   @IsString()
   @IsOptional()
+  @MinLength(2)
+  @MaxLength(100)
   @Prop({ required: true, unique: true })
   slug: string;
 
   @IsString()
   @ApiPropertyOptional()
   @IsOptional()
+  @MinLength(5)
+  @MaxLength(500)
   @Prop()
   details: string;
 

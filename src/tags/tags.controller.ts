@@ -18,8 +18,10 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
 import config from 'src/config';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
 
 @Controller('tags')
+@UseInterceptors(LoggingInterceptor)
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
 

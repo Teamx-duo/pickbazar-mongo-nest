@@ -5,6 +5,7 @@ import {
   IsArray,
   IsMongoId,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -22,7 +23,7 @@ export class ContactDetail {
   @Prop({ type: [ShopSocialsSchema] })
   socials: ShopSocials[];
 
-  @IsString()
+  @IsPhoneNumber(null, { message: 'Contact must be a valid phone number.' })
   @IsOptional()
   @ApiProperty()
   @Prop()

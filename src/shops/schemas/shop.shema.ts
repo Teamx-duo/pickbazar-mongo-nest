@@ -8,15 +8,17 @@ import mongoosePaginate from 'mongoose-paginate-v2';
 import {
   IsArray,
   IsBoolean,
-  isMongoId,
   IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
-  Validate,
+  MaxLength,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ShopAddress, ShopAddressSchema } from './shopAddress.schema';
+import { Type } from 'class-transformer';
 
 export type ShopSchema = Shop & Document;
 
@@ -58,26 +60,36 @@ export class Shop {
   products_count: number;
 
   @ApiProperty()
+  @Type(() => Balance)
+  @ValidateNested()
   @IsOptional()
   @Prop({ type: BalanceSchema })
   balance: Balance;
 
   @IsString()
   @ApiProperty()
+  @MinLength(5)
+  @MaxLength(100)
   @Prop({ required: true })
   name: string;
 
   @IsString()
   @ApiProperty()
+  @MinLength(5)
+  @MaxLength(150)
   @Prop({ required: true })
   slug: string;
 
   @IsString()
   @ApiProperty()
+  @MinLength(10)
+  @MaxLength(2000)
   @Prop({ required: true })
   description: string;
 
   @IsString()
+  @MinLength(7)
+  @MaxLength(500)
   @ApiProperty()
   @Prop({
     required: true,
@@ -85,6 +97,8 @@ export class Shop {
   cover_image: string;
 
   @IsString()
+  @MinLength(2)
+  @MaxLength(500)
   @ApiProperty()
   @Prop({
     required: true,
@@ -92,23 +106,15 @@ export class Shop {
   logo: string;
 
   @ApiProperty()
+  @Type(() => ShopAddress)
+  @ValidateNested()
   @IsOptional()
-  @Prop(
-    raw({
-      street_address: { type: String },
-
-      country: { type: String },
-
-      city: { type: String },
-
-      state: { type: String },
-
-      zip: { type: String },
-    }),
-  )
-  address: Record<string, any>;
+  @Prop({ type: ShopAddressSchema })
+  address: ShopAddress;
 
   @ApiProperty()
+  @Type(() => ShopAddress)
+  @ValidateNested()
   @IsOptional()
   @Prop({ type: ShopSettingsSchema })
   settings: ShopSettings;

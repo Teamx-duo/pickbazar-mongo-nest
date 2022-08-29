@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -17,15 +17,15 @@ export enum QueryCouponsOrderByColumn {
   AMOUNT = 'amount',
 }
 export class GetCouponsDto extends PaginationArgs {
-  @IsString()
+  @IsEnum(QueryCouponsOrderByColumn)
   @ApiPropertyOptional({ enum: QueryCouponsOrderByColumn })
   @IsOptional()
-  orderBy?: QueryCouponsOrderByColumn;
+  orderBy?: QueryCouponsOrderByColumn = QueryCouponsOrderByColumn.CREATED_AT;
 
-  @IsString()
+  @IsEnum(SortOrder)
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
-  sortedBy?: SortOrder;
+  sortedBy?: SortOrder = SortOrder.DESC;
 
   @IsString()
   @ApiPropertyOptional()

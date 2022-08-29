@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -9,6 +9,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
+  ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -39,11 +42,15 @@ export class Question {
   product: mongoose.Schema.Types.ObjectId;
 
   @IsString()
+  @MaxLength(500)
+  @MinLength(50)
   @ApiProperty()
   @Prop({ required: true })
   question: string;
 
   @IsString()
+  @MaxLength(500)
+  @MinLength(5)
   @ApiProperty()
   @IsOptional()
   @Prop()
@@ -68,6 +75,8 @@ export class Question {
   abusive_reports_count: number;
 
   @ApiPropertyOptional()
+  @Type(() => UserFeedback)
+  @ValidateNested({ each: true })
   @IsOptional()
   @Prop({ type: [UserFeedbackSchema] })
   feedbacks: UserFeedback[];

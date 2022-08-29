@@ -12,7 +12,7 @@ import {
 
 export type TypeSchema = Type & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Type {
   @IsString()
   @Prop({ required: true, unique: true })

@@ -7,6 +7,8 @@ import {
   IsMongoId,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -26,11 +28,15 @@ export enum NotifcationType {
 @Schema({ timestamps: true })
 export class Notification {
   @IsString()
+  @MinLength(5)
+  @MaxLength(100)
   @ApiProperty()
   @Prop({ required: true })
   title: string;
 
   @IsString()
+  @MinLength(5)
+  @MaxLength(1000)
   @IsOptional()
   @ApiProperty()
   @Prop()

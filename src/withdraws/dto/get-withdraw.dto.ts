@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -15,11 +15,11 @@ export enum QueryWithdrawOrderByColumn {
   UPDATED_AT = 'updatedAt',
 }
 export class GetWithdrawsDto extends PaginationArgs {
-  @IsString()
+  @IsEnum(QueryWithdrawOrderByColumn)
   @ApiPropertyOptional({ enum: QueryWithdrawOrderByColumn })
   @IsOptional()
   orderBy?: QueryWithdrawOrderByColumn = QueryWithdrawOrderByColumn.CREATED_AT;
-  @IsString()
+  @IsEnum(SortOrder)
   @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.DESC;
