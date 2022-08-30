@@ -6,6 +6,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
@@ -18,9 +20,11 @@ export enum ShippingType {
   FREE = 'free',
 }
 
-@Schema()
+@Schema({ timestamps: true })
 export class Shipping {
   @IsString()
+  @MinLength(5)
+  @MaxLength(100)
   @ApiProperty()
   @Prop()
   name: string;
@@ -28,7 +32,7 @@ export class Shipping {
   @IsNumber()
   @ApiProperty()
   @Prop()
-  amount: string;
+  amount: number;
 
   @IsBoolean()
   @ApiProperty()

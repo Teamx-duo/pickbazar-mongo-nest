@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { CreateReviewDto } from './create-review.dto';
 
@@ -13,15 +13,15 @@ export enum QueryCategoriesOrderByColumn {
 }
 
 export class GetReviewsDto extends PartialType(
-  OmitType(CreateReviewDto, ['my_feedback', 'photos']),
+  OmitType(CreateReviewDto, ['feedbacks', 'photos']),
 ) {
-  @IsString()
-  @ApiPropertyOptional()
+  @IsEnum(QueryCategoriesOrderByColumn)
+  @ApiPropertyOptional({ enum: QueryCategoriesOrderByColumn })
   @IsOptional()
   orderBy?: QueryCategoriesOrderByColumn =
     QueryCategoriesOrderByColumn.CREATED_AT;
-  @IsString()
-  @ApiPropertyOptional()
+  @IsEnum(SortOrder)
+  @ApiPropertyOptional({ enum: SortOrder })
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.ASC;
   @IsOptional()

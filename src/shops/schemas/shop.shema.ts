@@ -1,22 +1,24 @@
 import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { ShopSettings } from './shopSettings.schema';
-import { Balance } from './balance.schema';
+import { ShopSettings, ShopSettingsSchema } from './shopSettings.schema';
+import { Balance, BalanceSchema } from './balance.schema';
 import { UserAddress } from 'src/addresses/schemas/userAddress.schema';
 import { User } from 'src/users/schema/user.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import {
   IsArray,
   IsBoolean,
-  isMongoId,
   IsMongoId,
   IsNumber,
   IsOptional,
   IsString,
-  Validate,
+  MaxLength,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ShopAddress, ShopAddressSchema } from './shopAddress.schema';
+import { Type } from 'class-transformer';
 
 export type ShopSchema = Shop & Document;
 
@@ -58,46 +60,35 @@ export class Shop {
   products_count: number;
 
   @ApiProperty()
+  @Type(() => Balance)
+  @ValidateNested()
   @IsOptional()
-  @Prop(
-    raw({
-      admin_commission_rate: { type: Number },
-
-      total_earnings: { type: Number },
-
-      withdrawn_amount: { type: Number },
-
-      current_balance: { type: Number },
-
-      payment_info: {
-        account: { type: String },
-
-        name: { type: String },
-
-        email: { type: String },
-
-        bank: { type: String },
-      },
-    }),
-  )
-  balance: Record<string, any>;
+  @Prop({ type: BalanceSchema })
+  balance: Balance;
 
   @IsString()
   @ApiProperty()
+  @MinLength(5)
+  @MaxLength(100)
   @Prop({ required: true })
   name: string;
 
   @IsString()
   @ApiProperty()
+  @MinLength(5)
+  @MaxLength(150)
   @Prop({ required: true })
   slug: string;
 
   @IsString()
   @ApiProperty()
+  @MinLength(10)
+  @MaxLength(2000)
   @Prop({ required: true })
   description: string;
 
   @IsString()
+  @MaxLength(500)
   @ApiProperty()
   @Prop({
     required: true,
@@ -105,6 +96,7 @@ export class Shop {
   cover_image: string;
 
   @IsString()
+  @MaxLength(500)
   @ApiProperty()
   @Prop({
     required: true,
@@ -112,38 +104,18 @@ export class Shop {
   logo: string;
 
   @ApiProperty()
+  @Type(() => ShopAddress)
+  @ValidateNested()
   @IsOptional()
-  @Prop(
-    raw({
-      street_address: { type: String },
-
-      country: { type: String },
-
-      city: { type: String },
-
-      state: { type: String },
-
-      zip: { type: String },
-    }),
-  )
-  address: Record<string, any>;
+  @Prop({ type: ShopAddressSchema })
+  address: ShopAddress;
 
   @ApiProperty()
+  @Type(() => ShopAddress)
+  @ValidateNested()
   @IsOptional()
-  @Prop(
-    raw({
-      socials: [
-        {
-          icon: { type: String, required: true },
-          url: { type: String, required: true },
-        },
-      ],
-      contact: { type: String },
-      location: { type: String },
-      website: { type: String },
-    }),
-  )
-  settings: Record<string, any>;
+  @Prop({ type: ShopSettingsSchema })
+  settings: ShopSettings;
 }
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);

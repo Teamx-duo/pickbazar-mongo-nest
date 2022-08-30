@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -8,6 +8,7 @@ import {
   IsMongoId,
   IsNumber,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   Validate,
   ValidateNested,
@@ -35,7 +36,13 @@ export enum PaymentGatewayType {
 
 @Schema({ timestamps: true })
 export class Order {
-  @IsString()
+  @IsNumber()
+  @Prop({ index: true })
+  tracking_number: number;
+
+  @IsPhoneNumber(null, {
+    message: 'Contact must a valid phone number (eg: +92XXXXXXXXXX)',
+  })
   @ApiProperty({ minLength: 10, maxLength: 15 })
   @Prop({ required: true })
   customer_contact: string;
@@ -43,11 +50,10 @@ export class Order {
   @IsMongoId()
   @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  customer: User;
+  customer: mongoose.Schema.Types.ObjectId;
 
   @IsMongoId()
   @IsOptional()
-  @ApiProperty()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Order' })
   parent_order: this;
 
@@ -58,7 +64,8 @@ export class Order {
 
   @IsMongoId()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'OrderStatus' })
   status: OrderStatus;
 
@@ -80,12 +87,14 @@ export class Order {
   @IsNumber()
   @ApiProperty()
   @IsOptional()
+  @ApiPropertyOptional()
   @Prop({ default: 0 })
   paid_total: number;
 
   @IsNumber()
   @ApiProperty()
   @IsOptional()
+  @ApiPropertyOptional()
   @Prop()
   payment_id: string;
 
@@ -110,8 +119,8 @@ export class Order {
   @IsMongoId({ each: true })
   @IsArray()
   @IsOptional()
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }] })
-  shop: mongoose.Schema.Types.ObjectId[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shop' })
+  shop: mongoose.Schema.Types.ObjectId;
 
   @IsNumber()
   @ApiProperty()
@@ -124,12 +133,11 @@ export class Order {
   @Prop({ default: 0 })
   delivery_fee: number;
 
-  @IsDate()
-  @Transform((val) => new Date(val.value))
-  @ApiProperty()
+  @IsString()
+  @ApiPropertyOptional()
   @IsOptional()
   @Prop()
-  delivery_time: Date;
+  delivery_time: string;
 
   @IsMongoId({ each: true })
   @IsArray()
@@ -140,11 +148,15 @@ export class Order {
   products: ProductPivot[];
 
   @IsOptional()
+  @Type(() => UserAddress)
+  @ValidateNested()
   @ApiProperty()
   @Prop({ type: UserAddressSchema })
   billing_address: UserAddress;
 
   @IsOptional()
+  @Type(() => UserAddress)
+  @ValidateNested()
   @ApiProperty()
   @Prop({ type: UserAddressSchema })
   shipping_address: UserAddress;

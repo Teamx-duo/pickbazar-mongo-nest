@@ -29,6 +29,8 @@ export class NotificationsService {
     user,
     page,
     limit,
+    orderBy,
+    sortedBy,
   }: GetNotificationsDto) {
     const response = await this.notificationModel.paginate(
       {
@@ -42,6 +44,9 @@ export class NotificationsService {
       {
         page,
         limit,
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
       },
     );
     return PaginationResponse(response);

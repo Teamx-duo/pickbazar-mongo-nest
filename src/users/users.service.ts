@@ -32,10 +32,7 @@ export class UsersService {
       await userData.save();
       return user;
     } else {
-      throw new HttpException(
-        'REGISTRATION.USER_ALREADY_REGISTERED',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Email is already taken.', HttpStatus.CONFLICT);
     }
   }
 
@@ -55,15 +52,12 @@ export class UsersService {
       await userData.save();
       return user;
     } else {
-      throw new HttpException(
-        'REGISTRATION.USER_ALREADY_REGISTERED',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Email is already taken.', HttpStatus.CONFLICT);
     }
   }
 
   async getUsers({
-    text,
+    search,
     shop,
     roles,
     limit,
@@ -73,7 +67,7 @@ export class UsersService {
   }: GetUsersDto) {
     return await this.userModel.paginate(
       {
-        ...(text ? { name: text } : {}),
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
         ...(shop ? { shop: shop } : {}),
         ...(roles ? { roles: roles } : {}),
       },
@@ -98,6 +92,18 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.userModel.findByIdAndUpdate(id, { $set: updateUserDto });
+  }
+
+  async banUser(id: string) {
+    return await this.userModel.findByIdAndUpdate(id, {
+      $set: { is_active: false },
+    });
+  }
+
+  async activateUser(id: string) {
+    return await this.userModel.findByIdAndUpdate(id, {
+      $set: { is_active: true },
+    });
   }
 
   async updateByEmail(email: string, updateUserDto: UpdateUserDto) {

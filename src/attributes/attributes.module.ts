@@ -7,6 +7,7 @@ import {
   AttributeValueSchema,
 } from './schemas/attributeValue.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ShopsModule } from 'src/shops/shops.module';
 
 @Module({
   imports: [
@@ -16,8 +17,10 @@ import { MongooseModule } from '@nestjs/mongoose';
     MongooseModule.forFeature([
       { name: AttributeValue.name, schema: AttributeValueSchema },
     ]),
+    ShopsModule,
   ],
   controllers: [AttributesController],
   providers: [AttributesService],
+  exports: [MongooseModule, AttributesService],
 })
 export class AttributesModule {}

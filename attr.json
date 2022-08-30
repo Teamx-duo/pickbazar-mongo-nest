@@ -1,0 +1,77 @@
+[
+  {
+    "_id": "6303b756b3f8c99042676bfb",
+    "name": "Color",
+    "shop": {
+      "balance": {
+        "payment_info": {
+          "account": "1234567890123456",
+          "email": "usama.irfan9791@gmail.com",
+          "name": "Usama Irfan",
+          "bank": "Meezan"
+        }
+      },
+      "address": {
+        "country": "Pakistan",
+        "city": "Karachi",
+        "state": "Sindh",
+        "zip": "75210",
+        "street_address": "Teamx, Pakistan"
+      },
+      "settings": {
+        "contact": "+923218932626",
+        "website": "https://usamateamx.yaahero.com/",
+        "socials": [
+          {
+            "icon": "FacebookIcon",
+            "url": "https://www.facebook.com",
+            "_id": "6304fa5abeace80260b4e913"
+          },
+          {
+            "icon": "InstagramIcon",
+            "url": "https://www.instagram.com",
+            "_id": "6304fa5abeace80260b4e914"
+          }
+        ]
+      },
+      "_id": "62ffb19ce818fe430653be77",
+      "owner": "62ffb014e818fe430653bd50",
+      "staffs": [],
+      "is_active": true,
+      "orders_count": 0,
+      "products_count": 9,
+      "name": "The furniture shop",
+      "slug": "the-furniture-shop",
+      "description": "The furniture shop",
+      "cover_image": "https://api.teamxmv.com/api/attachments/images/Untitled-6-3cdf.jpg",
+      "logo": "https://api.teamxmv.com/api/attachments/images/Furniture-d4aa.png",
+      "createdAt": "2022-08-19T15:51:56.364Z",
+      "updatedAt": "2022-08-24T08:54:30.434Z",
+      "__v": 0
+    },
+    "slug": "color",
+    "values": [
+      {
+        "_id": "6303b756b3f8c99042676bfd",
+        "value": "Purple",
+        "meta": "Purple",
+        "attribute": "6303b756b3f8c99042676bfb",
+        "__v": 0,
+        "createdAt": "2022-08-22T17:05:26.837Z",
+        "updatedAt": "2022-08-22T17:05:26.837Z"
+      },
+      {
+        "_id": "6303b756b3f8c99042676bfe",
+        "value": "Yellow",
+        "meta": "Yellow",
+        "attribute": "6303b756b3f8c99042676bfb",
+        "__v": 0,
+        "createdAt": "2022-08-22T17:05:26.837Z",
+        "updatedAt": "2022-08-22T17:05:26.837Z"
+      }
+    ],
+    "createdAt": "2022-08-22T17:05:26.833Z",
+    "updatedAt": "2022-08-22T17:05:26.844Z",
+    "__v": 1
+  }
+]

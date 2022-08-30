@@ -14,6 +14,7 @@ import { UsersService } from 'src/users/users.service';
 import { User, UserSchema } from 'src/users/schema/user.schema';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 import { MailModule } from 'src/mail/mail.module';
+import { SettingsModule } from 'src/settings/settings.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MailModule } from 'src/mail/mail.module';
     ]),
     UsersModule,
     MailModule,
+    SettingsModule,
   ],
   controllers: [ShopsController, StaffsController],
   providers: [ShopsService, UsersService],

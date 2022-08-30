@@ -56,12 +56,6 @@ export class SeoSetting {
   @Prop()
   metaTags?: string;
 
-  @IsMongoId()
-  @ApiProperty()
-  @IsOptional()
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Setting' })
-  setting?: Setting;
-
   @IsString()
   @ApiProperty()
   @Prop()

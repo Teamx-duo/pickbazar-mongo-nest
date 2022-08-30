@@ -9,6 +9,7 @@ import {
   Put,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -18,8 +19,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
+import { CreateReviewFeebackDto } from './dto/create-feedback.dto';
+import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
 
 @Controller('reviews')
+@UseInterceptors(LoggingInterceptor)
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
@@ -51,5 +55,19 @@ export class ReviewsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.reviewsService.remove(id);
+  }
+
+  @Post('feedback/:id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.CUSTOMER)
+  feedback(
+    @Param('id') id: string,
+    @Body() createFeedbackDto: CreateReviewFeebackDto,
+    @Req() req,
+  ) {
+    return this.reviewsService.addFeedBack(id, {
+      ...createFeedbackDto,
+      user: req.user?._id,
+    });
   }
 }

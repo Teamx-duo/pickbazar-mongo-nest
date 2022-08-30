@@ -5,7 +5,14 @@ import { Attachment } from 'src/common/schemas/attachment.schema';
 import { Type } from 'src/types/schemas/type.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
-import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsMongoId,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export type CategorySchema = Category & Document;
@@ -13,11 +20,15 @@ export type CategorySchema = Category & Document;
 @Schema({ timestamps: true })
 export class Category {
   @IsString()
+  @MinLength(5)
+  @MaxLength(100)
   @ApiProperty()
   @Prop({ required: true })
   name: string;
 
   @IsString()
+  @MinLength(5)
+  @MaxLength(150)
   @IsOptional()
   @ApiProperty()
   @Prop({ required: true, unique: true })
@@ -37,19 +48,24 @@ export class Category {
   children?: mongoose.Schema.Types.ObjectId[];
 
   @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
+  @MaxLength(2000)
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Prop()
   details: string;
 
   @IsString()
+  @MaxLength(500)
   @IsOptional()
   @ApiPropertyOptional()
   @Prop()
   image: string;
 
   @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
+  @MaxLength(500)
+  @IsOptional()
+  @ApiPropertyOptional()
+  @Prop()
   icon: string;
 
   @IsMongoId()

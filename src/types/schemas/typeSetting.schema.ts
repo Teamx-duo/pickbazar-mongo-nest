@@ -6,7 +6,7 @@ export type TypeSettingSchema = TypeSetting & Document;
 @Schema()
 export class TypeSetting {
   @Prop()
-  isHome: string;
+  isHome: boolean;
 
   @Prop()
   layoutType: string;

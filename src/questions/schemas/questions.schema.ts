@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsDate,
@@ -9,9 +9,13 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
+  ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import { UserFeedback, UserFeedbackSchema } from './user-feedback.schema';
 
 export type QuestionSchema = Question & Document;
 
@@ -38,11 +42,14 @@ export class Question {
   product: mongoose.Schema.Types.ObjectId;
 
   @IsString()
+  @MaxLength(500)
+  @MinLength(50)
   @ApiProperty()
   @Prop({ required: true })
   question: string;
 
   @IsString()
+  @MaxLength(500)
   @ApiProperty()
   @IsOptional()
   @Prop()
@@ -66,11 +73,12 @@ export class Question {
   @Prop({ default: 0, min: 0 })
   abusive_reports_count: number;
 
-  @IsNumber()
   @ApiPropertyOptional()
+  @Type(() => UserFeedback)
+  @ValidateNested({ each: true })
   @IsOptional()
-  @Prop()
-  my_feedback: string;
+  @Prop({ type: [UserFeedbackSchema] })
+  feedbacks: UserFeedback[];
 }
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);

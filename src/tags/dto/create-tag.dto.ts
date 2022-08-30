@@ -1,29 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { Tag } from '../schemas/tag.schema';
 
-export class CreateTagDto {
-  @IsString()
-  @ApiProperty()
-  public name: string;
-
-  @IsString()
-  @ApiProperty()
-  public type: string;
-
-  @IsString()
-  @ApiProperty()
-  public details: string;
-
-  @IsString()
-  @ApiProperty()
-  @IsOptional()
-  public image: string;
-
-  @IsString()
-  @ApiProperty()
-  @IsOptional()
-  public icon: string;
-}
+export class CreateTagDto extends PickType(Tag, [
+  'details',
+  'icon',
+  'image',
+  'products',
+  'name',
+  'slug',
+  'type',
+]) {}
 
 // export class CreateTagDto extends PickType(Tag, [
 //   'name',

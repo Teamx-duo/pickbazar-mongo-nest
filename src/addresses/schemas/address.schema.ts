@@ -10,7 +10,11 @@ import {
   IsMongoId,
   IsEnum,
   IsOptional,
+  MinLength,
+  MaxLength,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export type AddressSchema = Address & Document;
 
@@ -21,9 +25,11 @@ export enum AddressType {
 
 @Schema({ timestamps: true })
 export class Address {
+  @IsString()
+  @MinLength(2)
+  @MaxLength(100)
   @Prop({ required: true })
   @ApiProperty({ required: true })
-  @IsString()
   title: string;
 
   @Prop({ default: false })
@@ -31,6 +37,8 @@ export class Address {
   @IsOptional()
   default: boolean;
 
+  @ValidateNested()
+  @Type(() => UserAddress)
   @ApiProperty()
   @IsOptional()
   @Prop({

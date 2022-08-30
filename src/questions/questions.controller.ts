@@ -18,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
+import { CreateQuestionFeebackDto } from './dto/create-feedback.dto';
 
 @Controller('questions')
 export class QuestionsController {
@@ -66,5 +67,19 @@ export class QuestionsController {
   @Roles(Role.SUPER_ADMIN, Role.STORE_OWNER)
   remove(@Param('id') id: string) {
     return this.questionsService.remove(id);
+  }
+
+  @Post('feedback/:id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.CUSTOMER)
+  feedback(
+    @Param('id') id: string,
+    @Body() createFeedbackDto: CreateQuestionFeebackDto,
+    @Req() req,
+  ) {
+    return this.questionsService.addFeedBack(id, {
+      ...createFeedbackDto,
+      user: req.user?._id,
+    });
   }
 }

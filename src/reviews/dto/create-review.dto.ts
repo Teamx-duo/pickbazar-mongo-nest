@@ -4,7 +4,7 @@ import { Review } from '../schemas/review.schema';
 
 export class CreateReviewDto extends PickType(Review, [
   'comment',
-  'my_feedback',
+  'feedbacks',
   'photos',
   'product',
   'rating',

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNumber, IsString } from 'class-validator';
+import { IsMongoId, IsNumber, IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { ContactDetail } from './contactDetails.schema';
 
@@ -9,36 +9,43 @@ export type LocationSchema = Location & Document;
 @Schema()
 export class Location {
   @IsNumber()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   lat: number;
 
   @IsNumber()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   lng: number;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   city: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
   @Prop()
   state: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
   @Prop()
   country: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
   @Prop()
   zip: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
   @Prop()
   formattedAddress: string;

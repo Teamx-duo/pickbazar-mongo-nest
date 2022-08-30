@@ -1,4 +1,5 @@
-import { IsMongoId, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
 import { PaginationArgs } from 'src/common/dto/pagination-args.dto';
 import { Paginator } from 'src/common/dto/paginator.dto';
@@ -9,26 +10,31 @@ export class UserPaginator extends Paginator<User> {
   data: User[];
 }
 
-export class GetUsersDto extends PaginationArgs {
-  @IsString()
-  @IsOptional()
-  orderBy?: QueryUsersOrderByColumn;
-  @IsString()
-  @IsOptional()
-  sortedBy?: SortOrder;
-  @IsString()
-  @IsOptional()
-  text?: string;
-  @IsMongoId()
-  @IsOptional()
-  shop?: string;
-  @IsString()
-  @IsOptional()
-  roles?: string;
-}
-
 export enum QueryUsersOrderByColumn {
   NAME = 'name',
   CREATED_AT = 'createdAt',
   UPDATED_AT = 'updatedAt',
+}
+
+export class GetUsersDto extends PaginationArgs {
+  @IsEnum(QueryUsersOrderByColumn)
+  @ApiPropertyOptional({ enum: QueryUsersOrderByColumn })
+  @IsOptional()
+  orderBy?: QueryUsersOrderByColumn = QueryUsersOrderByColumn.CREATED_AT;
+  @IsEnum(SortOrder)
+  @ApiPropertyOptional({ enum: SortOrder })
+  @IsOptional()
+  sortedBy?: SortOrder = SortOrder.DESC;
+  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  search?: string;
+  @IsMongoId()
+  @ApiPropertyOptional()
+  @IsOptional()
+  shop?: string;
+  @IsString()
+  @ApiPropertyOptional()
+  @IsOptional()
+  roles?: string;
 }

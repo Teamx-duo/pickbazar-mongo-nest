@@ -1,93 +1,116 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
+  IsDefined,
   IsMongoId,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
   ValidateNested,
 } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { Attachment } from 'src/common/schemas/attachment.schema';
-import { ContactDetail } from './contactDetails.schema';
-import { DeliveryTime } from './deliveryTime.schema';
-import { FacebookSetting } from './facebookSettings.schema';
-import { GoogleSetting } from './googleSettings.schema';
-import { SeoSetting } from './seoSettings.schema';
+import { Shipping } from 'src/shippings/entities/shipping.entity';
+import { Tax } from 'src/taxes/schemas/taxes.schema';
+import { ContactDetail, ContactDetailSchema } from './contactDetails.schema';
+import { DeliveryTime, DeliveryTimeSchema } from './deliveryTime.schema';
+import {
+  FacebookSetting,
+  FacebookSettingSchema,
+} from './facebookSettings.schema';
+import { GoogleSetting, GoogleSettingSchema } from './googleSettings.schema';
+import { SeoSetting, SeoSettingSchema } from './seoSettings.schema';
 
 export type SettingsOptionsSchema = SettingsOptions & Document;
 
 @Schema()
 export class SettingsOptions {
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @MaxLength(100)
+  @Prop()
   siteTitle: string;
-
-  @IsString()
-  @ApiProperty()
-  @Prop({ required: true })
-  siteSubtitle: string;
 
   @IsString()
   @IsOptional()
   @ApiProperty()
+  @MaxLength(160)
+  @Prop()
+  siteSubtitle: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(5)
+  @ApiPropertyOptional()
   @Prop({ default: 'USD' })
   currency?: string;
 
   @IsNumber()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop({ default: 10 })
   minimumOrderAmount: number;
 
+  @IsOptional()
+  @Type(() => DeliveryTime)
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => DeliveryTime)
-  @IsOptional()
-  @ApiProperty()
-  @Prop()
+  @ApiPropertyOptional()
+  @Prop({ type: [DeliveryTimeSchema] })
   deliveryTime: DeliveryTime[];
 
   @IsString()
   @IsOptional()
-  @ApiProperty()
+  @ApiPropertyOptional()
   @Prop()
   logo: string;
 
-  @IsString()
+  @IsMongoId()
   @IsOptional()
-  @ApiProperty()
-  @Prop()
-  taxClass: string;
+  @ApiPropertyOptional()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tax' })
+  taxClass: Tax;
 
-  @IsString()
+  @IsMongoId()
   @IsOptional()
-  @ApiProperty()
-  @Prop()
-  shippingClass: string;
+  @ApiPropertyOptional()
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Shipping' })
+  shippingClass: Shipping;
 
+  @IsOptional()
+  @Type(() => SeoSetting)
   @ValidateNested()
-  @Type(() => GoogleSetting)
+  @ApiPropertyOptional()
+  @Prop({ type: SeoSettingSchema })
+  seo?: SeoSetting;
+
   @IsOptional()
-  @ApiProperty()
-  @Prop()
+  @Type(() => GoogleSetting)
+  @IsDefined()
+  @ValidateNested()
+  @ApiPropertyOptional()
+  @Prop({ type: GoogleSettingSchema })
   google?: GoogleSetting;
 
-  @ValidateNested()
-  @Type(() => FacebookSetting)
   @IsOptional()
-  @ApiProperty()
-  @Prop()
+  @Type(() => FacebookSetting)
+  @ValidateNested()
+  @ApiPropertyOptional()
+  @Prop({ type: FacebookSettingSchema })
   facebook?: FacebookSetting;
 
-  @ValidateNested()
-  @Type(() => ContactDetail)
   @IsOptional()
-  @ApiProperty()
-  @Prop()
+  @Type(() => ContactDetail)
+  @ValidateNested()
+  @ApiPropertyOptional()
+  @Prop({ type: ContactDetailSchema })
   contactDetails?: ContactDetail;
 }
 

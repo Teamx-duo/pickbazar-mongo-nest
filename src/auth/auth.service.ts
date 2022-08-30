@@ -77,7 +77,12 @@ export class AuthService {
       })
       .populate(['profile', 'address', 'shops']);
     if (!userFromDb)
-      throw new HttpException('User not found.', HttpStatus.NOT_FOUND);
+      throw new HttpException('Invalid credentials', HttpStatus.NOT_FOUND);
+    if (!userFromDb.is_active)
+      throw new HttpException(
+        'Your account has been suspended temporarily. Please contact support if you think this is a mistake.',
+        HttpStatus.NOT_FOUND,
+      );
 
     const isValidPass = await bcrypt.compare(
       loginInput.password,
@@ -115,7 +120,10 @@ export class AuthService {
         message: 'Password change successful',
       };
     } else {
-      throw new HttpException('Unable to login', HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        'Unable to change password',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
@@ -287,17 +295,17 @@ export class AuthService {
     };
   }
 
-  async verifyOtpCode(
-    verifyOtpInput: VerifyOtpDto,
-    user?: any,
-  ): Promise<CoreResponse> {
-    await this.profileModel.findOneAndUpdate(
-      { user },
-      { $set: { contact: verifyOtpInput.phone_number } },
-    );
+  async verifyOtpCode(verifyOtpInput: VerifyOtpDto, user?: any) {
+    const dbUser = await this.userModel.findById(user);
+    dbUser.profile = {
+      ...dbUser.profile,
+      contact: verifyOtpInput.phone_number,
+    };
+    await dbUser.save();
     return {
       message: 'success',
       success: true,
+      profile: dbUser,
     };
   }
 
@@ -337,10 +345,6 @@ export class AuthService {
   }
 
   async updateMe(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userService.update(id, updateUserDto);
+    return await this.userModel.findById(id, { $set: updateUserDto });
   }
-
-  // updateUser(id: number, updateUserInput: UpdateUserInput) {
-  //   return `This action updates a #${id} user`;
-  // }
 }

@@ -17,12 +17,18 @@ export class CouponsService {
     return await this.couponModel.create(createCouponDto);
   }
 
-  async getCoupons({ search, limit, page }: GetCouponsDto) {
+  async getCoupons({ search, limit, page, orderBy, sortedBy }: GetCouponsDto) {
     const response = await this.couponModel.paginate(
       {
-        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(search ? { code: { $regex: search, $options: 'i' } } : {}),
       },
-      { limit, page },
+      {
+        limit,
+        page,
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }
@@ -40,7 +46,8 @@ export class CouponsService {
     }
     return {
       coupon,
-      is_valid: new Date(coupon.expire_at).getTime() < new Date().getTime(),
+      is_valid:
+        new Date(coupon.expire_at).getTime() > new Date().getTime(),
     };
   }
 

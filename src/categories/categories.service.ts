@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -30,8 +31,16 @@ export class CategoriesService {
 
   async create(createCategoryDto: CreateCategoryDto) {
     const { name, details, type, parent, icon, image } = createCategoryDto;
+    const slug = convertToSlug(name);
+    const exists = await this.categoryModel.findOne({ slug });
+    if (exists) {
+      throw new HttpException(
+        'Category with this name or slug already exists.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return this.categoryModel.create({
-      slug: convertToSlug(name),
+      slug,
       name,
       details,
       type,
@@ -53,7 +62,14 @@ export class CategoriesService {
     return PaginationResponse(categories);
   }
 
-  async getCategories({ limit, page, search, type }: GetCategoriesDto) {
+  async getCategories({
+    limit,
+    page,
+    search,
+    type,
+    orderBy,
+    sortedBy,
+  }: GetCategoriesDto) {
     const aggregate = this.categoryAggregateModel.aggregate([
       {
         $match: {
@@ -62,7 +78,7 @@ export class CategoriesService {
         },
       },
       {
-        $sort: { createdAt: 1 },
+        $sort: { [orderBy]: sortedBy === 'asc' ? 1 : -1 },
       },
       {
         $graphLookup: {

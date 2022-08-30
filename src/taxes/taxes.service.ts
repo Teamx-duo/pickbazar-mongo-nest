@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ObjectId, PaginateModel } from 'mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
@@ -14,12 +14,20 @@ export class TaxesService {
   ) {}
 
   async create(createTaxDto: CreateTaxDto) {
-    console.log(createTaxDto);
+    const exists = await this.taxesModel.findOne({
+      priority: createTaxDto.priority,
+    });
+    if (exists) {
+      throw new HttpException(
+        'Tax with this priority already exists.',
+        HttpStatus.CONFLICT,
+      );
+    }
     return await this.taxesModel.create(createTaxDto);
   }
 
   async findAll({
-    text,
+    search,
     orderBy,
     sortedBy,
     country,
@@ -28,19 +36,29 @@ export class TaxesService {
   }: GetTaxesDto) {
     const response = await this.taxesModel.paginate(
       {
-        ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
         ...(country ? { country } : {}),
         ...(priority ? { priority } : {}),
         ...(global !== null || global !== undefined ? { global } : {}),
       },
-      { sort: { [orderBy]: sortedBy } },
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(response);
   }
 
-  async getAllTaxes({ text, country, priority }: GetTaxesDto) {
+  async getAllTaxes({
+    search,
+    country,
+    priority,
+    sortedBy,
+    orderBy,
+  }: GetTaxesDto) {
     return await this.taxesModel.find({
-      ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+      ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       ...(country ? { country } : {}),
       ...(priority ? { priority } : {}),
       ...(priority ? { priority } : {}),

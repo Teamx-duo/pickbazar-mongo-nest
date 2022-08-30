@@ -12,7 +12,7 @@ import {
 
 export type TypeSchema = Type & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Type {
   @IsString()
   @Prop({ required: true, unique: true })
@@ -45,7 +45,7 @@ export class Type {
   @ValidateNested()
   @Prop(
     raw({
-      isHome: { type: String },
+      isHome: { type: Boolean },
       layoutType: { type: String },
       productCard: { type: String },
     }),

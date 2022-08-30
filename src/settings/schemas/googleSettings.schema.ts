@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 
 export type GoogleSettingSchema = GoogleSetting & Document;
@@ -8,13 +8,15 @@ export type GoogleSettingSchema = GoogleSetting & Document;
 @Schema()
 export class GoogleSetting {
   @IsBoolean()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   isEnable: boolean;
 
   @IsString()
   @ApiProperty()
-  @Prop({ required: true })
+  @IsOptional()
+  @Prop()
   tagManagerId: string;
 }
 

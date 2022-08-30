@@ -16,6 +16,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductPivot } from './productPivot.schema';
@@ -36,12 +38,16 @@ export enum ProductStatus {
 export class Product {
   @IsString()
   @ApiProperty()
+  @MinLength(5)
+  @MaxLength(100)
   @Prop({ required: true, unique: true })
   @ApiProperty()
   name: string;
 
   @IsString()
   @IsOptional()
+  @MinLength(5)
+  @MaxLength(150)
   @Prop({ required: true, unique: true })
   @ApiProperty()
   slug: string;
@@ -105,6 +111,8 @@ export class Product {
   shop: Shop;
 
   @IsString()
+  @MinLength(10)
+  @MaxLength(2000)
   @Prop({ required: true })
   @ApiProperty()
   description: string;
@@ -178,18 +186,21 @@ export class Product {
   status: ProductStatus;
 
   @IsString()
+  @MaxLength(50)
   @IsOptional()
   @Prop()
   @ApiProperty()
   height: string;
 
   @IsString()
+  @MaxLength(50)
   @IsOptional()
   @Prop()
   @ApiProperty()
   length: string;
 
   @IsString()
+  @MaxLength(50)
   @IsOptional()
   @Prop()
   @ApiProperty()
@@ -208,6 +219,7 @@ export class Product {
   quantity: number;
 
   @IsString()
+  @MaxLength(50)
   @IsOptional()
   @Prop({ required: true })
   @ApiProperty()

@@ -27,12 +27,18 @@ export class TypesService {
     private typeSettingModel: PaginateModel<TypeSettingSchema>,
   ) {}
 
-  async getTypes({ text, page, limit }: GetTypesDto) {
+  async getTypes({ search, page, limit, sortedBy, orderBy }: GetTypesDto) {
     const data = await this.typeModel.paginate(
       {
-        ...(text ? { name: { $regex: text, $options: 'i' } } : {}),
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
       },
-      { page, limit },
+      {
+        page,
+        limit,
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
     );
     return PaginationResponse(data);
   }
@@ -42,7 +48,6 @@ export class TypesService {
   }
 
   async create(createTypeDto: CreateTypeDto) {
-    console.log(createTypeDto);
     const bannerIds = [];
     const createObj = { ...createTypeDto };
     const dbType = await this.typeModel.create({
@@ -58,12 +63,21 @@ export class TypesService {
     }
     createObj.banners = bannerIds;
     dbType.banners = bannerIds;
-    console.log('UPDATE', createObj);
     return await dbType.save();
   }
 
-  async findAll() {
-    return await this.typeModel.find({});
+  async findAll({ search, sortedBy, orderBy }: GetTypesDto) {
+    return await this.typeModel.find(
+      {
+        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+      },
+      {},
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
+    );
   }
 
   async findOne(id: string) {

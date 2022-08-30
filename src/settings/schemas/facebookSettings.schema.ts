@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsMongoId, IsString } from 'class-validator';
+import { IsBoolean, IsMongoId, IsOptional, IsString } from 'class-validator';
 import mongoose, { Document } from 'mongoose';
 import { SettingsOptions } from './settingOptions.schema';
 
@@ -9,18 +9,21 @@ export type FacebookSettingSchema = FacebookSetting & Document;
 @Schema()
 export class FacebookSetting {
   @IsBoolean()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   isEnable: boolean;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   appId: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  @Prop({ required: true })
+  @Prop()
   pageId: string;
 }
 
