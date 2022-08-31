@@ -11,7 +11,7 @@ export class LoggerMiddleware implements NestMiddleware {
         offuscateRequest.newPassword = '*******';
       if (offuscateRequest && offuscateRequest.currentPassword)
         offuscateRequest.currentPassword = '*******';
-      if (offuscateRequest != {})
+      if (offuscateRequest && Object.keys(offuscateRequest)?.length > 0)
         console.log(
           new Date().toString() +
             ' - [Request] ' +

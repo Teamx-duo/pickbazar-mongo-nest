@@ -1,55 +1,57 @@
-version: '3.3'
+version: '3.7'
+
 services:
-  dev:
-    container_name: nestjs_api_dev
-    image: usamairfan/nestjs-k8s
+  main:
+    container_name: main
     build:
       context: .
-      dockerfile: ./Dockerfile
-    command: npm run start:dev
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/multivendor
-    ports:
-      - 5000:5000
-      - 5001:9229
-    networks:
-      - nesjs-network
-    depends_on:
-      - mongodb
+      target: development
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    restart: unless-stopped
+    ports:
+      - 5000:5000
+      - 9229:9229
+    command: npm run start:dev
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - mongodb
+  prod:
+    container_name: nest_api
+    build:
+      context: .
+      target: production
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 5000:5000
+      - 9229:9229
+    command: npm run start:prod
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - mongodb
   mongodb:
-    image : mongo:latest
+    image: mongo:latest
     container_name: mongodb
     volumes:
       - ./database:/data/db
     ports:
       - 27017:27017
     networks:
-      - nesjs-network
+      - webnet
     restart: always
-  prod:
-    container_name: nestjs_api_prod
-    image: usamairfan/nestjs-k8s
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    command: npm run start:prod
-    environment:
-      - MONGO_URI=mongodb://mongodb:27017/multivendor
-    ports:
-      - 5000:5000
-      - 9229:9229
-    networks:
-      - nesjs-network
-    depends_on:
-      - mongodb
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    restart: unless-stopped
 networks:
-    nesjs-network:
-      driver: bridge
+  webnet:
+volumes:
+  pgdata:
