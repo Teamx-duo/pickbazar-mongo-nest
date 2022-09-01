@@ -7,14 +7,12 @@ import {
   AttributeValue,
   AttributeValueSchema,
 } from './schemas/attributeValue.schema';
-import { plainToClass } from 'class-transformer';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { GetAttributesArgs } from './dto/get-attributes.dto';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 import { Shop, ShopSchema } from 'src/shops/schemas/shop.shema';
 
-const attributes = plainToClass(Attribute, attributesJson);
 @Injectable()
 export class AttributesService {
   constructor(
@@ -25,7 +23,6 @@ export class AttributesService {
     @InjectModel(Shop.name)
     private shopModel: PaginateModel<ShopSchema>,
   ) {}
-  private attributes: Attribute[] = attributes;
 
   async create(createAttributeDto: CreateAttributeDto) {
     if (createAttributeDto.shop) {

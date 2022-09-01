@@ -1,6 +1,5 @@
 import { TypeSchema, Type } from './schemas/type.schema';
 import { Injectable } from '@nestjs/common';
-import { plainToClass } from 'class-transformer';
 import { CreateTypeDto } from './dto/create-type.dto';
 import { UpdateTypeDto } from './dto/update-type.dto';
 
@@ -13,7 +12,6 @@ import { convertToSlug } from 'src/common/constants/common.function';
 import { Banner, BannerSchema } from './schemas/banner.schema';
 import { TypeSetting, TypeSettingSchema } from './schemas/typeSetting.schema';
 
-const types = plainToClass(Type, typesJson);
 const options = {
   keys: ['name'],
   threshold: 0.3,
@@ -28,7 +26,6 @@ export class TypesService {
     @InjectModel(TypeSetting.name)
     private typeSettingModel: PaginateModel<TypeSettingSchema>,
   ) {}
-  private types: Type[] = types;
 
   async getTypes({ search, page, limit, sortedBy, orderBy }: GetTypesDto) {
     const data = await this.typeModel.paginate(

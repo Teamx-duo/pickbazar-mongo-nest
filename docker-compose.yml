@@ -1,0 +1,78 @@
+version: '3.7'
+
+services:
+  main:
+    container_name: main
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 5000:5000
+      - 9229:9229
+    command: npm run start:dev
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - mongodb
+      - mongo-express
+    restart: always
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    environment:
+        ME_CONFIG_MONGODB_SERVER: "mongodb"
+        ME_CONFIG_MONGODB_PORT: 27017
+        ME_CONFIG_MONGODB_ENABLE_ADMIN: "false"
+        ME_CONFIG_MONGODB_AUTH_DATABASE: multivendor
+        ME_CONFIG_BASICAUTH_USERNAME: "admin"
+        ME_CONFIG_BASICAUTH_PASSWORD: "nkx7Baz5LBNnkI2G"
+    depends_on:
+        - mongodb
+    ports:
+      - "8081:8081"
+    networks:
+      - webnet
+    restart: always
+  prod:
+    container_name: nest_api
+    build:
+      context: .
+      target: production
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - 5000:5000
+      - 9229:9229
+    command: npm run start:prod
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/multivendor
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - mongodb
+      - mongo-express
+    restart: always
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    volumes:
+      - ./database:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - webnet
+    restart: always
+networks:
+  webnet:
+volumes:
+  pgdata:

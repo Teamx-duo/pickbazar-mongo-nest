@@ -19,7 +19,6 @@ import { convertToSlug } from 'src/common/constants/common.function';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { AggregatePaginateModel } from 'mongoose';
 
-const categories = plainToClass(Category, categoriesJson);
 
 @Injectable()
 export class CategoriesService {
@@ -29,7 +28,6 @@ export class CategoriesService {
     @InjectModel(Category.name)
     private categoryAggregateModel: AggregatePaginateModel<CategorySchema>,
   ) {}
-  private categories: Category[] = categories;
 
   async create(createCategoryDto: CreateCategoryDto) {
     const { name, details, type, parent, icon, image } = createCategoryDto;
