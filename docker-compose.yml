@@ -21,6 +21,22 @@ services:
       - webnet
     depends_on:
       - mongodb
+      - mongo-express
+    restart: always
+  mongo-express:
+    image: mongo-express
+    environment:
+        - ME_CONFIG_MONGODB_SERVER=mongodb
+        - ME_CONFIG_MONGODB_PORT=27017
+        - ME_CONFIG_MONGODB_ENABLE_ADMIN=false
+        - ME_CONFIG_MONGODB_AUTH_DATABASE=multivendor
+    depends_on:
+        - mongodb
+    ports:
+      - "8081:8081"
+    networks:
+      - webnet
+    restart: always
   prod:
     container_name: nest_api
     build:
@@ -41,6 +57,8 @@ services:
       - webnet
     depends_on:
       - mongodb
+      - mongo-express
+    restart: always
   mongodb:
     image: mongo:latest
     container_name: mongodb
