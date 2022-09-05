@@ -14,7 +14,7 @@ services:
       - 9229:9229
     command: npm run start:dev
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/multivendor
+      - MONGO_URI=mongodb://root:nkx7Baz5LBNnkI2G@mongodb:27017/multivendor?authSource=admin
     env_file:
       - .env
     networks:
@@ -27,16 +27,18 @@ services:
     container_name: mongo-express
     image: mongo-express
     environment:
-        ME_CONFIG_MONGODB_SERVER: "mongodb"
-        ME_CONFIG_MONGODB_PORT: 27017
-        ME_CONFIG_MONGODB_ENABLE_ADMIN: "false"
-        ME_CONFIG_MONGODB_AUTH_DATABASE: multivendor
-        ME_CONFIG_BASICAUTH_USERNAME: "admin"
-        ME_CONFIG_BASICAUTH_PASSWORD: "nkx7Baz5LBNnkI2G"
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+      ME_CONFIG_MONGODB_AUTH_USERNAME: root
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: nkx7Baz5LBNnkI2G
+      ME_CONFIG_MONGODB_AUTH_DATABASE: multivendor?authSource=admin
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: nkx7Baz5LBNnkI2G
     depends_on:
-        - mongodb
+      - mongodb
     ports:
-      - "8081:8081"
+      - '8081:8081'
     networks:
       - webnet
     restart: always
@@ -53,7 +55,7 @@ services:
       - 9229:9229
     command: npm run start:prod
     environment:
-      - MONGO_URI=mongodb://mongodb:27017/multivendor
+      - MONGO_URI=mongodb://root:nkx7Baz5LBNnkI2G@mongodb:27017/multivendor?authSource=admin
     env_file:
       - .env
     networks:
@@ -65,6 +67,9 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb
+    environment:
+      - "MONGO_INITDB_ROOT_USERNAME=root"
+      - "MONGO_INITDB_ROOT_PASSWORD=nkx7Baz5LBNnkI2G"
     volumes:
       - ./database:/data/db
     ports:
