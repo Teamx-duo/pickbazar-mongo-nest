@@ -145,7 +145,7 @@ export class OrdersService {
             0,
           );
           const shipping = settings?.options?.shippingClass;
-          if (taxes.length > 0) {
+          if (taxes && taxes.length > 0) {
             tax = (taxes[0].rate / 100) * total;
             total += (taxes[0].rate / 100) * total;
           }
@@ -370,7 +370,7 @@ export class OrdersService {
     } else {
       taxes = [settings?.options?.taxClass];
     }
-    if (taxes.length > 0) {
+    if (taxes && taxes.length > 0) {
       tax = (taxes[0].rate / 100) * total;
       total += (taxes[0].rate / 100) * total;
     }
