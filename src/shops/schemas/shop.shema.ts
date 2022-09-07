@@ -120,4 +120,9 @@ export class Shop {
 
 export const ShopSchema = SchemaFactory.createForClass(Shop);
 
+ShopSchema.index({
+  name: 'text',
+  description: 'text',
+});
+
 ShopSchema.plugin(mongoosePaginate);

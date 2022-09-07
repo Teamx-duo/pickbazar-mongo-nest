@@ -72,4 +72,8 @@ export class Withdraw {
 }
 
 export const WithdrawSchema = SchemaFactory.createForClass(Withdraw);
+
+WithdrawSchema.index({ note: 'text', details: 'text' });
+WithdrawSchema.index({ shop: 1 });
+
 WithdrawSchema.plugin(mongoosePaginate);

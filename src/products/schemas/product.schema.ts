@@ -228,5 +228,12 @@ export class Product {
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
-ProductSchema.index({ name: 'text' });
+ProductSchema.index({
+  name: 'text',
+  description: 'text',
+});
+ProductSchema.index({
+  type: 1,
+  categories: 1,
+});
 ProductSchema.plugin(mongoosePaginate);
