@@ -5,6 +5,7 @@ import { Balance, BalanceSchema } from './balance.schema';
 import { UserAddress } from 'src/addresses/schemas/userAddress.schema';
 import { User } from 'src/users/schema/user.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import {
   IsArray,
   IsBoolean,
@@ -126,3 +127,4 @@ ShopSchema.index({
 });
 
 ShopSchema.plugin(mongoosePaginate);
+ShopSchema.plugin(mongooseAggregatePaginate);

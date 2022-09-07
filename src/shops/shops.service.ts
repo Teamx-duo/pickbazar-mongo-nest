@@ -1,5 +1,10 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
-import mongoose, { Model, ObjectId, PaginateModel } from 'mongoose';
+import mongoose, {
+  AggregatePaginateModel,
+  Model,
+  ObjectId,
+  PaginateModel,
+} from 'mongoose';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApproveShopDto,
@@ -37,6 +42,8 @@ export class ShopsService {
   constructor(
     @InjectModel(Shop.name)
     private shopModel: PaginateModel<ShopSchema>,
+    @InjectModel(Shop.name)
+    private shopAggregateModel: AggregatePaginateModel<ShopSchema>,
     @InjectModel(Balance.name)
     private balanceModel: PaginateModel<BalanceSchema>,
     @InjectModel(ShopSettings.name)
@@ -121,24 +128,66 @@ export class ShopsService {
     return staff;
   }
 
-  async getNearByShops({ lat, lng, orderBy, sortedBy }: GetNearbyShopsDto) {
-    const shops = await this.shopModel.paginate(
+  async getNearByShops({
+    lat,
+    lng,
+    orderBy,
+    sortedBy,
+    page,
+    limit,
+  }: GetNearbyShopsDto) {
+    const aggregate = this.shopModel.aggregate([
       {
-        'settings.location': {
-          $geoWithin: {
-            $centerSphere: [
-              [lat, lng],
-              100 / 3963.2, // 100 mile radius
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [lat, lng],
+          },
+          distanceField: 'distance',
+          spherical: true,
+        },
+      },
+      {
+        $sort: { [orderBy]: sortedBy === 'asc' ? 1 : -1 },
+      },
+    ]);
+
+    const data = await this.shopAggregateModel.aggregatePaginate(aggregate, {
+      ...(limit ? { limit } : {}),
+      ...(page ? { page } : {}),
+    });
+
+    return data;
+  }
+
+  async getNearByShopsNew({ lat, lng, orderBy, sortedBy }: GetNearbyShopsDto) {
+    const shops = await this.shopModel.aggregate([
+      {
+        $search: {
+          index: 'name',
+          compound: {
+            must: [
+              {
+                geoWithin: {
+                  circle: {
+                    center: {
+                      type: 'Point',
+                      coordinates: [lat, lng],
+                      radius: 10000,
+                    },
+                  },
+                },
+              },
             ],
           },
         },
       },
       {
-        sort: {
-          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        $project: {
+          $score: { $meta: 'searchScore' },
         },
       },
-    );
+    ]);
     return shops;
   }
 
