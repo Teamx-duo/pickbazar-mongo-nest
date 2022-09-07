@@ -89,4 +89,7 @@ export class Review {
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
 
+ReviewSchema.index({ comment: 'text' });
+ReviewSchema.index({ rating: 1 });
+
 ReviewSchema.plugin(mongoosePaginate);

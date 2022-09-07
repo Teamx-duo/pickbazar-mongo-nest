@@ -72,7 +72,7 @@ export class ProductsService {
   }: GetProductsDto) {
     const response = await this.productModel.paginate(
       {
-        ...(search ? { name: { $regex: search, $options: 'i' } } : {}),
+        ...(search ? { $text: { $search: search } } : {}),
         ...(shop ? { shop: shop } : {}),
         ...(type ? { type } : {}),
         ...(category

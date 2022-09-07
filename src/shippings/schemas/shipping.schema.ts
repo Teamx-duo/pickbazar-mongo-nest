@@ -38,7 +38,7 @@ export class Shipping {
   @ApiProperty()
   @IsOptional()
   @Prop({ default: false })
-  is_global: boolean = false;
+  is_global: boolean;
 
   @IsEnum(ShippingType)
   @ApiPropertyOptional({ enum: ShippingType })

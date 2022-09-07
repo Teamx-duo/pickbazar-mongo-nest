@@ -57,4 +57,6 @@ export class Address {
 }
 export const AddressSchema = SchemaFactory.createForClass(Address);
 
+AddressSchema.index({ customer: 1 });
+
 AddressSchema.plugin(mongoosePaginate);

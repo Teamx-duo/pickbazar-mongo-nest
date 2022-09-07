@@ -37,7 +37,7 @@ export enum PaymentGatewayType {
 @Schema({ timestamps: true })
 export class Order {
   @IsNumber()
-  @Prop({ index: true })
+  @Prop()
   tracking_number: number;
 
   @IsPhoneNumber(null, {
@@ -163,5 +163,7 @@ export class Order {
 }
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
+
+OrderSchema.index({ shop: 1, customer: 1, coupon: 1, tracking_number: 1 });
 
 OrderSchema.plugin(mongoosePaginate);

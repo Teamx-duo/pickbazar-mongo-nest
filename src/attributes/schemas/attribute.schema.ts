@@ -37,4 +37,6 @@ export class Attribute {
 
 export const AttributeSchema = SchemaFactory.createForClass(Attribute);
 
+AttributeSchema.index({ name: 'text', shop: 1 });
+
 AttributeSchema.plugin(mongoosePaginate);
