@@ -15,7 +15,7 @@ async function bootstrap() {
     }),
   );
   app.use(
-    ['api/docs', 'api/docs-json'],
+    ['/api/docs', '/api/docs-json'],
     basicAuth({
       challenge: true,
       users: {
@@ -26,17 +26,14 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Nest Multivendor')
     .setDescription('Nest Multivendor API')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'Token',
-    }, 'access-token')
-    // .addSecurity('bearerAuth', {
-    //   name: 'bearerAuth',
-    //   type: 'http',
-    //   scheme: 'bearer',
-    //   bearerFormat: 'JWT',
-    // })
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'Token',
+      },
+      'access-token',
+    )
     .setVersion('1.0')
     .addTag('teamxmv')
     .build();
