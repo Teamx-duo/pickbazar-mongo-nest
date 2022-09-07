@@ -10,8 +10,10 @@ import {
 import { SettingsService } from './settings.service';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('settings')
+@ApiBearerAuth('access-token')
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 

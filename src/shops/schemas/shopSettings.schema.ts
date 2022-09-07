@@ -15,7 +15,6 @@ import {
   ShopSocials,
   ShopSocialsSchema,
 } from 'src/settings/schemas/shopSocials.schema';
-import { Shop } from './shop.shema';
 
 export type ShopSettingsSchema = ShopSettings & Document;
 
@@ -40,7 +39,7 @@ export class ShopSettings {
   @ValidateNested()
   @ApiPropertyOptional()
   @IsOptional()
-  @Prop({ type: LocationSchema })
+  @Prop({ type: LocationSchema, index: '2dsphere' })
   location: Location;
 
   @IsString()

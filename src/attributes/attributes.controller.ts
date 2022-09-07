@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { convertToSlug } from 'src/common/constants/common.function';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -20,6 +21,7 @@ import { GetAttributesArgs } from './dto/get-attributes.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 
 @Controller('attributes')
+@ApiBearerAuth('access-token')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
 

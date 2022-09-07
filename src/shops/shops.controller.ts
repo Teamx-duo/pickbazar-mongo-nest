@@ -26,8 +26,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { GetNearbyShopsDto } from './dto/get-nearby-shops.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('shops')
+@ApiBearerAuth('access-token')
 export class ShopsController {
   constructor(private readonly shopsService: ShopsService) {}
 
@@ -47,6 +50,11 @@ export class ShopsController {
   @Get()
   async getShops(@Query() query: GetShopsDto) {
     return this.shopsService.getShops(query);
+  }
+
+  @Get('nearby')
+  getNearbyShops(@Query() getNearByShopsDto: GetNearbyShopsDto) {
+    return this.shopsService.getNearByShops(getNearByShopsDto);
   }
 
   @Get(':slug')

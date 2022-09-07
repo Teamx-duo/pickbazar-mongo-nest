@@ -30,6 +30,7 @@ import { User, UserSchema } from 'src/users/schema/user.schema';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { MailService } from 'src/mail/mail.service';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { GetNearbyShopsDto } from './dto/get-nearby-shops.dto';
 
 @Injectable()
 export class ShopsService {
@@ -118,6 +119,27 @@ export class ShopsService {
       },
     );
     return staff;
+  }
+
+  async getNearByShops({ lat, lng, orderBy, sortedBy }: GetNearbyShopsDto) {
+    const shops = await this.shopModel.paginate(
+      {
+        'settings.location': {
+          $geoWithin: {
+            $centerSphere: [
+              [lat, lng],
+              100 / 3963.2, // 100 mile radius
+            ],
+          },
+        },
+      },
+      {
+        sort: {
+          [orderBy]: sortedBy === 'asc' ? 1 : -1,
+        },
+      },
+    );
+    return shops;
   }
 
   async getShop(slug: string): Promise<Shop> {

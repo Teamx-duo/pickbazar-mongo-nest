@@ -12,8 +12,10 @@ import { ShippingsService } from './shippings.service';
 import { CreateShippingDto } from './dto/create-shipping.dto';
 import { UpdateShippingDto } from './dto/update-shipping.dto';
 import { GetShippingsDto } from './dto/get-shippings.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('shippings')
+@ApiBearerAuth('access-token')
 export class ShippingsController {
   constructor(private readonly shippingsService: ShippingsService) {}
 

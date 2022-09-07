@@ -19,8 +19,10 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
 import config from 'src/config';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('types')
+@ApiBearerAuth('access-token')
 export class TypesController {
   constructor(private readonly typesService: TypesService) {}
 

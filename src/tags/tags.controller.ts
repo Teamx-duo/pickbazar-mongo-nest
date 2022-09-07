@@ -19,8 +19,10 @@ import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
 import config from 'src/config';
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('tags')
+@ApiBearerAuth('access-token')
 @UseInterceptors(LoggingInterceptor)
 export class TagsController {
   constructor(private readonly tagsService: TagsService) {}
