@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ShopsService } from './shops.service';
 import { ShopsController, StaffsController } from './shops.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -15,6 +15,7 @@ import { User, UserSchema } from 'src/users/schema/user.schema';
 import { Profile, ProfileSchema } from 'src/users/schema/profile.schema';
 import { MailModule } from 'src/mail/mail.module';
 import { SettingsModule } from 'src/settings/settings.module';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -32,4 +33,10 @@ import { SettingsModule } from 'src/settings/settings.module';
   providers: [ShopsService, UsersService],
   exports: [ShopsService, MongooseModule],
 })
-export class ShopsModule {}
+export class ShopsModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes(ShopsController, StaffsController);
+  }
+}

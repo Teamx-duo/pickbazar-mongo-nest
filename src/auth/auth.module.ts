@@ -45,6 +45,7 @@ import { MailModule } from 'src/mail/mail.module';
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService, JWTService, JwtStrategy],
+  exports: [MongooseModule, AuthService],
 })
 export class AuthModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {

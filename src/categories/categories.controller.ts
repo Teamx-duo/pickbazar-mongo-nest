@@ -14,28 +14,20 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
-  UploadedFiles,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { diskStorage } from 'multer';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { CategoriesService } from './categories.service';
-import {
-  CreateCategoryDto,
-  CreateCategoryRequestDto,
-} from './dto/create-category.dto';
-import { GetCategoriesAlongChildrenDto } from './dto/get-categories-along-children.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { Category } from './schemas/category.schema';
-import { editFileName, imageFileFilter } from 'src/uploads/uploads.utils';
-import config from 'src/config';
 import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
-import { TransformInterceptor } from 'src/common/interceptors/transform.interceptor';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('categories')
+@ApiBearerAuth('access-token')
 @UseInterceptors(LoggingInterceptor)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}

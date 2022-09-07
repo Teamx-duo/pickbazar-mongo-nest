@@ -12,6 +12,7 @@ import {
   UseFilters,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guards';
@@ -22,6 +23,7 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('addresses')
+@ApiBearerAuth('access-token')
 export class AddressesController {
   constructor(private readonly addressesService: AddressesService) {}
 

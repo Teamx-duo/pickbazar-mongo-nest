@@ -111,7 +111,7 @@ export class Shop {
   address: ShopAddress;
 
   @ApiProperty()
-  @Type(() => ShopAddress)
+  @Type(() => ShopSettings)
   @ValidateNested()
   @IsOptional()
   @Prop({ type: ShopSettingsSchema })

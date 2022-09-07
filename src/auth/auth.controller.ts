@@ -12,6 +12,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guards';
@@ -31,6 +32,7 @@ import {
 } from './dto/create-auth.dto';
 
 @Controller()
+@ApiBearerAuth('access-token')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -12,15 +12,15 @@ import { WithdrawsService } from './withdraws.service';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
 import { ApproveWithdrawDto } from './dto/approve-withdraw.dto';
 import { GetWithdrawsDto, WithdrawPaginator } from './dto/get-withdraw.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { PaginateModel } from 'mongoose';
 import { Withdraw, WithdrawSchema } from './schemas/withdraw.schema';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('withdraws')
+@ApiBearerAuth('access-token')
 export class WithdrawsController {
   constructor(private readonly withdrawsService: WithdrawsService) {}
 
@@ -32,6 +32,7 @@ export class WithdrawsController {
   }
 
   @Get()
+  @ApiBearerAuth('access-token')
   @Roles(Role.STORE_OWNER, Role.SUPER_ADMIN)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   async withdraws(@Query() query: GetWithdrawsDto): Promise<WithdrawPaginator> {
