@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { GetOrdersDto, OrderPaginator } from './dto/get-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -72,6 +72,9 @@ export class OrdersService {
     const verifyProductPromises = dbProducts.map(
       (prod) =>
         new Promise(async (res, rej) => {
+          if (!prod) {
+            return rej(`Invalid product ID or product not found`);
+          }
           const pivotProduct = products.find((p: any) =>
             prod._id.equals(p.product_id),
           );
@@ -111,7 +114,9 @@ export class OrdersService {
           res(pivot);
         }),
     );
-    await Promise.all(verifyProductPromises);
+    await Promise.all(verifyProductPromises).catch((error) => {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    });
 
     // Remove
     createOrderObj.shops = removeDuplicates(createOrderObj.shops);
@@ -145,7 +150,7 @@ export class OrdersService {
             0,
           );
           const shipping = settings?.options?.shippingClass;
-          if (taxes && taxes.length > 0) {
+          if (taxes && taxes.length > 0 && taxes?.[0]) {
             tax = (taxes[0].rate / 100) * total;
             total += (taxes[0].rate / 100) * total;
           }
@@ -195,7 +200,9 @@ export class OrdersService {
           res(order);
         }),
     );
-    const [...orders] = await Promise.all(orderPromises);
+    const [...orders] = await Promise.all(orderPromises).catch((error) => {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    });
     await this.orderModel.populate(orders, [
       { path: 'status' },
       { path: 'products' },
