@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -26,6 +27,7 @@ import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { VerifyCouponInput } from './dto/verify-coupon.dto';
 
 @Controller('coupons')
+@ApiBearerAuth('access-token')
 export class CouponsController {
   constructor(private readonly couponsService: CouponsService) {}
 

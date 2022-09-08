@@ -1,5 +1,10 @@
 import { ShopSchema, Shop } from './schemas/shop.shema';
-import mongoose, { Model, ObjectId, PaginateModel } from 'mongoose';
+import mongoose, {
+  AggregatePaginateModel,
+  Model,
+  ObjectId,
+  PaginateModel,
+} from 'mongoose';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   ApproveShopDto,
@@ -30,12 +35,15 @@ import { User, UserSchema } from 'src/users/schema/user.schema';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { MailService } from 'src/mail/mail.service';
 import { UpdateUserDto } from 'src/users/dto/update-user.dto';
+import { GetNearbyShopsDto } from './dto/get-nearby-shops.dto';
 
 @Injectable()
 export class ShopsService {
   constructor(
     @InjectModel(Shop.name)
     private shopModel: PaginateModel<ShopSchema>,
+    @InjectModel(Shop.name)
+    private shopAggregateModel: AggregatePaginateModel<ShopSchema>,
     @InjectModel(Balance.name)
     private balanceModel: PaginateModel<BalanceSchema>,
     @InjectModel(ShopSettings.name)
@@ -118,6 +126,69 @@ export class ShopsService {
       },
     );
     return staff;
+  }
+
+  async getNearByShops({
+    lat,
+    lng,
+    orderBy,
+    sortedBy,
+    page,
+    limit,
+  }: GetNearbyShopsDto) {
+    const aggregate = this.shopModel.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: [lat, lng],
+          },
+          distanceField: 'distance',
+          spherical: true,
+        },
+      },
+      {
+        $sort: { [orderBy]: sortedBy === 'asc' ? 1 : -1 },
+      },
+    ]);
+
+    const data = await this.shopAggregateModel.aggregatePaginate(aggregate, {
+      ...(limit ? { limit } : {}),
+      ...(page ? { page } : {}),
+    });
+
+    return data;
+  }
+
+  async getNearByShopsNew({ lat, lng, orderBy, sortedBy }: GetNearbyShopsDto) {
+    const shops = await this.shopModel.aggregate([
+      {
+        $search: {
+          index: 'name',
+          compound: {
+            must: [
+              {
+                geoWithin: {
+                  circle: {
+                    center: {
+                      type: 'Point',
+                      coordinates: [lat, lng],
+                      radius: 10000,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
+      {
+        $project: {
+          $score: { $meta: 'searchScore' },
+        },
+      },
+    ]);
+    return shops;
   }
 
   async getShop(slug: string): Promise<Shop> {

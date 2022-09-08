@@ -83,5 +83,8 @@ export class Category {
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
 
+CategorySchema.index({ name: 'text' });
+CategorySchema.index({ type: 1 });
+
 CategorySchema.plugin(mongoosePaginate);
 CategorySchema.plugin(mongooseAggregatePaginate);

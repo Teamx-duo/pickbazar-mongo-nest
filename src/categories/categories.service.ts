@@ -19,7 +19,6 @@ import { convertToSlug } from 'src/common/constants/common.function';
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import { AggregatePaginateModel } from 'mongoose';
 
-
 @Injectable()
 export class CategoriesService {
   constructor(

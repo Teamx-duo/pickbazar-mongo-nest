@@ -12,8 +12,10 @@ import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { GetNotificationsDto } from './dto/get-notification.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('notifications')
+@ApiBearerAuth('access-token')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

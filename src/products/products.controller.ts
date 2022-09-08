@@ -33,8 +33,10 @@ import {
   UpdateVariationDto,
   UpdateVariationOptionDto,
 } from './dto/update-variation.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('products')
+@ApiBearerAuth('access-token')
 @UseInterceptors(LoggingInterceptor)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}

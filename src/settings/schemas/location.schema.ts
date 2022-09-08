@@ -1,10 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNumber, IsOptional, IsString } from 'class-validator';
-import mongoose, { Document } from 'mongoose';
-import { ContactDetail } from './contactDetails.schema';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { Document } from 'mongoose';
 
 export type LocationSchema = Location & Document;
+
+export enum GeoJsonTypes {
+  LINE_STRING = 'LineString',
+  POINT = 'Point',
+}
 
 @Schema()
 export class Location {
@@ -19,6 +29,18 @@ export class Location {
   @ApiProperty()
   @Prop()
   lng: number;
+
+  @IsNumber({}, { each: true })
+  @IsArray()
+  @ApiProperty()
+  @Prop()
+  coordinates: number[];
+
+  @IsEnum(GeoJsonTypes)
+  @IsOptional()
+  @ApiProperty()
+  @Prop({ default: 'Point', enum: GeoJsonTypes })
+  type: GeoJsonTypes = GeoJsonTypes.POINT;
 
   @IsString()
   @IsOptional()

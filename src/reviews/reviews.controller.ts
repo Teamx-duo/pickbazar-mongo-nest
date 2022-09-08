@@ -9,7 +9,6 @@ import {
   Put,
   Req,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -20,10 +19,10 @@ import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles.enum';
 import { CreateReviewFeebackDto } from './dto/create-feedback.dto';
-import { LoggingInterceptor } from 'src/common/interceptors/logging.interceptor';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('reviews')
-@UseInterceptors(LoggingInterceptor)
+@ApiBearerAuth('access-token')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 

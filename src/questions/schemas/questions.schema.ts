@@ -83,4 +83,7 @@ export class Question {
 
 export const QuestionSchema = SchemaFactory.createForClass(Question);
 
+QuestionSchema.index({ question: 'text', answer: 'text', product: 1, user: 1 });
+QuestionSchema.index({ product: 1, user: 1 });
+
 QuestionSchema.plugin(mongoosePaginate);

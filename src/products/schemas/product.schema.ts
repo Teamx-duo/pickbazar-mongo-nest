@@ -226,37 +226,14 @@ export class Product {
   unit: string;
 }
 
-// name: string;
-// slug: string;
-// type: Type;
-// type_id: number;
-// product_type: ProductType;
-// categories: Category[];
-// tags?: Tag[];
-// variations?: AttributeValue[];
-// variation_options?: Variation[];
-// pivot?: OrderProductPivot;
-// orders?: Order[];
-// shop: Shop;
-// shop_id: number;
-// related_products?: Product[];
-// description: string;
-// in_stock: boolean;
-// is_taxable: boolean;
-// sale_price?: number;
-// max_price?: number;
-// min_price?: number;
-// sku?: string;
-// gallery?: Attachment[];
-// image?: Attachment;
-// status: ProductStatus;
-// height?: string;
-// length?: string;
-// width?: string;
-// price?: number;
-// quantity: number;
-// unit: string;
-
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
+ProductSchema.index({
+  name: 'text',
+  description: 'text',
+});
+ProductSchema.index({
+  type: 1,
+  categories: 1,
+});
 ProductSchema.plugin(mongoosePaginate);

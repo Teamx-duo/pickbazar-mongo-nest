@@ -94,4 +94,7 @@ export class Coupon {
 
 export const CouponSchema = SchemaFactory.createForClass(Coupon);
 
+CouponSchema.index({ code: 'text' });
+CouponSchema.index({ type: 1 });
+
 CouponSchema.plugin(mongoosePaginate);

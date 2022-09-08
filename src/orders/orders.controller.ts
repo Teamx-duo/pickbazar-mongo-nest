@@ -27,8 +27,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Role } from 'src/common/constants/roles.enum';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('orders')
+@ApiBearerAuth('access-token')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
