@@ -8,6 +8,7 @@ import { Tag } from 'src/tags/schemas/tag.schema';
 import { Type } from 'src/types/schemas/type.schema';
 import { Variation, VariationSchema } from './variation.schema';
 import mongoosePaginate from 'mongoose-paginate-v2';
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 import {
   IsArray,
   IsBoolean,
@@ -237,3 +238,4 @@ ProductSchema.index({
   categories: 1,
 });
 ProductSchema.plugin(mongoosePaginate);
+ProductSchema.plugin(mongooseAggregatePaginate);

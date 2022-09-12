@@ -7,7 +7,11 @@ import {
 } from './dto/get-products.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductSchema, ProductType } from './schemas/product.schema';
-import mongoose, { PaginateModel } from 'mongoose';
+import mongoose, {
+  AggregatePaginateModel,
+  PaginateModel,
+  Types,
+} from 'mongoose';
 import { GetPopularProductsDto } from './dto/get-popular-products.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
@@ -26,6 +30,8 @@ export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private productModel: PaginateModel<ProductSchema>,
+    @InjectModel(Product.name)
+    private productAggragateModel: AggregatePaginateModel<ProductSchema>,
     @InjectModel(Tag.name)
     private tagModel: PaginateModel<TagSchema>,
     @InjectModel(Variation.name)
@@ -130,6 +136,70 @@ export class ProductsService {
       { path: 'shop' },
       { path: 'type' },
     ]);
+  }
+
+  async getShopProducts(shopId: string, { page, limit }: GetProductsDto) {
+    const aggregate = this.productModel.aggregate([
+      { $sort: { createdAt: 1 } },
+      {
+        $match: {
+          $and: [{ shop: new Types.ObjectId(shopId) }],
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categories',
+          foreignField: '_id',
+          as: 'category',
+        },
+      },
+      {
+        $group: {
+          _id: '$category',
+          products: { $push: '$$ROOT' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          category: {
+            $arrayElemAt: ['$_id', 0],
+          },
+          products: {
+            $map: {
+              input: '$products',
+              in: {
+                $mergeObjects: [
+                  '$$this',
+                  {
+                    category: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$cat',
+                            as: 'c',
+                            cond: {
+                              $eq: ['$$c._id', '$$this.category'],
+                            },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
+    const data = await this.productAggragateModel.aggregatePaginate(aggregate, {
+      ...(limit ? { limit } : {}),
+      ...(page ? { page } : {}),
+    });
+    return PaginationResponse(data);
   }
 
   async getProductById(id: string) {

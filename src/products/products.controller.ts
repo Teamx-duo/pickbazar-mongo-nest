@@ -51,6 +51,14 @@ export class ProductsController {
     return this.productsService.getProducts(query);
   }
 
+  @Get('shop/:shopId')
+  getShopProducts(
+    @Param('shopId') shopId: string,
+    @Query() getProductsDto: GetProductsDto,
+  ) {
+    return this.productsService.getShopProducts(shopId, getProductsDto);
+  }
+
   @Get(':slug')
   async getProductBySlug(@Param('slug') slug: string): Promise<Product> {
     return this.productsService.getProductBySlug(slug);
