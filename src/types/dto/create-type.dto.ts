@@ -1,11 +1,5 @@
 import { PickType } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsMongoId,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { Type } from '../schemas/type.schema';
 
 export class UpdateSettingsDto {
