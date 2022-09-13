@@ -268,7 +268,7 @@ export class ShopsService {
         _id: { $in: ids },
       },
       {
-        $push: { orders: amount },
+        $inc: { orders_count: amount },
       },
       { new: true },
     );
