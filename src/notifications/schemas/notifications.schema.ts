@@ -60,8 +60,8 @@ export class Notification {
   @IsEnum(NotifcationType)
   @ApiProperty({ enum: NotifcationType })
   @IsOptional()
-  @Prop({ enum: NotifcationType })
-  notification_type: NotifcationType = NotifcationType.MISCALLENEOUS;
+  @Prop({ enum: NotifcationType, default: NotifcationType.MISCALLENEOUS })
+  notification_type: NotifcationType;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

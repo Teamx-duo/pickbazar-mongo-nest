@@ -1,7 +1,8 @@
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional, PartialType, PickType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { SortOrder } from 'src/common/dto/generic-conditions.dto';
+import { Notification } from '../schemas/notifications.schema';
 import { CreateNotificationDto } from './create-notification.dto';
 
 export enum QueryOrdersOrderByColumn {
@@ -17,7 +18,8 @@ export class GetNotificationsDto extends PartialType(CreateNotificationDto) {
   @Transform((val) => parseInt(val.value))
   page?: number = 1;
   @IsOptional()
-  @IsString()
+  @Transform((val) => JSON.parse(val.value))
+  @IsBoolean()
   unread: boolean;
   @IsEnum(QueryOrdersOrderByColumn)
   @ApiPropertyOptional({ enum: QueryOrdersOrderByColumn })
@@ -28,3 +30,5 @@ export class GetNotificationsDto extends PartialType(CreateNotificationDto) {
   @IsOptional()
   sortedBy?: SortOrder = SortOrder.ASC;
 }
+
+export class ReadNotificationsDto extends PickType(Notification, ['user']) {}

@@ -7,7 +7,10 @@ import {
   NotificationSchema,
 } from './schemas/notifications.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { GetNotificationsDto } from './dto/get-notification.dto';
+import {
+  GetNotificationsDto,
+  ReadNotificationsDto,
+} from './dto/get-notification.dto';
 import { PaginationResponse } from 'src/common/middlewares/response.middleware';
 
 @Injectable()
@@ -34,11 +37,9 @@ export class NotificationsService {
   }: GetNotificationsDto) {
     const response = await this.notificationModel.paginate(
       {
-        ...(description ? { description } : {}),
-        ...(title ? { title } : {}),
+        unread: Boolean(unread),
         ...(order_id ? { order_id } : {}),
         ...(notification_type ? { notification_type } : {}),
-        ...(unread ? { unread } : {}),
         ...(user ? { user } : {}),
       },
       {
@@ -50,6 +51,13 @@ export class NotificationsService {
       },
     );
     return PaginationResponse(response);
+  }
+
+  async readNotifications({ user }: ReadNotificationsDto) {
+    return await this.notificationModel.updateMany(
+      { user },
+      { $set: { unread: false } },
+    );
   }
 
   async findOne(id: string) {

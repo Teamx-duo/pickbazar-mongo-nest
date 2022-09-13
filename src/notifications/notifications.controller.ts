@@ -16,6 +16,8 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { GetNotificationsDto } from './dto/get-notification.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/common/guards/roles.guards';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('notifications')
 @ApiBearerAuth('access-token')
@@ -37,7 +39,7 @@ export class NotificationsController {
   }
 
   @Get('read')
-  @UseGuards(AuthGuard('jwt'))feat:
+  @UseGuards(AuthGuard('jwt'))
   readNotifications(@Req() req) {
     return this.notificationsService.readNotifications({ user: req.user?._id });
   }

@@ -285,22 +285,26 @@ export class OrdersService {
   }
   async update(id: string, updateOrderInput: UpdateOrderDto) {
     if (updateOrderInput.status) {
-      const statuses = await this.orderStatusModel
-        .find()
-        .sort({ serial: -1 })
-        .limit(1);
-      if (statuses?.[0]?._id.equals(updateOrderInput.status)) {
+      const statuses = await this.orderStatusModel.find({});
+      const finalStatus = Math.max(...statuses.map((stat) => stat.serial));
+      if (
+        statuses
+          ?.find((stat) => stat.serial === finalStatus)
+          ?._id.equals(updateOrderInput.status)
+      ) {
         console.log('FINALIZED');
       }
       const order = await this.orderModel.findById(id);
       await this.notificationServices.create({
         description:
           'Your order status has been updated to ' +
-          statuses.find((stat) => stat._id.equals(updateOrderInput.status))
-            .name,
+          statuses.find((stat) => {
+            console.log(stat, updateOrderInput.status);
+            return stat._id.equals(updateOrderInput.status);
+          })?.name,
         notification_type: NotifcationType.ORDER,
-        user: order.customer,
-        order_id: order._id,
+        user: order?.customer,
+        order_id: order?._id,
         title: 'Order Status Updated',
         unread: true,
       });
