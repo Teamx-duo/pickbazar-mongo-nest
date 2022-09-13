@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { GetNotificationsDto } from './dto/get-notification.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('notifications')
 @ApiBearerAuth('access-token')
@@ -25,11 +28,22 @@ export class NotificationsController {
   }
 
   @Get()
-  findAll(@Query() getNotificationsFilters: GetNotificationsDto) {
-    return this.notificationsService.findAll(getNotificationsFilters);
+  @UseGuards(AuthGuard('jwt'))
+  findAll(@Query() getNotificationsFilters: GetNotificationsDto, @Req() req) {
+    return this.notificationsService.findAll({
+      ...getNotificationsFilters,
+      user: req.user?._id,
+    });
+  }
+
+  @Get('read')
+  @UseGuards(AuthGuard('jwt'))feat:
+  readNotifications(@Req() req) {
+    return this.notificationsService.readNotifications({ user: req.user?._id });
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
   findOne(@Param('id') id: string) {
     return this.notificationsService.findOne(id);
   }
