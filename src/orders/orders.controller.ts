@@ -38,6 +38,7 @@ export class OrdersController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.CUSTOMER, Role.SUPER_ADMIN)
   create(@Body() createOrderDto: CreateOrderDto, @Req() req) {
+    console.log(createOrderDto);
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     return this.ordersService.create(
       { ...createOrderDto, customer: req.user._id },
