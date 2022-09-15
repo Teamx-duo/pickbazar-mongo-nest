@@ -27,6 +27,7 @@ import {
   RegisterDto,
   ResetPasswordDto,
   SocialLoginDto,
+  VerifyEmailDto,
   VerifyForgetPasswordDto,
   VerifyOtpDto,
 } from './dto/create-auth.dto';
@@ -82,6 +83,10 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   verifyOtpCode(@Body() verifyOtpDto: VerifyOtpDto, @Req() req) {
     return this.authService.verifyOtpCode(verifyOtpDto, req.user._id);
+  }
+  @Post('verify-email')
+  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    // return this.usersService.getUsers(updateUserInput.id);
   }
   @Post('forget-password')
   forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {

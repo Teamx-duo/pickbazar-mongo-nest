@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { NestModule, MiddlewareConsumer } from '@nestjs/common/interfaces';
 import { OrdersService } from './orders.service';
 import { OrdersController, OrderStatusController } from './orders.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,6 +13,7 @@ import { CouponsModule } from 'src/coupons/coupons.module';
 import { TaxesModule } from 'src/taxes/taxes.module';
 import { SettingsModule } from 'src/settings/settings.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -31,4 +33,8 @@ import { NotificationsModule } from 'src/notifications/notifications.module';
   providers: [OrdersService],
   exports: [OrdersService, MongooseModule],
 })
-export class OrdersModule {}
+export class OrdersModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(OrdersController);
+  }
+}

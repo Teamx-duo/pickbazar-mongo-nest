@@ -74,6 +74,11 @@ export class User {
   @Prop({ default: true })
   is_active?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  @Prop({ default: false })
+  email_verified?: boolean;
+
   @IsEnum(Role)
   @IsOptional()
   @Prop({

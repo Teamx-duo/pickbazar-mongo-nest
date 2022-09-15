@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType, PickType } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsMongoId } from 'class-validator';
 import { CreateUserDto } from './create-user.dto';
 

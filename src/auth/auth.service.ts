@@ -17,6 +17,7 @@ import {
   VerifyOtpDto,
   OtpDto,
   GetUsersResponse,
+  VerifyEmailDto,
 } from './dto/create-auth.dto';
 import { User, UserSchema } from 'src/users/schema/user.schema';
 import { Model } from 'mongoose';
@@ -31,6 +32,10 @@ import {
   ForgottenPasswordSchema,
 } from './schemas/forgotPassword.schema';
 import { MailService } from 'src/mail/mail.service';
+import {
+  EmailVerification,
+  EmailVerificationSchema,
+} from './schemas/emailVerification.schema';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +43,8 @@ export class AuthService {
     @InjectModel(User.name) private userModel: Model<UserSchema>,
     @InjectModel(Profile.name) private profileModel: Model<ProfileSchema>,
     @InjectModel(Otp.name) private otpModel: Model<OtpSchema>,
+    @InjectModel(EmailVerification.name)
+    private emailVerificationModel: Model<EmailVerificationSchema>,
     @InjectModel(ForgottenPassword.name)
     private forgottenPasswordModel: Model<ForgottenPasswordSchema>,
     private readonly userService: UsersService,
@@ -59,11 +66,15 @@ export class AuthService {
         user.email,
         savedUser.roles,
       );
+      await this.emailVerificationModel.create({
+        email: user.email,
+        emailToken: access_token,
+      });
       await this.mailService.sendUserConfirmationEmail(savedUser, access_token);
       return {
-        token: access_token,
-        user: savedUser,
-        permissions: savedUser.roles,
+        success: true,
+        message:
+          'We have sent you an email on the given account. Please verify.',
       };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -224,6 +235,26 @@ export class AuthService {
     }
   }
 
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    const emailVerif = await this.emailVerificationModel.findOne({
+      emailToken: verifyEmailDto.emailToken,
+    });
+    if (emailVerif && emailVerif.email) {
+      await this.userService.updateByEmail(emailVerif.email, {
+        email_verified: true,
+      });
+      return {
+        success: true,
+        message: 'Email verified successfully',
+      };
+    } else {
+      throw new HttpException(
+        'Unable to verify your email.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   async resetPassword(resetPasswordInput: ResetPasswordDto) {
     const emailVerif: any = await this.forgottenPasswordModel.findOneAndDelete(
       {
@@ -323,23 +354,6 @@ export class AuthService {
       is_contact_exist: true,
     };
   }
-
-  // async getUsers({ text, first, page }: GetUsersArgs): Promise<UserPaginator> {
-  //   const startIndex = (page - 1) * first;
-  //   const endIndex = page * first;
-  //   let data: User[] = this.users;
-  //   if (text?.replace(/%/g, '')) {
-  //     data = fuse.search(text)?.map(({ item }) => item);
-  //   }
-  //   const results = data.slice(startIndex, endIndex);
-  //   return {
-  //     data: results,
-  //     paginatorInfo: paginate(data.length, page, first, results.length),
-  //   };
-  // }
-  // public getUser(getUserArgs: GetUserArgs): User {
-  //   return this.users.find((user) => user.id === getUserArgs.id);
-  // }
   async me(id: string) {
     return await this.userService.findOne(id);
   }

@@ -51,8 +51,8 @@ export class UsersController {
   }
 
   @Post(':id/active')
-  activeUser(@Param('id') id: number) {
-    console.log(id);
+  verifyEmail() {
+    return;
     // return this.usersService.getUsers(updateUserInput.id);
   }
 

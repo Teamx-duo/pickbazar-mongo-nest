@@ -3,25 +3,14 @@ import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
 import { IsString, IsEnum, IsOptional } from 'class-validator';
 import { Role } from './../../common/constants/roles.enum';
+import { EmailVerification } from '../schemas/emailVerification.schema';
 
 export class RegisterDto extends PickType(User, ['name', 'email', 'password']) {
-  @IsString()
-  name: string;
-  @IsString()
-  email: string;
-  @IsString()
-  password: string;
   @IsEnum(Role)
   permission: Role = Role.CUSTOMER;
 }
 
-export class LoginDto extends PickType(User, ['email', 'password']) {
-  @IsString()
-  email: string;
-
-  @IsString()
-  password: string;
-}
+export class LoginDto extends PickType(User, ['email', 'password']) {}
 
 export class SocialLoginDto {
   provider: string;
@@ -97,3 +86,7 @@ export class OtpLoginDto {
   @IsOptional()
   email?: string;
 }
+
+export class VerifyEmailDto extends PickType(EmailVerification, [
+  'emailToken',
+]) {}
