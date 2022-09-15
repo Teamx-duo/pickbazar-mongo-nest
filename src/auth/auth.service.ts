@@ -36,6 +36,7 @@ import {
   EmailVerification,
   EmailVerificationSchema,
 } from './schemas/emailVerification.schema';
+import { SmsService } from 'src/sms/sms.service';
 
 @Injectable()
 export class AuthService {
@@ -50,6 +51,7 @@ export class AuthService {
     private readonly userService: UsersService,
     private readonly jwtService: JWTService,
     private readonly mailService: MailService,
+    private readonly smsService: SmsService,
   ) {}
 
   async register(createUserInput: RegisterDto) {
@@ -327,12 +329,13 @@ export class AuthService {
   }
 
   async verifyOtpCode(verifyOtpInput: VerifyOtpDto, user?: any) {
-    const dbUser = await this.userModel.findById(user);
-    dbUser.profile = {
-      ...dbUser.profile,
-      contact: verifyOtpInput.phone_number,
-    };
-    await dbUser.save();
+    await this.smsService.confirmPhoneNumber(
+      verifyOtpInput?.phone_number,
+      verifyOtpInput.code,
+    );
+    const dbUser = await this.userModel.findByIdAndUpdate(user, {
+      $set: { contact: verifyOtpInput.phone_number },
+    });
     return {
       message: 'success',
       success: true,
@@ -345,13 +348,16 @@ export class AuthService {
       code: Math.floor(1000 + Math.random() * 9000),
       phone_number: otpInput.phone_number,
     });
+    const twilio = await this.smsService.initiatePhoneNumberVerification(
+      otpInput.phone_number,
+    );
     return {
       message: 'success',
       success: true,
       id: otp._id,
-      provider: 'local',
+      provider: 'twilio',
       phone_number: otpInput.phone_number,
-      is_contact_exist: true,
+      twilio,
     };
   }
   async me(id: string) {

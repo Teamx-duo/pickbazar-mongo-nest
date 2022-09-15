@@ -1,7 +1,13 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { CoreMutationOutput } from 'src/common/dto/core-mutation-output.dto';
 import { User } from 'src/users/schema/user.schema';
-import { IsString, IsEnum, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEnum,
+  IsOptional,
+  IsPhoneNumber,
+  IsMobilePhone,
+} from 'class-validator';
 import { Role } from './../../common/constants/roles.enum';
 import { EmailVerification } from '../schemas/emailVerification.schema';
 
@@ -55,9 +61,14 @@ export class GetUsersResponse {
 }
 export class CoreResponse extends CoreMutationOutput {}
 export class VerifyOtpDto {
+  @IsString()
   otp_id: string;
+  @IsString()
   code: string;
+  @IsPhoneNumber()
   phone_number: string;
+  @IsString()
+  sid: string;
 }
 export class OtpResponse {
   id: string;
@@ -68,7 +79,7 @@ export class OtpResponse {
   is_contact_exist: boolean;
 }
 export class OtpDto {
-  @IsString()
+  @IsPhoneNumber()
   phone_number: string;
 }
 export class OtpLoginDto {
@@ -77,7 +88,7 @@ export class OtpLoginDto {
   otp_id?: string;
   @IsString()
   code: string;
-  @IsString()
+  @IsPhoneNumber()
   phone_number: string;
   @IsString()
   @IsOptional()

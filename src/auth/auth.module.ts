@@ -25,6 +25,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UsersModule } from 'src/users/users.module';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import { MailModule } from 'src/mail/mail.module';
+import { SmsModule } from 'src/sms/sms.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { MailModule } from 'src/mail/mail.module';
     HttpModule,
     PassportModule,
     MailModule,
+    SmsModule,
     JwtModule.register({
       secret: config.jwt.secretOrKey,
       signOptions: { expiresIn: config.jwt.expiresIn },

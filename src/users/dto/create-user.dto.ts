@@ -11,6 +11,7 @@ export class CreateUserDto extends PickType(User, [
   'roles',
   'shops',
   'email_verified',
+  'contact',
   'shop',
   'managed_shop',
 ]) {}

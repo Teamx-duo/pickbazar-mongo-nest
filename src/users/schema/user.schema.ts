@@ -11,6 +11,7 @@ import {
   IsEnum,
   IsMongoId,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   MaxLength,
   MinLength,
@@ -73,6 +74,13 @@ export class User {
   @IsOptional()
   @Prop({ default: true })
   is_active?: boolean;
+
+  @IsPhoneNumber(null, {
+    message: 'Contact must be valid phone number. (eg: +92XXXXXXXXXX)',
+  })
+  @IsOptional()
+  @Prop()
+  contact?: string;
 
   @IsBoolean()
   @IsOptional()

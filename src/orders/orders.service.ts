@@ -55,7 +55,7 @@ export class OrdersService {
       shops: [],
       productsList: [],
     };
-    const { products, shop, coupon } = createOrderInput;
+    const { products, coupon } = createOrderInput;
     const status = await this.orderStatusModel.findOne({
       serial: 1,
     });
@@ -381,7 +381,7 @@ export class OrdersService {
     } else {
       taxes = [settings?.options?.taxClass];
     }
-    if (taxes && taxes.length > 0) {
+    if (taxes && taxes.length > 0 && taxes?.[0]) {
       tax = (taxes[0].rate / 100) * total;
       total += (taxes[0].rate / 100) * total;
     }
