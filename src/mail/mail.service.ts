@@ -27,7 +27,8 @@ export class MailService {
 
     await SendGrid.send({
       to: user.email,
-      from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      // from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      from: 'usama@teamx.global',
       templateId: 'd-8e8773f87ce04a4188f8d53f3d6f56cd',
       dynamicTemplateData: {
         user: user.name,
@@ -45,7 +46,8 @@ export class MailService {
     };
     await SendGrid.send({
       to: user.email,
-      from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      // from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      from: 'usama@teamx.global',
       templateId: 'd-c59be05f23184cdfb9363d582ebb7702',
       dynamicTemplateData: args,
     });
@@ -61,7 +63,8 @@ export class MailService {
     };
     await SendGrid.send({
       to: email,
-      from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      // from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+      from: 'usama@teamx.global',
       templateId: 'd-c14a283457564ff5bf92e8ea7ae5ec87',
       dynamicTemplateData: args,
     });
