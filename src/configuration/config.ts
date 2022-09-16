@@ -19,6 +19,11 @@ export interface ConfigType {
     secretOrKey?: string;
     expiresIn?: number;
   };
+  twilio?: {
+    accountSid?: string;
+    serviceSid?: string;
+    authToken?: string;
+  };
   mail?: {
     host?: string;
     port?: string;
@@ -58,6 +63,11 @@ export default () => ({
   jwt: {
     secretOrKey: process.env.JWT_SECRET,
     expiresIn: parseInt(process.env.JWT_EXPIRE_IN_SECONDS) || 36000000,
+  },
+  twilio: {
+    accountSid: process.env.TWILIO_ACCOUNT_SID,
+    serviceSid: process.env.TWILIO_SERVICE_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
   },
   mail: {
     host: process.env.MAIL_HOST,

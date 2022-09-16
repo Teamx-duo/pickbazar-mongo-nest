@@ -2,20 +2,25 @@ import { Injectable } from '@nestjs/common';
 import { HttpException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 import { Twilio } from 'twilio';
+import { ConfigService } from '@nestjs/config';
+import { ConfigType } from 'src/configuration/config';
 
 @Injectable()
 export class SmsService {
   private twilioClient: Twilio;
 
-  constructor() {
-    const accountSid = 'AC1b863b523cd19da809bd1ef0ddacc7c8';
-    const authToken = '78f25af461740f9365d5ea2434f4b172';
+  constructor(private readonly configService: ConfigService) {
+    const accountSid =
+      this.configService.get<ConfigType['twilio']>('twilio').accountSid;
+    const authToken =
+      this.configService.get<ConfigType['twilio']>('twilio').authToken;
 
     this.twilioClient = new Twilio(accountSid, authToken);
   }
 
   initiatePhoneNumberVerification(phoneNumber: string) {
-    const serviceSid = 'VAa6da6870e07f50c3e4a65dd9905f2c75';
+    const serviceSid =
+      this.configService.get<ConfigType['twilio']>('twilio').serviceSid;
 
     return this.twilioClient.verify
       .services(serviceSid)
@@ -23,7 +28,8 @@ export class SmsService {
   }
 
   async confirmPhoneNumber(phone_number: string, verificationCode: string) {
-    const serviceSid = 'VAa6da6870e07f50c3e4a65dd9905f2c75';
+    const serviceSid =
+      this.configService.get<ConfigType['twilio']>('twilio').serviceSid;
 
     const result = await this.twilioClient.verify
       .services(serviceSid)
