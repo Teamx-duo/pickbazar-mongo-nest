@@ -43,6 +43,6 @@ async function bootstrap() {
   });
   const PORT = process.env.PORT || 5000;
   await app.listen(PORT);
-  console.log(`Application is running on: ${await app.getUrl()} V: 1.0.5`);
+  console.log(`Application is running on: ${await app.getUrl()} V: 1.0.6`);
 }
 bootstrap();
