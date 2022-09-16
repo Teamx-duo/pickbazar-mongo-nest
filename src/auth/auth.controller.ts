@@ -76,6 +76,8 @@ export class AuthController {
     return this.authService.otpLogin(otpLoginDto);
   }
   @Post('send-otp-code')
+  @Roles(Role.CUSTOMER, Role.STORE_OWNER, Role.SUPER_ADMIN)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   sendOtpCode(@Body() otpDto: OtpDto) {
     return this.authService.sendOtpCode(otpDto);
   }
