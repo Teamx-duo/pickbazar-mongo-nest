@@ -18,6 +18,7 @@ import {
   OtpDto,
   GetUsersResponse,
   VerifyEmailDto,
+  ContactDto,
 } from './dto/create-auth.dto';
 import { User, UserSchema } from 'src/users/schema/user.schema';
 import { Model } from 'mongoose';
@@ -37,6 +38,8 @@ import {
   EmailVerificationSchema,
 } from './schemas/emailVerification.schema';
 import { SmsService } from 'src/sms/sms.service';
+import { ConfigType } from 'src/configuration/config';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -52,6 +55,7 @@ export class AuthService {
     private readonly jwtService: JWTService,
     private readonly mailService: MailService,
     private readonly smsService: SmsService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(createUserInput: RegisterDto) {
@@ -362,6 +366,14 @@ export class AuthService {
   }
   async me(id: string) {
     return await this.userService.findOne(id);
+  }
+  async sendContactEmail(contactDto: ContactDto) {
+    return await this.mailService.sendEmail({
+      to: 'info@teamx.global',
+      subject: contactDto.subject,
+      text: contactDto.description,
+      from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress,
+    });
   }
 
   async updateMe(id: string, updateUserDto: UpdateUserDto) {

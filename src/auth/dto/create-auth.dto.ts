@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsMobilePhone,
+  IsEmail,
 } from 'class-validator';
 import { Role } from './../../common/constants/roles.enum';
 import { EmailVerification } from '../schemas/emailVerification.schema';
@@ -96,6 +97,18 @@ export class OtpLoginDto {
   @IsString()
   @IsOptional()
   email?: string;
+}
+export class ContactDto {
+  @IsString()
+  @IsOptional()
+  description?: string;
+  @IsEmail()
+  email: string;
+  @IsString()
+  name: string;
+  @IsString()
+  @IsOptional()
+  subject?: string;
 }
 
 export class VerifyEmailDto extends PickType(EmailVerification, [

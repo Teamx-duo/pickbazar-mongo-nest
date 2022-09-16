@@ -20,6 +20,7 @@ import { UpdateUserDto } from 'src/users/dto/update-user.dto';
 import { AuthService } from './auth.service';
 import {
   ChangePasswordDto,
+  ContactDto,
   ForgetPasswordDto,
   LoginDto,
   OtpDto,
@@ -86,7 +87,7 @@ export class AuthController {
   }
   @Post('verify-email')
   verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    // return this.usersService.getUsers(updateUserInput.id);
+    return this.authService.verifyEmail(verifyEmailDto);
   }
   @Post('forget-password')
   forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
@@ -119,6 +120,12 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   me(@Req() req) {
     return this.authService.me(req.user._id);
+  }
+
+  @Post('contact')
+  @UseGuards(AuthGuard('jwt'))
+  contact(@Body() contactDto: ContactDto) {
+    return this.authService.sendContactEmail(contactDto);
   }
 
   @Put('me')

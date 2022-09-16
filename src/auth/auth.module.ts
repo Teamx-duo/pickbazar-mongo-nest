@@ -26,6 +26,7 @@ import { UsersModule } from 'src/users/users.module';
 import { Otp, OtpSchema } from './schemas/otp.schema';
 import { MailModule } from 'src/mail/mail.module';
 import { SmsModule } from 'src/sms/sms.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SmsModule } from 'src/sms/sms.module';
     HttpModule,
     PassportModule,
     MailModule,
+    ConfigModule,
     SmsModule,
     JwtModule.register({
       secret: config.jwt.secretOrKey,

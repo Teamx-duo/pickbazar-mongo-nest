@@ -14,20 +14,8 @@ export class MailService {
     );
   }
 
-  async sendEmail(sendMailDto: SendMailDto) {
-    SendGrid.send({
-      to: sendMailDto.to, // list of receivers
-      from: this.configService.get<ConfigType['mail']>('mail').mailFromAddress, // sender address
-      subject: sendMailDto.subject, // Subject line
-      text: sendMailDto.text, // plaintext body
-      html: sendMailDto.html, // HTML body content
-    })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+  async sendEmail(sendMailDto: SendGrid.MailDataRequired) {
+    SendGrid.send(sendMailDto);
   }
 
   async sendUserConfirmationEmail(user: User, token: string) {
