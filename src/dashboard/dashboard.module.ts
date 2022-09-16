@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
 import { ProductsModule } from 'src/products/products.module';
@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Dashboard, DashboardSchema } from './schemas/dashboard.schema';
 import { Banner, BannerSchema } from 'src/types/schemas/banner.schema';
 import { TypesModule } from 'src/types/types.module';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -23,4 +24,8 @@ import { TypesModule } from 'src/types/types.module';
   controllers: [DashboardController],
   providers: [DashboardService],
 })
-export class DashboardModule {}
+export class DashboardModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(DashboardController);
+  }
+}

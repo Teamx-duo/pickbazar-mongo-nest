@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Category, CategorySchema } from './schemas/category.schema';
-import {
-  Attachment,
-  AttachmentSchema,
-} from 'src/common/schemas/attachment.schema';
+import { CouponsController } from 'src/coupons/coupons.controller';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -18,4 +16,8 @@ import {
   providers: [CategoriesService],
   exports: [CategoriesService, MongooseModule],
 })
-export class CategoriesModule {}
+export class CategoriesModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(CouponsController);
+  }
+}

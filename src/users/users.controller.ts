@@ -75,16 +75,16 @@ export class UsersController {
 export class ProfilesController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  createProfile(@Body() createProfileDto: CreateProfileDto) {
-    console.log(createProfileDto);
-  }
-  @Put(':id')
-  updateProfile(@Body() updateProfileDto: UpdateProfileDto) {
-    console.log(updateProfileDto);
-  }
-  @Delete(':id')
-  deleteProfile(@Param('id') id: string) {
-    return this.usersService.remove(id);
-  }
+  // @Post()
+  // createProfile(@Body() createProfileDto: CreateProfileDto) {
+  //   console.log(createProfileDto);
+  // }
+  // @Put(':id')
+  // updateProfile(@Body() updateProfileDto: UpdateProfileDto) {
+  //   console.log(updateProfileDto);
+  // }
+  // @Delete(':id')
+  // deleteProfile(@Param('id') id: string) {
+  //   return this.usersService.remove(id);
+  // }
 }

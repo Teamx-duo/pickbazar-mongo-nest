@@ -53,11 +53,6 @@ import { ConfigModule } from '@nestjs/config';
 })
 export class AuthModule implements NestModule {
   public configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggerMiddleware)
-      // .exclude(
-      //   { path: 'example', method: RequestMethod.GET },
-      // )
-      .forRoutes(AuthController);
+    consumer.apply(LoggerMiddleware).forRoutes(AuthController);
   }
 }

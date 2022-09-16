@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { WithdrawsService } from './withdraws.service';
 import { WithdrawsController } from './withdraws.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Withdraw, WithdrawSchema } from './schemas/withdraw.schema';
 import { ShopsModule } from 'src/shops/shops.module';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -16,4 +17,8 @@ import { ShopsModule } from 'src/shops/shops.module';
   providers: [WithdrawsService],
   exports: [MongooseModule, WithdrawsService],
 })
-export class WithdrawsModule {}
+export class WithdrawsModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(WithdrawsController);
+  }
+}

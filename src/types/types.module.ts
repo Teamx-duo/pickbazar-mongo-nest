@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypesService } from './types.service';
 import { TypesController } from './types.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Banner, BannerSchema } from './schemas/banner.schema';
 import { Type, TypeSchema } from './schemas/type.schema';
 import { TypeSetting, TypeSettingSchema } from './schemas/typeSetting.schema';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -18,4 +19,8 @@ import { TypeSetting, TypeSettingSchema } from './schemas/typeSetting.schema';
   providers: [TypesService],
   exports: [TypesService, MongooseModule],
 })
-export class TypesModule {}
+export class TypesModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(TypesController);
+  }
+}

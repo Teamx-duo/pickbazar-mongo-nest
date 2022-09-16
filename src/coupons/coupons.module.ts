@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
 import { CouponsController } from './coupons.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Coupon, CouponSchema } from './schemas/coupon.shema';
+import { LoggerMiddleware } from 'src/common/middlewares/logger.middlware';
 
 @Module({
   imports: [
@@ -12,4 +13,8 @@ import { Coupon, CouponSchema } from './schemas/coupon.shema';
   providers: [CouponsService],
   exports: [CouponsService, MongooseModule],
 })
-export class CouponsModule {}
+export class CouponsModule implements NestModule {
+  public configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes(CouponsController);
+  }
+}

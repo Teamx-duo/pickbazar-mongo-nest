@@ -12,7 +12,6 @@ import { WithdrawsService } from './withdraws.service';
 import { CreateWithdrawDto } from './dto/create-withdraw.dto';
 import { ApproveWithdrawDto } from './dto/approve-withdraw.dto';
 import { GetWithdrawsDto, WithdrawPaginator } from './dto/get-withdraw.dto';
-import { Withdraw, WithdrawSchema } from './schemas/withdraw.schema';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/common/guards/roles.guards';
 import { Roles } from 'src/common/decorators/roles.decorator';
